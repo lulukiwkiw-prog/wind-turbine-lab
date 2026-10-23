@@ -1,0 +1,112 @@
+[
+  {
+    "name": "01-overview",
+    "darkFrac": 0,
+    "std": 39.714,
+    "colors": 210,
+    "mean": 183.612,
+    "ok": true
+  },
+  {
+    "name": "02-front",
+    "darkFrac": 0,
+    "std": 39.292,
+    "colors": 215,
+    "mean": 185.319,
+    "ok": true
+  },
+  {
+    "name": "03-side",
+    "darkFrac": 0,
+    "std": 40.628,
+    "colors": 207,
+    "mean": 185.184,
+    "ok": true
+  },
+  {
+    "name": "04-nacelle-closeup",
+    "darkFrac": 0,
+    "std": 40.625,
+    "colors": 215,
+    "mean": 177.39,
+    "ok": true
+  },
+  {
+    "name": "05-select-hub",
+    "darkFrac": 0,
+    "std": 38.957,
+    "colors": 252,
+    "mean": 192.521,
+    "ok": true
+  },
+  {
+    "name": "06-info-expanded",
+    "darkFrac": 0,
+    "std": 39.561,
+    "colors": 252,
+    "mean": 196.509,
+    "ok": true
+  },
+  {
+    "name": "點選 tower",
+    "expected": "tower",
+    "got": "tower",
+    "ok": true
+  },
+  {
+    "name": "點選 nacelleShell",
+    "expected": "nacelle",
+    "got": "nacelle",
+    "ok": true
+  },
+  {
+    "name": "點選 rotor",
+    "expected": "hub",
+    "got": "hub",
+    "ok": true
+  },
+  {
+    "name": "渲染統計（桌面）",
+    "fps": 14.471780028943561,
+    "drawCalls": 26,
+    "triangles": 18592,
+    "pixelRatio": 1
+  },
+  {
+    "name": "07-mobile-390",
+    "darkFrac": 0,
+    "std": 43.666,
+    "colors": 213,
+    "mean": 185.126,
+    "ok": true
+  },
+  {
+    "name": "08-mobile-390-select-blade",
+    "darkFrac": 0,
+    "std": 38.563,
+    "colors": 240,
+    "mean": 208.007,
+    "ok": true
+  },
+  {
+    "name": "09-mobile-390-partlist",
+    "darkFrac": 0,
+    "std": 33.944,
+    "colors": 185,
+    "mean": 222.084,
+    "ok": true
+  },
+  {
+    "name": "手機觸控目標 < 44px 的按鈕",
+    "count": 0,
+    "items": [],
+    "ok": true
+  },
+  {
+    "name": "渲染統計（手機）",
+    "fps": 15.20767987834058,
+    "drawCalls": 48,
+    "triangles": 20280,
+    "pixelRatio": 2
+  }
+]
