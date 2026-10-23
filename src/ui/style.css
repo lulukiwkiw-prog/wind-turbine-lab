@@ -56,6 +56,7 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .cutbar.open { display: flex; }
 .btn.cut { font-size: 16px; }
 .btn.cut.back { background: var(--accent); color: #fff; }
+.btn.cut .short { display: none; }
 .cutnote {
   flex-basis: 100%; margin: 0; font-size: 14px; color: #8a5a00; background: #fff4d6;
   padding: 4px 10px; border-radius: 10px; width: fit-content; max-width: 100%;
@@ -320,6 +321,8 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   .cutbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .cutbar::-webkit-scrollbar { display: none; }
   .btn.cut { flex: none; font-size: 15px; padding: 6px 10px; }
+  .btn.cut .long { display: none; }
+  .btn.cut .short { display: inline; }
   .cutnote { font-size: 12px; }
   .partlist { max-height: 60vh; }
   .xp { top: auto; left: 8px; right: 8px; width: auto; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); max-height: 40vh; padding: 8px 12px 12px; }

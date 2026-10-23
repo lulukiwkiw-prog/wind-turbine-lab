@@ -240,7 +240,7 @@ const picker = createPicker({
 store.subscribe((s, prev, changed) => {
   const modeChanged = changed.includes('mode');
   if (modeChanged) {
-    const patch = {};
+    const patch = { showSpeeds: false, showNote: false }; // 換模式時說明收起來
     if (prev.mode === 'explode') Object.assign(patch, { hiddenParts: [], soloPart: null });
     if (s.mode === 'cutaway') {
       if (s.shellView === 'solid') patch.shellView = 'transparent';

@@ -103,6 +103,14 @@ export function createUI({ root, store, actions, speech }) {
   cutBtn('gearbox', '看齒輪箱', () => actions.selectPart('gearbox'));
   cutBtn('generator', '看發電機', () => actions.selectPart('generator'));
   cutBtn('pitch', '看輪轂裡面', () => actions.selectPart('pitchSystem'));
+  // 說明預設收起來，避免擋住 3D 畫面；點了才展開
+  const noteToggle = (bar) => {
+    const b = el('button', { class: 'btn cut note-toggle', type: 'button', 'aria-expanded': 'false' }, 'ⓘ 教學示意');
+    b.addEventListener('click', () => store.set({ showNote: !store.get().showNote }));
+    bar.append(b);
+    return b;
+  };
+  const cutNoteBtn = noteToggle(cutbar);
   const cutNote = el('p', { class: 'cutnote' },
     `教學示意：高速軸實際約比主軸快 ${Math.round(gearboxRatio())} 倍，畫面已經放慢。`);
 
@@ -160,6 +168,9 @@ export function createUI({ root, store, actions, speech }) {
   exBtn('back', '返回外觀', () => store.set({ mode: 'exterior', selectedPart: null }), 'back');
   const openBtn = exBtn('toggle', '合起來', () => store.set({ exploded: !store.get().exploded }));
   exBtn('gears', '看齒輪', () => actions.focusGears());
+  const speedsBtn = exBtn('speeds', '轉速比較', () => store.set({ showSpeeds: !store.get().showSpeeds }));
+  speedsBtn.setAttribute('aria-expanded', 'false');
+  const exNoteBtn = noteToggle(exbar);
   const showAllBtn = exBtn('showall', '全部顯示', () => store.set({ hiddenParts: [], soloPart: null }));
 
   // 轉速比較：從葉輪前方（上風）看，每根軸轉幾倍、往哪個方向
@@ -196,15 +207,21 @@ export function createUI({ root, store, actions, speech }) {
     learnBtn.classList.toggle('on', s.openPanel === 'learn');
     for (const [id, b] of Object.entries(listButtons)) b.classList.toggle('active', id === s.selectedPart);
     cutbar.classList.toggle('open', s.mode === 'cutaway');
-    cutNote.hidden = s.mode !== 'cutaway';
+    cutNote.hidden = s.mode !== 'cutaway' || !s.showNote;
+    for (const b of [cutNoteBtn, exNoteBtn]) { b.classList.toggle('active', s.showNote); b.setAttribute('aria-expanded', String(s.showNote)); }
+    speedsBtn.classList.toggle('active', s.showSpeeds);
+    speedsBtn.setAttribute('aria-expanded', String(s.showSpeeds));
     const ex = s.mode === 'explode';
     exbar.classList.toggle('open', ex);
-    speedRow.hidden = !ex;
-    exNote.hidden = !ex;
+    speedRow.hidden = !ex || !s.showSpeeds;
+    exNote.hidden = !ex || !s.showNote;
     openBtn.textContent = s.exploded ? '合起來' : '拆開';
     const nHidden = s.hiddenParts.length + (s.soloPart ? 1 : 0);
     showAllBtn.disabled = nHidden === 0;
-    showAllBtn.textContent = s.hiddenParts.length ? `全部顯示（藏了 ${s.hiddenParts.length} 個）` : '全部顯示';
+    // 手機上只顯示數字，按鈕短一點
+    showAllBtn.innerHTML = s.hiddenParts.length
+      ? `全部顯示<span class="long">（藏了 ${s.hiddenParts.length} 個）</span><span class="short">（${s.hiddenParts.length}）</span>`
+      : '全部顯示';
     infoActions.hidden = !ex;
     soloBtn.textContent = s.soloPart && s.soloPart === s.selectedPart ? '顯示全部零件' : '只看這個';
     seeBtn.classList.toggle('active', s.shellView === 'transparent');
