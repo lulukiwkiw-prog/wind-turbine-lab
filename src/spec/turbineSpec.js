@@ -339,13 +339,16 @@ export const SIM = {
   cpCoeffs: { c1: 0.22, c2: 116, c3: 0.4, c4: 5, c5: 12.5, c6: 0 },
   overspeedFactor: 1.15, // 超過額定轉速 15% 觸發超速保護（自動順槳）
   // ---- 動態（教學示意：真實葉輪慣量更大、反應更慢） ----
-  rotorTimeConstantSec: 2.5, // 轉速追上平衡點的時間常數
+  windRampMps2: 2, // 風速最快每秒改變 2 m/s（滑桿一拉，風要幾秒才變大／變小；陣風也需要時間形成）
+  rotorInertia: 2.5e6, // kg·m²，葉輪 + 傳動系統換算到主軸（真實約 5～10 倍大，反應更慢；教學示意）
+  pitchGainDegPerUnit: 150, // 轉速每超過額定 1%，葉片多轉開 1.5°
+  brakeTorqueRatio: 0.5, // 停機時，轉速降到額定 30% 以下才煞車（煞車力矩 = 額定力矩的一半）
   maxYawRateDegPerSec: 0.5, // 真實偏航很慢（約 0.3–0.5 °/s）
   teachingYawRateDegPerSec: 6, // 教學動畫加速版，介面須標示「教學示意」
   yawDeadbandDeg: 2, // 偏差小於此角度不轉
   cableTwistLimitTurns: 2, // 電纜最多扭 2 圈，超過就繞回去「解纜」（真實約 2～3 圈）
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
-  maxPitchRateDegPerSec: 8,
+  maxPitchRateDegPerSec: 10,
   // ---- 畫面 ----
   visualMaxHighSpeedRps: 1.2, // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快

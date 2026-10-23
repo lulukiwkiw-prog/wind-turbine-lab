@@ -190,7 +190,14 @@ export function createExperimentPanel({ root, store, actions }) {
       const s = store.get();
       if (s.pitchAuto) pitchSlider.value = String(Math.round(now.pitchDeg));
       pitchValue.textContent = `${Math.round(now.pitchDeg)}°`;
-      const st = STATUS[now.status];
+      const st = now.status === 'rated' && !now.pitchAuto
+        ? { text: '滿載！發電機已經發到最大 2000 kW', icon: '●', tone: 'good' }
+        : STATUS[now.status];
+      // 風速要幾秒才會追上滑桿（空氣有質量）
+      const gap = now.targetWindSpeed - now.windSpeed;
+      windDesc.textContent = Math.abs(gap) > 0.2
+        ? `風正在${gap > 0 ? '變大' : '變小'}，現在 ${now.windSpeed.toFixed(1)} m/s`
+        : windWords(now.targetWindSpeed);
       summary.innerHTML = `<i class="${st.tone}">${st.icon}</i><b>${Math.round(now.powerKW).toLocaleString('zh-TW')} kW</b><span>${now.windSpeed.toFixed(1)} m/s</span>`;
       status.className = `xp-status ${st.tone}`;
       status.innerHTML = `<i aria-hidden="true">${st.icon}</i><span>${st.text}</span>`;
@@ -205,7 +212,11 @@ export function createExperimentPanel({ root, store, actions }) {
       cRotor.textContent = `${Math.round(now.aeroPowerKW).toLocaleString('zh-TW')} kW`;
       cElec.textContent = `${Math.round(now.powerKW).toLocaleString('zh-TW')} kW`;
       const pct = now.windPowerKW > 0 ? Math.round((now.aeroPowerKW / now.windPowerKW) * 100) : 0;
-      cNote.textContent = `葉輪接住了風能的 ${pct}%。理論上最多只能接住 59%（貝茲極限），因為風還要繼續往後吹走。`;
+      // 能量去哪裡：接住的比送出去的多，葉輪加速（存成轉動的能量）；少，葉輪減速（把轉動的能量放出來）
+      const flow = Math.abs(now.accelPowerKW) > Math.max(20, 0.05 * now.aeroPowerKW)
+        ? (now.accelPowerKW > 0 ? '現在接住的比送出去的多，多的能量讓葉輪越轉越快。' : '現在送出去的比接住的多，是葉輪把轉動的能量放出來，所以會越轉越慢。')
+        : '';
+      cNote.textContent = `葉輪接住了風能的 ${pct}%。理論上最多只能接住 59%（貝茲極限），因為風還要繼續往後吹走。${flow}`;
     },
   };
 }

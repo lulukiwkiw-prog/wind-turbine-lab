@@ -224,8 +224,8 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.1,
-    "colors": 262,
+    "std": 43.101,
+    "colors": 261,
     "mean": 176.005,
     "ok": true
   },
@@ -255,7 +255,7 @@
   {
     "name": "24-experiment-8ms",
     "darkFrac": 0,
-    "std": 44.103,
+    "std": 44.102,
     "colors": 257,
     "mean": 197.225,
     "ok": true
@@ -279,25 +279,25 @@
   {
     "name": "27-experiment-yawing-east-wind",
     "darkFrac": 0,
-    "std": 44.171,
+    "std": 44.189,
     "colors": 266,
-    "mean": 197.443,
+    "mean": 197.409,
     "ok": true
   },
   {
     "name": "28-experiment-manual-overspeed",
     "darkFrac": 0,
-    "std": 43.514,
-    "colors": 247,
+    "std": 43.513,
+    "colors": 249,
     "mean": 197.063,
     "ok": true
   },
   {
     "name": "29-experiment-inside",
     "darkFrac": 0,
-    "std": 52.677,
-    "colors": 509,
-    "mean": 177.41,
+    "std": 52.691,
+    "colors": 518,
+    "mean": 177.398,
     "ok": true
   },
   {
@@ -309,9 +309,9 @@
   {
     "name": "30-experiment-power-to-grid",
     "darkFrac": 0,
-    "std": 48.022,
+    "std": 48.023,
     "colors": 221,
-    "mean": 184.745,
+    "mean": 184.744,
     "ok": true
   },
   {
@@ -341,9 +341,9 @@
   {
     "name": "模擬：改成東風：轉向中、功率下降",
     "status": "yawing",
-    "kW": 197,
+    "kW": 296,
     "pitch": 0,
-    "rpm": 5.1,
+    "rpm": 7.6,
     "ok": true
   },
   {
@@ -384,7 +384,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 13.776815587480254,
+    "fps": 13.671875000000004,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -392,9 +392,9 @@
   {
     "name": "32-first-tour",
     "darkFrac": 0,
-    "std": 40.93,
-    "colors": 148,
-    "mean": 142.414,
+    "std": 40.929,
+    "colors": 149,
+    "mean": 142.423,
     "ok": true
   },
   {
@@ -412,9 +412,9 @@
   {
     "name": "33-missions-toast",
     "darkFrac": 0,
-    "std": 51.069,
-    "colors": 437,
-    "mean": 197.223,
+    "std": 49.596,
+    "colors": 428,
+    "mean": 198.18,
     "ok": true
   },
   {
@@ -437,7 +437,7 @@
     "darkFrac": 0,
     "std": 53.014,
     "colors": 203,
-    "mean": 155.775,
+    "mean": 155.776,
     "ok": true
   },
   {
@@ -460,7 +460,7 @@
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
     "std": 38.994,
-    "colors": 246,
+    "colors": 245,
     "mean": 208.936,
     "ok": true
   },
@@ -476,23 +476,23 @@
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
     "std": 44.893,
-    "colors": 529,
+    "colors": 526,
     "mean": 163.346,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 51.244,
-    "colors": 477,
-    "mean": 163.498,
+    "std": 51.243,
+    "colors": 481,
+    "mean": 163.499,
     "ok": true
   },
   {
     "name": "35-mobile-390-learn",
     "darkFrac": 0,
     "std": 39.927,
-    "colors": 164,
+    "colors": 161,
     "mean": 225.2,
     "ok": true
   },
@@ -517,9 +517,9 @@
   {
     "name": "31-mobile-390-experiment",
     "darkFrac": 0,
-    "std": 51.119,
+    "std": 51.097,
     "colors": 259,
-    "mean": 203.511,
+    "mean": 203.528,
     "ok": true
   },
   {
@@ -535,9 +535,9 @@
   {
     "name": "31b-mobile-390-experiment-folded",
     "darkFrac": 0,
-    "std": 41.71,
-    "colors": 239,
-    "mean": 192.661,
+    "std": 41.713,
+    "colors": 237,
+    "mean": 192.663,
     "ok": true
   },
   {
@@ -554,7 +554,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 12.927054478301017,
+    "fps": 14.099069461416782,
     "drawCalls": 75,
     "triangles": 43696,
     "pixelRatio": 2
