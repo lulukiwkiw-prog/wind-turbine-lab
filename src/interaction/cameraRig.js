@@ -63,6 +63,12 @@ export function createCameraRig(canvas) {
       if (pos.y < 2) pos.y = 2;
       flyTo(center, pos);
     },
+    /** 從某個方向（世界座標單位向量）看一個包圍球 */
+    viewFrom(center, dir, radius) {
+      const fov = (camera.fov * Math.PI) / 180;
+      const dist = THREE.MathUtils.clamp((radius / Math.sin(fov / 2)) * 1.3 / Math.min(camera.aspect, 1), VIEW.minDistance + 0.5, VIEW.maxDistance);
+      flyTo(center, center.clone().addScaledVector(dir, dist));
+    },
     preset(name) {
       const { target, pos } = fitted(name, presetOf(name));
       flyTo(target, pos);

@@ -1,7 +1,7 @@
 // 進入點：把模型、動畫、互動、學習資料與 UI 組合起來
 import * as THREE from 'three';
 import './ui/style.css';
-import { VIEW, PALETTE, PARTS } from './spec/turbineSpec.js';
+import { VIEW, PALETTE, PARTS, EXPLODE } from './spec/turbineSpec.js';
 import { store } from './state/store.js';
 import { createMaterialRegistry } from './model/materials.js';
 import { buildTurbine } from './model/turbine.js';
@@ -11,6 +11,7 @@ import { createCameraRig } from './interaction/cameraRig.js';
 import { createPicker } from './interaction/picking.js';
 import { createUI } from './ui/ui.js';
 import { createViewController } from './model/viewState.js';
+import { createExploder } from './animation/exploder.js';
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -50,26 +51,49 @@ function partBounds(id) {
   return box;
 }
 
-// 只能在剖視模式看到的零件（在外觀模式選到時自動切換到剖視）
+// 只能在剖視／拆解模式看到的零件（在外觀模式選到時自動切換）
 const CUTAWAY_PARTS = new Set(PARTS.filter((p) => p.group === 'internal' || p.id === 'powerCable').map((p) => p.id));
+const GEAR_PARTS = new Set(PARTS.filter((p) => p.group === 'gears').map((p) => p.id));
+const INSIDE_PARTS = new Set([...CUTAWAY_PARTS, ...GEAR_PARTS]);
 
-function focusPart(id) {
-  const box = partBounds(id);
+function focusBox(box, minR) {
   if (box.isEmpty()) return;
   const sphere = box.getBoundingSphere(new THREE.Sphere());
-  rig.focusSphere(sphere.center, Math.max(sphere.radius, CUTAWAY_PARTS.has(id) ? 1.8 : 4));
+  rig.focusSphere(sphere.center, Math.max(sphere.radius, minR));
+}
+
+function focusPart(id) {
+  // 零件可能正在拆開移動中：以最終位置附近聚焦（先更新世界矩陣）
+  scene.updateMatrixWorld(true);
+  focusBox(partBounds(id), GEAR_PARTS.has(id) ? 0.7 : CUTAWAY_PARTS.has(id) ? 1.8 : 4);
+}
+
+/** 看齒輪：藏起擋住齒輪的零件，從前方斜上看行星齒輪組（方向跟著機艙轉） */
+function focusGears() {
+  const s = store.get();
+  const hide = EXPLODE.gearView.hide.filter((id) => !s.hiddenParts.includes(id));
+  store.set({ mode: 'explode', soloPart: null, selectedPart: null, hiddenParts: [...s.hiddenParts, ...hide] });
+  scene.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  for (const id of GEAR_PARTS) box.union(partBounds(id));
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const dir = new THREE.Vector3(...EXPLODE.gearView.dir).normalize().transformDirection(turbine.nodes.drivetrain.matrixWorld);
+  rig.viewFrom(sphere.center, dir, sphere.radius * 0.8);
 }
 
 function selectPart(id) {
   const s = store.get();
   if (id === s.selectedPart) { focusPart(id); return; } // 再按一次：重新聚焦
   const patch = { selectedPart: id, partListOpen: false };
-  if (CUTAWAY_PARTS.has(id) && s.mode !== 'cutaway') patch.mode = 'cutaway';
+  if (GEAR_PARTS.has(id) && s.mode !== 'explode') patch.mode = 'explode';
+  else if (CUTAWAY_PARTS.has(id) && s.mode === 'exterior') patch.mode = 'cutaway';
+  if (s.mode === 'explode' && s.hiddenParts.includes(id)) patch.hiddenParts = s.hiddenParts.filter((x) => x !== id);
   store.set(patch);
 }
 
 const view = createViewController({ root: scene, mats });
 view.apply(store.get());
+const exploder = createExploder({ root: scene, nodes: turbine.nodes });
 
 const ui = createUI({
   root: document.getElementById('ui'),
@@ -78,6 +102,7 @@ const ui = createUI({
     resetView: () => rig.reset(),
     preset: (name) => rig.preset(name),
     selectPart,
+    focusGears,
   },
 });
 
@@ -91,14 +116,20 @@ const picker = createPicker({
 store.subscribe((s, prev, changed) => {
   const modeChanged = changed.includes('mode');
   if (modeChanged) {
-    if (s.mode === 'cutaway' && s.shellView === 'solid') store.set({ shellView: 'transparent' });
-    if (s.mode === 'exterior') {
-      const patch = { shellView: 'solid' };
-      if (CUTAWAY_PARTS.has(s.selectedPart)) patch.selectedPart = null;
-      store.set(patch);
+    const patch = {};
+    if (prev.mode === 'explode') Object.assign(patch, { hiddenParts: [], soloPart: null });
+    if (s.mode === 'cutaway') {
+      if (s.shellView === 'solid') patch.shellView = 'transparent';
+      if (GEAR_PARTS.has(s.selectedPart)) patch.selectedPart = null;
     }
+    if (s.mode === 'explode') Object.assign(patch, { shellView: 'hidden', exploded: true });
+    if (s.mode === 'exterior') {
+      patch.shellView = 'solid';
+      if (INSIDE_PARTS.has(s.selectedPart)) patch.selectedPart = null;
+    }
+    store.set(patch);
   }
-  if (modeChanged || changed.includes('shellView')) view.apply(s);
+  if (modeChanged || changed.some((k) => ['shellView', 'hiddenParts', 'soloPart'].includes(k))) view.apply(s);
 
   if (changed.includes('selectedPart')) {
     if (prev.selectedPart) mats.setHighlight(prev.selectedPart, 0);
@@ -108,6 +139,7 @@ store.subscribe((s, prev, changed) => {
   if (changed.includes('selectedPart') && s.selectedPart) focusPart(s.selectedPart);
   else if (modeChanged) {
     if (s.mode === 'cutaway') rig.preset('cutaway');
+    else if (s.mode === 'explode') rig.preset('explode');
     else rig.reset();
   }
 });
@@ -142,6 +174,8 @@ let fps = 0;
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1); // 切換分頁回來時避免大跳
   animator.update(dt);
+  const st = store.get();
+  exploder.update(dt, st.mode === 'explode' && st.exploded ? 1 : 0);
   rig.update(dt);
   renderer.render(scene, rig.camera);
   ui.placeMarker(markerScreen());
@@ -160,7 +194,9 @@ window.__lab = {
   setRotorAngleDeg: (a) => animator.setRotorAngleDeg(a),
   selectPart,
   focusPart,
+  focusGears,
   animator,
+  exploder,
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),

@@ -5,7 +5,7 @@ import {
   COORDS, DIM, DRIVETRAIN, HIERARCHY, PARTS, CONNECTIONS, PALETTE, SIM, VIEW,
   GEARBOX_CONFIGS, ACTIVE_GEARBOX, stageRatio, centerDistance, gearboxRatio, highSpeedShaftOffset,
   rotorCenterLocal, rotorAxisLocal, hubHeight, upwindVector, yawForWind, bladeSectionAt, MODES, DIFFICULTIES,
-  CABLE_ROUTE, INTERNALS, gearboxDirection,
+  CABLE_ROUTE, INTERNALS, gearboxDirection, gearLayout, gearTrainAngles, EXPLODE, CURRENT_STAGE,
 } from '../src/spec/turbineSpec.js';
 import { PARTS_TEXT, partText } from '../src/learning/partsData.js';
 
@@ -236,4 +236,73 @@ test('第二階段：輪轂本體在導流罩內，變槳軸承在葉根', () =>
   assert.ok(INTERNALS.hubBodyRadius < DIM.spinner.radius);
   assert.ok(INTERNALS.pitch.bearingRadius > DIM.blade.rootDiameter / 2, '軸承包住葉根');
   assert.ok(Math.hypot(...INTERNALS.pitch.motorOffset) + INTERNALS.pitch.motorLength / 2 < INTERNALS.hubBodyRadius, '變槳馬達在輪轂內');
+});
+
+// ---------------- 第三階段：齒輪組 ----------------
+const frac = (x) => ((x % 1) + 1) % 1;
+const nearHalf = (x) => Math.abs(frac(x) - 0.5) < 1e-6;
+
+test('第三階段：齒輪配置的末端軸位置 = 高速軸位置', () => {
+  const { shafts } = gearLayout();
+  const [hx, hy] = highSpeedShaftOffset();
+  const last = shafts[shafts.length - 1];
+  assert.ok(Math.abs(last[0] - hx) < 1e-9 && Math.abs(last[1] - hy) < 1e-9);
+});
+
+test('第三階段：各軸轉速比 主軸 1 : 太陽 5 : 中間軸 −20 : 高速軸 112', () => {
+  const a = gearTrainAngles(0.1), b = gearTrainAngles(0.1 + 0.01);
+  const d = (k) => (b[k] - a[k]) / 0.01;
+  assert.ok(Math.abs(d('sun') - 5) < 1e-6);
+  assert.ok(Math.abs(d('intermediate') + 20) < 1e-6, '中間軸反向');
+  assert.ok(Math.abs(d('high') - 112) < 1e-6, '高速軸同向、112 倍');
+  assert.ok(Math.abs((b.planetAbs[0] - a.planetAbs[0]) / 0.01 - (1 - 96 / 36)) < 1e-6, '行星自轉（絕對）');
+});
+
+test('第三階段：任何角度下，每一對齒輪都是「齒對齒溝」（嚙合相位）', () => {
+  const { planetary: pl, parallel: par, shafts, planets } = gearLayout();
+  const P = (z) => (2 * Math.PI) / z;
+  for (const thetaC of [0, 0.37, -1.9, 5.5, 123.4]) {
+    const g = gearTrainAngles(thetaC);
+    planets.forEach((b0, k) => {
+      const beta = thetaC + b0; // 行星中心方向（隨行星架轉）
+      const sSun = (beta - g.sun) / P(pl.sunTeeth);
+      const sPlanetIn = (beta + Math.PI - g.planetAbs[k]) / P(pl.planetTeeth);
+      assert.ok(nearHalf(sSun + sPlanetIn), `太陽–行星${k} θc=${thetaC}`);
+      const sPlanetOut = (beta - g.planetAbs[k]) / P(pl.planetTeeth);
+      const sRing = beta / P(pl.ringTeeth); // 環固定
+      assert.ok(nearHalf(sPlanetOut - sRing), `行星${k}–環 θc=${thetaC}`);
+    });
+    par.forEach((st, i) => {
+      const [x0, y0] = shafts[i], [x1, y1] = shafts[i + 1];
+      const alpha = Math.atan2(y1 - y0, x1 - x0);
+      const sDriver = (alpha - g.shafts[i]) / P(st.driverTeeth);
+      const sDriven = (alpha + Math.PI - g.shafts[i + 1]) / P(st.drivenTeeth);
+      assert.ok(nearHalf(sDriver + sDriven), `平行軸第 ${i + 1} 級 θc=${thetaC}`);
+    });
+  }
+});
+
+test('第三階段：行星齒輪互不碰撞，所有齒輪都在齒輪箱外殼內', () => {
+  const { planetary: pl, parallel: par, shafts, planetRadius, planets } = gearLayout();
+  const tip = (m, z) => (m * z) / 2 + m;
+  const gap = 2 * planetRadius * Math.sin(Math.PI / planets.length);
+  assert.ok(gap > 2 * tip(pl.module, pl.planetTeeth) + 0.02, '相鄰行星的齒頂不碰');
+  const ringOuter = (pl.module * pl.ringTeeth) / 2 + 2.3 * pl.module + 0.03;
+  assert.ok(ringOuter < DRIVETRAIN.gearboxHousing.planetaryRadius, '環形齒輪在行星段外殼內');
+  const box = DRIVETRAIN.gearboxHousing.parallelBox;
+  par.forEach((st, i) => {
+    for (const [c, r] of [[shafts[i], tip(st.module, st.driverTeeth)], [shafts[i + 1], tip(st.module, st.drivenTeeth)]]) {
+      assert.ok(c[0] - r >= box.x[0] && c[0] + r <= box.x[1] && c[1] - r >= box.y[0] && c[1] + r <= box.y[1], `第 ${i + 1} 級齒輪超出外殼`);
+    }
+    assert.ok(st.z - st.faceWidth / 2 > box.z[0] && st.z + st.faceWidth / 2 < box.z[1], `第 ${i + 1} 級齒輪的軸向位置超出外殼`);
+  });
+  // 第一級大齒輪不能碰到中間軸以外的軸；第二級大齒輪不能碰到太陽齒輪軸（不同軸向位置即可）
+  assert.ok(par[1].z < par[0].z - (par[0].faceWidth + par[1].faceWidth) / 2, '兩級平行軸齒輪在不同軸向位置');
+});
+
+test('第三階段：拆解位移表只引用存在的鍵，拆解模式已開放', () => {
+  const keys = new Set([...PARTS.map((p) => p.id), 'generatorRotor']);
+  for (const k of Object.keys(EXPLODE.offsets)) assert.ok(keys.has(k), `未知拆解鍵 ${k}`);
+  assert.ok(MODES.explode.stage <= CURRENT_STAGE);
+  assert.ok(Math.abs(SIM.gearDemoRotorRpm / 60 * gearboxRatio() - SIM.visualMaxHighSpeedRps) < 1e-9);
 });

@@ -15,6 +15,11 @@ graph TD
   nacelle --> drivetrain
   drivetrain --> lowSpeedShaft
   drivetrain --> highSpeedShaft
+  drivetrain --> sunShaft
+  drivetrain --> intermediateShaft
+  lowSpeedShaft --> planet0
+  lowSpeedShaft --> planet1
+  lowSpeedShaft --> planet2
   drivetrain --> rotor
   rotor --> blade0
   rotor --> blade1
@@ -50,11 +55,22 @@ graph LR
   controller["控制器"]:::electrical
   powerCable["電力電纜"]:::electrical
   undergroundCable["地下電纜"]:::electrical
+  sunGear["太陽齒輪"]:::gears
+  planetGear["行星齒輪"]:::gears
+  ringGear["環形齒輪"]:::gears
+  carrier["行星架"]:::gears
+  parallelGears["平行軸齒輪"]:::gears
   blade ==>|葉片固定在輪轂（經變槳軸承）| hub
   pitchSystem -->|轉動葉片改變槳距| blade
   hub ==>|輪轂帶動主軸（低速）| mainShaft
   mainBearing ---|軸承撐住主軸| mainShaft
   mainShaft ==>|低速輸入| gearbox
+  mainShaft ==>|主軸帶動行星架| carrier
+  carrier ==>|行星繞著轉| planetGear
+  ringGear ==>|環固定，行星沿著它滾| planetGear
+  planetGear ==>|×5| sunGear
+  sunGear ==>|×4、×5.6| parallelGears
+  parallelGears ==>|末級小齒輪| highSpeedShaft
   gearbox ==>|加速約 112 倍（教學示意）| highSpeedShaft
   brake -->|必要時煞住| highSpeedShaft
   highSpeedShaft ==>|高速帶動轉子| generator
@@ -72,6 +88,7 @@ graph LR
   tower ---|固定在基礎上| foundation
   classDef exterior fill:#eef1f4,stroke:#7b8794
   classDef internal fill:#e3f4e8,stroke:#3fae6a
+  classDef gears fill:#d6f0de,stroke:#1f7a45
   classDef electrical fill:#fff0e0,stroke:#ff7a1a
 ```
 

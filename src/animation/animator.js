@@ -1,5 +1,5 @@
 // 動畫：只改節點旋轉，不重建幾何。速度與暫停一律讀集中 store。
-import { COORDS, SIM, DIM, gearboxRatio, gearboxDirection } from '../spec/turbineSpec.js';
+import { COORDS, SIM, DIM, gearboxRatio, gearboxDirection, gearTrainAngles, gearLayout } from '../spec/turbineSpec.js';
 
 const DEG = Math.PI / 180;
 const TAU = Math.PI * 2;
@@ -12,8 +12,11 @@ export function createAnimator({ nodes, sensorParts, store }) {
   const ratio = gearboxRatio();
   const hsDir = COORDS.rotorSpinSign * gearboxDirection();
 
+  const planetCount = gearLayout().planets.length;
+
   function rotorRpm() {
-    // 第一～三階段：固定的展示轉速（教學示意）；第四階段改由模擬決定
+    // 拆解模式：齒輪依真實速比連動，葉輪放慢；其他模式：固定展示轉速（教學示意）。第四階段改由模擬決定
+    if (store.get().mode === 'explode') return SIM.gearDemoRotorRpm;
     return Math.min(SIM.demoRotorRpm, SIM.visualMaxRotorRpm);
   }
 
@@ -27,7 +30,13 @@ export function createAnimator({ nodes, sensorParts, store }) {
     nodes.yaw.rotation.y = s.windAngleDeg * DEG; // 第一階段：機艙正對預設風向
     nodes.rotor.rotation.z = rotorAngle;
     nodes.lowSpeedShaft.rotation.z = rotorAngle; // 主軸與葉輪剛性連接，角度相同
-    nodes.highSpeedShaft.rotation.z = highAngle;
+    // 齒輪組：全部由主軸（行星架）角度推得，保證齒對齒溝
+    const g = gearTrainAngles(rotorAngle);
+    nodes.sunShaft.rotation.z = g.sun;
+    nodes.intermediateShaft.rotation.z = g.intermediate;
+    for (let k = 0; k < planetCount; k++) nodes[`planet${k}`].rotation.z = g.planetAbs[k] - rotorAngle; // 掛在行星架上，存相對角
+    // 高速軸：拆解模式用真實速比（看得到末級齒輪咬合）；其他模式用放慢的展示角度
+    nodes.highSpeedShaft.rotation.z = s.mode === 'explode' ? g.high : highAngle;
     for (let i = 0; i < DIM.rotor.bladeCount; i++) {
       nodes[`pitch${i}`].rotation.y = COORDS.pitchSign * s.pitchDeg * DEG;
     }

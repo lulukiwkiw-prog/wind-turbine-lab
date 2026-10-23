@@ -66,6 +66,22 @@ async function cutaway(page, shellView, part = null) {
   await page.waitForTimeout(part ? 1600 : 500);
 }
 
+/** 拆解模式：立即拆開，可指定視角、聚焦零件、隱藏或只看某零件 */
+async function explode(page, { view = 'explode', part = null, gears = false, hidden = [], solo = null } = {}) {
+  await page.evaluate(({ view, part, gears, hidden, solo }) => {
+    const lab = window.__lab;
+    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false, paused: true });
+    lab.setRotorAngleDeg(20);
+    lab.store.set({ mode: 'explode' });
+    lab.exploder.setInstant(1);
+    lab.store.set({ hiddenParts: hidden, soloPart: solo });
+    lab.jumpView(view);
+    if (part) lab.selectPart(part);
+    if (gears) lab.focusGears();
+  }, { view, part, gears, hidden, solo });
+  await page.waitForTimeout(part || gears ? 1600 : 500);
+}
+
 /** 截圖並以像素統計檢查不是黑畫面／空白畫面 */
 async function shoot(page, name) {
   const buf = await page.screenshot();
@@ -164,6 +180,38 @@ try {
     const backOk = back.shellView === 'solid' && back.internalShown === 0;
     report.push({ name: '返回外觀', ...back, ok: backOk });
     if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
+    // ---------- 第三階段：機械拆解 ----------
+    await explode(page);
+    await shoot(page, '18-explode');
+    await pickCheck(page, 'generatorStator', 'generator', [0, 0, -4.75]);
+    await pickCheck(page, 'gearboxParallel', 'gearbox');
+    await explode(page, { hidden: ['gearbox', 'mainShaft', 'mainBearing', 'yawSystem'] });
+    await shoot(page, '19-gear-train-side');
+
+    await pickCheck(page, 'stage1Driver', 'parallelGears', [-0.6, 0, 0]);
+    await explode(page, { gears: true });
+    await page.evaluate(() => window.__lab.selectPart('planetGear'));
+    await page.waitForTimeout(1600);
+    await shoot(page, '20-planetary-closeup');
+    await pickCheck(page, 'planetMesh0', 'planetGear');
+    await explode(page, { gears: true });
+    await shoot(page, '20b-gear-view-front');
+    await pickCheck(page, 'ringGearMesh', 'ringGear', [0.18, 1.0, 0.17]);
+    await pickCheck(page, 'sunGearMesh', 'sunGear', [0, 0.21, 0.17]);
+    await explode(page, { part: 'generator', solo: 'generator' });
+    await shoot(page, '21-solo-generator');
+    // 合起來：拆開的零件回到原位
+    const closed = await page.evaluate(() => {
+      const lab = window.__lab;
+      lab.store.set({ exploded: false, hiddenParts: [], soloPart: null, selectedPart: null });
+      lab.exploder.setInstant(0);
+      lab.jumpView('explode');
+      return lab.exploder.amount();
+    });
+    await page.waitForTimeout(400);
+    await shoot(page, '22-explode-closed');
+    report.push({ name: '合起來', amount: closed, ok: closed === 0 });
+
     // 外觀模式下點機艙位置，應該點到機艙外殼而不是裡面的齒輪箱
     await pose(page, 'nacelle');
     await pickCheck(page, 'gearboxParallel', 'nacelle');
@@ -194,6 +242,8 @@ try {
     await shoot(page, '09-mobile-390-partlist');
     await cutaway(page, 'transparent');
     await shoot(page, '17-mobile-390-cutaway');
+    await explode(page, { gears: true, hidden: ['gearbox'] });
+    await shoot(page, '23-mobile-390-explode-gears');
     // 觸控目標大小檢查
     const small = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
       .filter((b) => b.offsetParent !== null)

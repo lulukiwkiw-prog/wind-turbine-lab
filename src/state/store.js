@@ -12,21 +12,29 @@ const initial = () => ({
   infoExpanded: false,
   partListOpen: false,
   shellView: 'solid', // 機艙外殼：solid 實心／transparent 透明／hidden 拿掉
+  exploded: true, // 拆解模式：true 拆開／false 合起來
+  hiddenParts: Object.freeze([]), // 拆解模式中被藏起來的零件
+  soloPart: null, // 拆解模式中「只看這個」的零件
   // 以下為模擬輸入（第四階段使用），預先定義以免各模組各自保存
   windSpeed: 8,
   windAngleDeg: 0,
   pitchDeg: 0,
 });
 
+const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
+
 const validators = {
   mode: (v) => v in MODES && MODES[v].stage <= CURRENT_STAGE,
   difficulty: (v) => v in DIFFICULTIES && DIFFICULTIES[v].enabled,
   animSpeed: (v) => ANIMATION.speeds.includes(v),
   paused: (v) => typeof v === 'boolean',
-  selectedPart: (v) => v === null || PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE),
+  selectedPart: (v) => v === null || isCurrentPart(v),
   infoExpanded: (v) => typeof v === 'boolean',
   partListOpen: (v) => typeof v === 'boolean',
   shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
+  exploded: (v) => typeof v === 'boolean',
+  hiddenParts: (v) => Array.isArray(v) && v.every(isCurrentPart) && new Set(v).size === v.length,
+  soloPart: (v) => v === null || isCurrentPart(v),
   windSpeed: (v) => Number.isFinite(v) && v >= 0 && v <= 30,
   windAngleDeg: (v) => Number.isFinite(v),
   pitchDeg: (v) => Number.isFinite(v) && v >= 0 && v <= 90,
@@ -49,7 +57,8 @@ export function createStore() {
       for (const [k, v] of Object.entries(patch)) {
         if (!(k in validators)) { console.warn(`[store] 未知狀態：${k}`); continue; }
         if (!validators[k](v)) { console.warn(`[store] 不合法的值：${k} =`, v); continue; }
-        if (next[k] !== v) { next[k] = v; changed.push(k); }
+        const same = Array.isArray(v) ? v.length === next[k].length && v.every((x, i) => x === next[k][i]) : next[k] === v;
+        if (!same) { next[k] = Array.isArray(v) ? Object.freeze([...v]) : v; changed.push(k); }
       }
       if (!changed.length) return;
       // 選取別的零件時，進階說明收合

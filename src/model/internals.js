@@ -12,9 +12,9 @@
 // userData.shell = 'see' 的網格在剖視時變透明（塔架、輪轂本體）。
 import * as THREE from 'three';
 import {
-  DIM, DRIVETRAIN, INTERNALS, CABLE_ROUTE, GEARBOX_CONFIGS, ACTIVE_GEARBOX,
-  highSpeedShaftOffset, drivetrainToNacelle,
+  DIM, DRIVETRAIN, INTERNALS, CABLE_ROUTE, highSpeedShaftOffset, drivetrainToNacelle,
 } from '../spec/turbineSpec.js';
+import { buildGears } from './gears.js';
 
 const DEG = Math.PI / 180;
 
@@ -81,13 +81,11 @@ export function buildInternals({ nodes, mats, add }) {
 
   // ---------- 齒輪箱外殼（第三階段打開看齒輪） ----------
   {
-    const stages = GEARBOX_CONFIGS[ACTIVE_GEARBOX].stages;
-    const ring = stages[0];
-    const R = (ring.module * ring.ringTeeth) / 2 + 0.12;
+    const R = d.gearboxHousing.planetaryRadius;
     const mat = mats.part('gearbox', 'gearbox', { roughness: 0.55, metalness: 0.15 });
     add(nodes.drivetrain, zCylinder(R, R, -0.35, 0.35, 40), mat, 'gearbox', internal((m) => { m.name = 'gearboxPlanetary'; }));
     add(nodes.drivetrain, zCylinder(R, d.mainShaft.radius + 0.12, 0.35, d.gearbox.z1, 40), mat, 'gearbox', internal());
-    const x0 = -0.55, x1 = hx + 0.45, y0 = -0.7, y1 = hy + 0.45, z0 = d.gearbox.z0, z1 = -0.35;
+    const { x: [x0, x1], y: [y0, y1], z: [z0, z1] } = d.gearboxHousing.parallelBox;
     add(nodes.drivetrain, new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat, 'gearbox',
       internal((m) => { m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.name = 'gearboxParallel'; }));
     for (const sx of [-1, 1]) supportTo([sx * 0.8, -0.6, 0], 0.35, 0.5, 'gearbox', 'gearbox');
@@ -130,7 +128,8 @@ export function buildInternals({ nodes, mats, add }) {
     }
     const rotorMat = mats.part('generator', 'generatorRotor', { roughness: 0.4, metalness: 0.2 });
     const rr = d.generatorRotorRadius;
-    add(nodes.highSpeedShaft, zCylinder(rr, rr, g.z0 + 0.2, g.z1 - 0.2, 32), rotorMat, 'generator', internal((m) => { m.name = 'generatorRotor'; }));
+    add(nodes.highSpeedShaft, zCylinder(rr, rr, g.z0 + 0.2, g.z1 - 0.2, 32), rotorMat, 'generator',
+      internal((m) => { m.name = 'generatorRotor'; m.userData.explodeKey = 'generatorRotor'; }));
     const barGeo = new THREE.BoxGeometry(0.1, 0.06, g.z1 - g.z0 - 0.5);
     const barMat = mats.part('generator', 'generatorStator', { roughness: 0.4 });
     for (let i = 0; i < 6; i++) {
@@ -138,6 +137,7 @@ export function buildInternals({ nodes, mats, add }) {
       add(nodes.highSpeedShaft, barGeo, barMat, 'generator', internal((m) => {
         m.position.set(Math.cos(a) * rr, Math.sin(a) * rr, (g.z0 + g.z1) / 2);
         m.rotation.z = a + Math.PI / 2;
+        m.userData.explodeKey = 'generatorRotor';
       }));
     }
     for (const z of [g.z0 + 0.4, g.z1 - 0.4]) supportTo([hx, hy - g.radius * 0.8, z], 0.9, 0.35, 'generator', 'generatorStator');
@@ -202,11 +202,15 @@ export function buildInternals({ nodes, mats, add }) {
     for (let i = 0; i < y.driveCount; i++) {
       const a = (y.driveAngleOffsetDeg + (i * 360) / y.driveCount) * DEG;
       const x = Math.cos(a) * y.driveRadius, z = Math.sin(a) * y.driveRadius;
-      add(nodes.nacelle, motorGeo, mat, 'yawSystem', internal((m) => { m.position.set(x, bedTop + y.motorHeight / 2, z); m.name = `yawMotor${i}`; }));
-      add(nodes.nacelle, shaftGeo, mat, 'yawSystem', internal((m) => { m.position.set(x, (bedTop + y.ringY[0]) / 2, z); }));
-      add(nodes.nacelle, pinionGeo, mat, 'yawSystem', internal((m) => { m.position.set(x, (y.ringY[0] + y.ringY[1]) / 2, z); }));
+      const drive = (setup) => internal((m) => { setup(m); m.userData.explodeKey = 'yawDrive'; });
+      add(nodes.nacelle, motorGeo, mat, 'yawSystem', drive((m) => { m.position.set(x, bedTop + y.motorHeight / 2, z); m.name = `yawMotor${i}`; }));
+      add(nodes.nacelle, shaftGeo, mat, 'yawSystem', drive((m) => { m.position.set(x, (bedTop + y.ringY[0]) / 2, z); }));
+      add(nodes.nacelle, pinionGeo, mat, 'yawSystem', drive((m) => { m.position.set(x, (y.ringY[0] + y.ringY[1]) / 2, z); }));
     }
   }
+
+  // ---------- 齒輪箱內部（第三階段，只在拆解模式顯示） ----------
+  buildGears({ nodes, mats, add });
 
   // ---------- 電力電纜：機艙內 → 塔架內 ----------
   {

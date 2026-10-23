@@ -2,7 +2,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { DIM, PARTS, CURRENT_STAGE, COORDS, SIM, CABLE_ROUTE, rotorCenterLocal, rotorAxisLocal, hubHeight } from '../src/spec/turbineSpec.js';
+import {
+  DIM, PARTS, CURRENT_STAGE, COORDS, SIM, CABLE_ROUTE, EXPLODE, rotorCenterLocal, rotorAxisLocal, hubHeight, gearTrainAngles,
+} from '../src/spec/turbineSpec.js';
+import { createExploder } from '../src/animation/exploder.js';
 import { createViewController } from '../src/model/viewState.js';
 import { createMaterialRegistry } from '../src/model/materials.js';
 import { buildTurbine } from '../src/model/turbine.js';
@@ -134,7 +137,7 @@ test('集中狀態：拒絕不合法或尚未開放的值', () => {
   const s = createStore();
   const warn = console.warn;
   console.warn = () => {};
-  s.set({ mode: 'explode' }); // 第三階段才開放
+  s.set({ mode: 'experiment' }); // 第四階段才開放
   s.set({ animSpeed: 3 });
   s.set({ selectedPart: 'flywheel' }); // 不存在的零件
   s.set({ shellView: 'glass' });
@@ -205,4 +208,64 @@ test('第二階段：電纜在任何偏航角都與塔內電纜相接', () => {
     const p = new THREE.Vector3(...last).applyMatrix4(nodes.nacelle.matrixWorld);
     near(p, new THREE.Vector3(...CABLE_ROUTE.tower[0]), 1e-6);
   }
+});
+
+// ---------------- 第三階段 ----------------
+test('第三階段：拆解模式時齒輪節點角度 = gearTrainAngles（高速軸用真實速比）', () => {
+  const { nodes, sensorParts } = build();
+  const store = createStore();
+  store.set({ mode: 'explode' });
+  const anim = createAnimator({ nodes, sensorParts, store });
+  anim.update(0.7);
+  const g = gearTrainAngles(nodes.lowSpeedShaft.rotation.z);
+  assert.ok(Math.abs(nodes.sunShaft.rotation.z - g.sun) < 1e-9);
+  assert.ok(Math.abs(nodes.intermediateShaft.rotation.z - g.intermediate) < 1e-9);
+  assert.ok(Math.abs(nodes.highSpeedShaft.rotation.z - g.high) < 1e-9);
+  assert.ok(Math.abs(nodes.planet0.rotation.z + nodes.lowSpeedShaft.rotation.z - g.planetAbs[0]) < 1e-9);
+});
+
+test('第三階段：拆解位移——會轉的節點底下只能沿 z 軸移動；合起來後回到原位', () => {
+  const { scene, nodes } = build();
+  const rotating = new Set(EXPLODE.rotatingNodes.map((id) => nodes[id]));
+  scene.traverse((o) => {
+    if (!o.isMesh) return;
+    const off = EXPLODE.offsets[o.userData.explodeKey ?? o.userData.partId];
+    if (!off) return;
+    let underRotating = false;
+    for (let p = o.parent; p; p = p.parent) if (rotating.has(p)) underRotating = true;
+    if (underRotating) assert.ok(off[0] === 0 && off[1] === 0, `${o.name || o.userData.partId} 在轉動節點下卻有 x/y 位移`);
+  });
+  const ex = createExploder({ root: scene, nodes });
+  assert.ok(ex.count() > 20);
+  const housing = scene.getObjectByName('gearboxParallel');
+  const y0 = housing.position.y, rz = nodes.rotor.position.z;
+  ex.setInstant(1);
+  assert.ok(Math.abs(housing.position.y - y0 - EXPLODE.offsets.gearbox[1]) < 1e-9);
+  assert.ok(Math.abs(nodes.rotor.position.z - rz - EXPLODE.nodeOffsets.rotor[2]) < 1e-9);
+  ex.setInstant(0);
+  assert.equal(housing.position.y, y0);
+  assert.equal(nodes.rotor.position.z, rz);
+});
+
+test('第三階段：齒輪只在拆解模式顯示；可隱藏零件與只看一個零件', () => {
+  const { scene, mats } = build();
+  const view = createViewController({ root: scene, mats });
+  const base = { shellView: 'hidden', hiddenParts: [], soloPart: null };
+  const vis = (name) => scene.getObjectByName(name).visible;
+  view.apply({ ...base, mode: 'cutaway', shellView: 'transparent' });
+  assert.equal(vis('sunGearMesh'), false);
+  assert.equal(vis('gearboxParallel'), true);
+  view.apply({ ...base, mode: 'explode' });
+  assert.equal(vis('sunGearMesh'), true);
+  assert.equal(vis('planetMesh1'), true);
+  view.apply({ ...base, mode: 'explode', hiddenParts: ['gearbox'] });
+  assert.equal(vis('gearboxParallel'), false);
+  assert.equal(vis('sunGearMesh'), true);
+  view.apply({ ...base, mode: 'explode', soloPart: 'generator' });
+  assert.equal(vis('generatorStator'), true);
+  assert.equal(vis('sunGearMesh'), false);
+  assert.equal(vis('towerShell'), false);
+  // 離開拆解模式：隱藏設定不再生效
+  view.apply({ ...base, mode: 'exterior', shellView: 'solid', hiddenParts: ['tower'] });
+  assert.equal(vis('towerShell'), true);
 });

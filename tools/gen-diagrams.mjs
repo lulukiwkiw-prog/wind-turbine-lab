@@ -200,6 +200,7 @@ ${parts.join('\n')}
 ${conns.join('\n')}
   classDef exterior fill:#eef1f4,stroke:#7b8794
   classDef internal fill:#e3f4e8,stroke:#3fae6a
+  classDef gears fill:#d6f0de,stroke:#1f7a45
   classDef electrical fill:#fff0e0,stroke:#ff7a1a
 \`\`\`
 

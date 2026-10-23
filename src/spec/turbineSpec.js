@@ -116,6 +116,7 @@ export const DRIVETRAIN = {
   mainShaft: { z0: 0.6, z1: 3.6, radius: 0.38 }, // 主軸（低速軸）
   mainBearings: [ { z: 2.9, outerRadius: 0.7 }, { z: 1.3, outerRadius: 0.62 } ],
   gearbox: { z0: -1.9, z1: 0.6 }, // 齒輪箱外殼範圍
+  gearboxHousing: { planetaryRadius: 1.08, parallelBox: { x: [-0.75, 1.05], y: [-0.72, 1.42], z: [-1.9, -0.35] } },
   highSpeedShaft: { z0: -3.4, z1: -1.9, radius: 0.09 },
   brake: { z: -2.3, discRadius: 0.42 },
   coupling: { z: -2.9, radius: 0.18 },
@@ -243,6 +244,46 @@ export function highSpeedShaftOffset(configId = ACTIVE_GEARBOX) {
   return [x, y];
 }
 
+/**
+ * 齒輪組配置（傳動框架 xy，軸向 z）：各軸中心、行星位置。
+ * 依序：行星架（= 主軸）→ 太陽齒輪軸 A → 中間軸 B → 高速軸 C。
+ */
+export function gearLayout(configId = ACTIVE_GEARBOX) {
+  const stages = GEARBOX_CONFIGS[configId].stages;
+  const pl = stages.find((st) => st.type === 'planetary');
+  const par = stages.filter((st) => st.type === 'parallel');
+  const shafts = [[0, 0]]; // A：與主軸同軸
+  for (const st of par) {
+    const a = st.offsetAngleDeg * DEG;
+    const [x, y] = shafts[shafts.length - 1];
+    shafts.push([x + centerDistance(st) * Math.cos(a), y + centerDistance(st) * Math.sin(a)]);
+  }
+  const planetRadius = centerDistance(pl);
+  const planets = Array.from({ length: pl.planetCount }, (_, k) => (2 * Math.PI * k) / pl.planetCount);
+  return { planetary: pl, parallel: par, shafts, planetRadius, planets };
+}
+
+/**
+ * 齒輪組各節點的絕對角度（弧度，繞傳動框架 +Z），由行星架（主軸）角度 θc 推得。
+ * 含「嚙合相位」：每個齒輪模型的第 0 齒朝局部 +X；相位讓相鄰齒輪在接觸線上齒對齒溝。
+ *   太陽齒輪：θs = (1 + Zr/Zs)·θc（環固定）
+ *   行星（自轉，絕對角）：θp = (1 − Zr/Zp)·θc + φk
+ *   平行軸：θout = −θin·(Z1/Z2) + φ
+ */
+export function gearTrainAngles(thetaC, configId = ACTIVE_GEARBOX) {
+  const { planetary: pl, parallel: par, planets } = gearLayout(configId);
+  const sun = stageRatio(pl) * thetaC;
+  const planetAbs = planets.map((b) => (1 - pl.ringTeeth / pl.planetTeeth) * thetaC + b + Math.PI - Math.PI / pl.planetTeeth);
+  const shafts = [sun];
+  for (const st of par) {
+    const a = st.offsetAngleDeg * DEG;
+    const z1 = st.driverTeeth, z2 = st.drivenTeeth;
+    const phase = a + Math.PI - Math.PI / z2 + (a * z1) / z2;
+    shafts.push(-shafts[shafts.length - 1] * (z1 / z2) + phase);
+  }
+  return { carrier: thetaC, sun, planetAbs, intermediate: shafts[1], high: shafts[shafts.length - 1], shafts };
+}
+
 // ---------------------------------------------------------------------
 // 5. 模擬參數（教學示意值；第四階段使用）
 // ---------------------------------------------------------------------
@@ -258,9 +299,13 @@ export const SIM = {
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
   maxPitchRateDegPerSec: 8,
   demoRotorRpm: 8, // 第一～三階段展示用的固定葉輪轉速（教學示意）
-  visualMaxHighSpeedRps: 1.2, // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，因此放慢；教學示意）
+  visualMaxHighSpeedRps: 1.2,
+  // 拆解模式要看齒輪「真的」咬合，所有齒輪依速比連動；為了不讓高速軸轉太快，葉輪放慢到 1.2 × 60 / 112 ≈ 0.64 rpm（教學示意） // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，因此放慢；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快
 };
+// 拆解模式：齒輪依速比連動，葉輪放慢到讓高速軸剛好達到畫面上限（約 0.64 rpm，教學示意）
+SIM.gearDemoRotorRpm = (SIM.visualMaxHighSpeedRps * 60) / gearboxRatio();
+
 
 // ---------------------------------------------------------------------
 // 6. 配色表 — 所有模組都從這裡取色
@@ -290,6 +335,12 @@ export const PALETTE = {
   cable: '#ff7a1a', // 電力：亮橘
   transformer: '#8aa37b',
   soil: '#8a6a48',
+  gearSun: '#2f9e5c', // 齒輪家族：深淺不同的綠
+  gearPlanet: '#7fd19b',
+  gearRing: '#1f7a45',
+  gearCarrier: '#a7c4b2',
+  gearParallel: '#56c27a',
+  arrow: '#17324d', // 轉向箭頭：深藍黑，不與任何零件顏色混淆
   bedplate: '#8d98a3',
   hubBody: '#9fb0c2',
   pole: '#8c6b4f',
@@ -351,6 +402,20 @@ export const HIERARCHY = [
     id: 'highSpeedShaft', parent: 'drivetrain', position: [...highSpeedShaftOffset(), 0],
     rotates: { axis: [0, 0, 1], what: '高速軸（含煞車盤、發電機轉子）', sign: COORDS.rotorSpinSign * gearboxDirection() },
   },
+  // 齒輪組（第三階段）：行星掛在主軸（行星架）上；太陽齒輪軸、中間軸各自轉動；末級小齒輪在高速軸上
+  {
+    id: 'sunShaft', parent: 'drivetrain', position: [...gearLayout().shafts[0], 0],
+    rotates: { axis: [0, 0, 1], what: '太陽齒輪 + 第一級平行軸大齒輪', sign: COORDS.rotorSpinSign },
+  },
+  {
+    id: 'intermediateShaft', parent: 'drivetrain', position: [...gearLayout().shafts[1], 0],
+    rotates: { axis: [0, 0, 1], what: '中間軸（第一級小齒輪 + 第二級大齒輪）', sign: -COORDS.rotorSpinSign },
+  },
+  ...gearLayout().planets.map((b, k) => ({
+    id: `planet${k}`, parent: 'lowSpeedShaft',
+    position: [gearLayout().planetRadius * Math.cos(b), gearLayout().planetRadius * Math.sin(b), gearLayout().planetary.z],
+    rotates: { axis: [0, 0, 1], what: '行星齒輪自轉（並隨行星架公轉）' },
+  })),
   {
     id: 'rotor', parent: 'drivetrain', position: [0, 0, DIM.rotor.centerOnAxis],
     rotates: { axis: [0, 0, 1], what: '葉輪方位角（從上風看順時針）', sign: COORDS.rotorSpinSign },
@@ -398,6 +463,12 @@ export const PARTS = [
   { id: 'controller', colorKey: 'controller', group: 'electrical', stage: 2, node: 'nacelle' },
   { id: 'powerCable', colorKey: 'cable', group: 'electrical', stage: 2, node: 'tower' },
   { id: 'undergroundCable', colorKey: 'cable', group: 'electrical', stage: 2, node: 'world' },
+  // 第三階段：齒輪箱內部
+  { id: 'sunGear', colorKey: 'gearSun', group: 'gears', stage: 3, node: 'sunShaft' },
+  { id: 'planetGear', colorKey: 'gearPlanet', group: 'gears', stage: 3, node: 'planet*' },
+  { id: 'ringGear', colorKey: 'gearRing', group: 'gears', stage: 3, node: 'drivetrain' },
+  { id: 'carrier', colorKey: 'gearCarrier', group: 'gears', stage: 3, node: 'lowSpeedShaft' },
+  { id: 'parallelGears', colorKey: 'gearParallel', group: 'gears', stage: 3, node: 'intermediateShaft' },
 ];
 
 // 零件連接關係（給結構圖與測試）：a 帶動 / 連接 b
@@ -407,6 +478,12 @@ export const CONNECTIONS = [
   { from: 'hub', to: 'mainShaft', kind: 'mech', label: '輪轂帶動主軸（低速）' },
   { from: 'mainBearing', to: 'mainShaft', kind: 'support', label: '軸承撐住主軸' },
   { from: 'mainShaft', to: 'gearbox', kind: 'mech', label: '低速輸入' },
+  { from: 'mainShaft', to: 'carrier', kind: 'mech', label: '主軸帶動行星架' },
+  { from: 'carrier', to: 'planetGear', kind: 'mech', label: '行星繞著轉' },
+  { from: 'ringGear', to: 'planetGear', kind: 'mech', label: '環固定，行星沿著它滾' },
+  { from: 'planetGear', to: 'sunGear', kind: 'mech', label: '×5' },
+  { from: 'sunGear', to: 'parallelGears', kind: 'mech', label: '×4、×5.6' },
+  { from: 'parallelGears', to: 'highSpeedShaft', kind: 'mech', label: '末級小齒輪' },
   { from: 'gearbox', to: 'highSpeedShaft', kind: 'mech', label: '加速約 112 倍（教學示意）' },
   { from: 'brake', to: 'highSpeedShaft', kind: 'control', label: '必要時煞住' },
   { from: 'highSpeedShaft', to: 'generator', kind: 'mech', label: '高速帶動轉子' },
@@ -442,7 +519,7 @@ export const MODES = {
   explode: { label: '機械拆解', stage: 3 },
   experiment: { label: '發電實驗', stage: 4 },
 };
-export const CURRENT_STAGE = 2;
+export const CURRENT_STAGE = 3;
 
 // ---------------------------------------------------------------------
 // 11. 視角與渲染
@@ -460,11 +537,34 @@ export const VIEW = {
     nacelle: { target: [0, 80, 0], camera: [-16, 86, 18] },
     cutaway: { target: [0, 80.4, -1.0], camera: [-11.5, 86, -4.5] },
     cable: { target: [11, 2, 8], camera: [-6, 15, 33] },
+    explode: { target: [0, 81.2, -2.0], camera: [-15.5, 88.5, -7.5] },
   },
-  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
+  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18, explode: 10 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
   minDistance: 4,
   maxDistance: 340,
   focusDurationSec: 0.9,
+};
+
+// ---------------------------------------------------------------------
+// 12. 機械拆解（爆炸圖）位移：鍵 = 網格的 explodeKey（預設為零件 id），值 = 在網格父節點座標中的位移（公尺）
+//     在會轉動的節點（主軸、高速軸）底下的網格只能沿 z 軸移動，否則會跟著轉（測試檢查）。
+// ---------------------------------------------------------------------
+export const EXPLODE = {
+  durationSec: 1.2,
+  offsets: {
+    gearbox: [0, 3.2, 0], // 齒輪箱外殼往上打開，露出齒輪
+    mainBearing: [0, 1.8, 0],
+    mainShaft: [0, 0, 2.4],
+    highSpeedShaft: [0, 0, -0.9],
+    brake: [0, 0, -1.5],
+    generatorRotor: [0, 0, -2.3], // 轉子從定子裡滑出來
+    generator: [0, 0, -3.8],
+    controller: [0, 1.7, 0],
+  },
+  nodeOffsets: { rotor: [0, 0, 4.5] }, // 整個葉輪往前移開
+  rotatingNodes: ['lowSpeedShaft', 'highSpeedShaft', 'sunShaft', 'intermediateShaft', 'rotor'],
+  // 「看齒輪」：暫時藏起擋住齒輪的零件，並從前方斜上看（傳動框架方向，前方 = +z）
+  gearView: { hide: ['gearbox', 'mainShaft', 'mainBearing', 'yawSystem'], dir: [-0.42, 0.42, 0.8] },
 };
 
 export const ANIMATION = {
