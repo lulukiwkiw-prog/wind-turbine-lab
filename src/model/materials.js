@@ -9,6 +9,7 @@ const HIGHLIGHT = new THREE.Color(PALETTE.highlight);
 export function createMaterialRegistry() {
   const byPart = new Map(); // partId → Map(variantKey → material)
   const scenery = new Map(); // 不可點選的場景材質（可跨物件共用）
+  const shells = new Set(); // 外殼材質（剖視時可變透明）
 
   function color(key) {
     if (!(key in PALETTE)) throw new Error(`PALETTE 沒有顏色：${key}`);
@@ -21,15 +22,17 @@ export function createMaterialRegistry() {
     part(partId, colorKey, opts = {}) {
       if (!byPart.has(partId)) byPart.set(partId, new Map());
       const variants = byPart.get(partId);
-      const key = `${colorKey}|${opts.metalness ?? 0.1}|${opts.roughness ?? 0.6}|${opts.side ?? 0}`;
+      const key = `${colorKey}|${opts.metalness ?? 0.1}|${opts.roughness ?? 0.6}|${opts.side ?? 0}|${opts.shell ? 1 : 0}`;
       if (!variants.has(key)) {
-        variants.set(key, new THREE.MeshStandardMaterial({
+        const m = new THREE.MeshStandardMaterial({
           color: color(colorKey),
           metalness: opts.metalness ?? 0.1,
           roughness: opts.roughness ?? 0.6,
           side: opts.side ?? THREE.FrontSide,
           flatShading: opts.flatShading ?? false,
-        }));
+        });
+        if (opts.shell) shells.add(m);
+        variants.set(key, m);
       }
       return variants.get(key);
     },
@@ -49,6 +52,16 @@ export function createMaterialRegistry() {
       for (const m of variants.values()) {
         m.emissive.copy(HIGHLIGHT);
         m.emissiveIntensity = amount;
+      }
+    },
+    /** 外殼透明度：1 = 實心；小於 1 = 透明（只改材質參數，不重建） */
+    setShellOpacity(opacity) {
+      for (const m of shells) {
+        const t = opacity < 1;
+        if (m.transparent !== t) m.needsUpdate = true;
+        m.transparent = t;
+        m.opacity = opacity;
+        m.depthWrite = !t;
       }
     },
     partIds: () => [...byPart.keys()],

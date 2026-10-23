@@ -26,7 +26,7 @@ export function createCameraRig(canvas) {
   function fitted(name, p) {
     const target = new THREE.Vector3().fromArray(p.target);
     const pos = new THREE.Vector3().fromArray(p.camera);
-    const half = name === 'nacelle' ? VIEW.fitHalfWidth.nacelle : VIEW.fitHalfWidth.full;
+    const half = VIEW.fitHalfWidth[name] ?? VIEW.fitHalfWidth.full;
     const need = half / (Math.tan((camera.fov * Math.PI) / 360) * camera.aspect);
     const d = pos.distanceTo(target);
     if (need > d) pos.sub(target).multiplyScalar(Math.min(need, VIEW.maxDistance) / d).add(target);

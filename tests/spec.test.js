@@ -5,6 +5,7 @@ import {
   COORDS, DIM, DRIVETRAIN, HIERARCHY, PARTS, CONNECTIONS, PALETTE, SIM, VIEW,
   GEARBOX_CONFIGS, ACTIVE_GEARBOX, stageRatio, centerDistance, gearboxRatio, highSpeedShaftOffset,
   rotorCenterLocal, rotorAxisLocal, hubHeight, upwindVector, yawForWind, bladeSectionAt, MODES, DIFFICULTIES,
+  CABLE_ROUTE, INTERNALS, gearboxDirection,
 } from '../src/spec/turbineSpec.js';
 import { PARTS_TEXT, partText } from '../src/learning/partsData.js';
 
@@ -199,4 +200,40 @@ test('視角：預設與各預設視角都在允許的距離範圍內', () => {
     assert.ok(d >= VIEW.minDistance && d <= VIEW.maxDistance, `距離 ${d}`);
     assert.ok(p.camera[1] > 0, '相機在地面上方');
   }
+});
+
+test('第二階段：電力路徑每一段首尾相接（發電機 → 塔內 → 地下 → 變壓器 → 電桿）', () => {
+  const r = CABLE_ROUTE;
+  const nEnd = r.nacelle[r.nacelle.length - 1];
+  assert.deepEqual([nEnd[0], nEnd[2]], [0, 0], '機艙內電纜要在偏航軸上往下，機艙轉向時才不會斷開');
+  assert.ok(Math.abs(DIM.tower.topY + nEnd[1] - r.tower[0][1]) < 1e-9, '機艙電纜終點 = 塔內電纜起點');
+  assert.deepEqual(r.tower[r.tower.length - 1], r.underground[0], '塔內電纜終點 = 地下電纜起點');
+  assert.deepEqual(r.underground[1], DIM.site.transformer.at, '地下電纜經過變壓器');
+  assert.deepEqual(r.underground[r.underground.length - 1], DIM.site.poles[0], '地下電纜接到第一根電桿');
+  assert.deepEqual(r.riser[0], DIM.site.poles[0]);
+  assert.ok(Math.abs(r.riser[1][1] - (DIM.site.poleHeight - 0.6)) < 1e-9, '引線接到橫擔高度');
+  // 起點在發電機下方
+  const [hx] = highSpeedShaftOffset();
+  assert.ok(Math.abs(r.nacelle[0][0] - hx) < 0.05, '電纜起點在發電機正下方');
+});
+
+test('第二階段：高速軸轉向與主軸相同（1 級行星同向 × 2 級平行軸各反向一次）', () => {
+  assert.equal(gearboxDirection(), 1);
+  const byId = Object.fromEntries(HIERARCHY.map((n) => [n.id, n]));
+  assert.equal(byId.highSpeedShaft.parent, 'drivetrain');
+  assert.equal(byId.lowSpeedShaft.parent, 'drivetrain');
+  assert.deepEqual(byId.highSpeedShaft.position.slice(0, 2), highSpeedShaftOffset());
+  assert.equal(byId.highSpeedShaft.rotates.sign, COORDS.rotorSpinSign);
+});
+
+test('第二階段：偏航馬達的小齒輪剛好咬住塔頂內齒環', () => {
+  const y = INTERNALS.yaw;
+  assert.ok(Math.abs(y.driveRadius + y.pinionRadius - y.ringInnerRadius) < 0.02);
+  assert.ok(y.ringOuterRadius >= DIM.tower.topRadius, '齒環坐在塔頂上');
+});
+
+test('第二階段：輪轂本體在導流罩內，變槳軸承在葉根', () => {
+  assert.ok(INTERNALS.hubBodyRadius < DIM.spinner.radius);
+  assert.ok(INTERNALS.pitch.bearingRadius > DIM.blade.rootDiameter / 2, '軸承包住葉根');
+  assert.ok(Math.hypot(...INTERNALS.pitch.motorOffset) + INTERNALS.pitch.motorLength / 2 < INTERNALS.hubBodyRadius, '變槳馬達在輪轂內');
 });

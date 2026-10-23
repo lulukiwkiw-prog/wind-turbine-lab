@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { DIM, PARTS, CURRENT_STAGE, COORDS, rotorCenterLocal, rotorAxisLocal, hubHeight } from '../src/spec/turbineSpec.js';
+import { DIM, PARTS, CURRENT_STAGE, COORDS, SIM, CABLE_ROUTE, rotorCenterLocal, rotorAxisLocal, hubHeight } from '../src/spec/turbineSpec.js';
+import { createViewController } from '../src/model/viewState.js';
 import { createMaterialRegistry } from '../src/model/materials.js';
 import { buildTurbine } from '../src/model/turbine.js';
 import { buildSite } from '../src/model/site.js';
@@ -94,7 +95,7 @@ test('暫停時葉輪不轉；慢動作時轉得較慢', () => {
   assert.ok(Math.abs(slow - Math.abs(a1) * 0.25) < 1e-6);
 });
 
-test('第一階段的零件都有可點選網格；網格只有一個葉片幾何（三片共用）', () => {
+test('目前階段的零件都有可點選網格；網格只有一個葉片幾何（三片共用）', () => {
   const { scene } = build();
   const found = new Set();
   const bladeGeos = new Set();
@@ -135,7 +136,8 @@ test('集中狀態：拒絕不合法或尚未開放的值', () => {
   console.warn = () => {};
   s.set({ mode: 'explode' }); // 第三階段才開放
   s.set({ animSpeed: 3 });
-  s.set({ selectedPart: 'gearbox' }); // 第二階段才有模型
+  s.set({ selectedPart: 'flywheel' }); // 不存在的零件
+  s.set({ shellView: 'glass' });
   console.warn = warn;
   assert.equal(s.get().mode, 'exterior');
   assert.equal(s.get().animSpeed, 1);
@@ -143,4 +145,64 @@ test('集中狀態：拒絕不合法或尚未開放的值', () => {
   s.set({ selectedPart: 'tower', infoExpanded: true });
   s.set({ selectedPart: 'blade' });
   assert.equal(s.get().infoExpanded, false, '換零件時收合進階說明');
+});
+
+test('第二階段：主軸與葉輪同角度；高速軸同向、畫面轉速有上限', () => {
+  const { nodes, sensorParts } = build();
+  const store = createStore();
+  const anim = createAnimator({ nodes, sensorParts, store });
+  anim.update(0.2);
+  assert.equal(nodes.lowSpeedShaft.rotation.z, nodes.rotor.rotation.z);
+  assert.ok(Math.sign(nodes.highSpeedShaft.rotation.z) === Math.sign(nodes.rotor.rotation.z), '高速軸與葉輪同向');
+  assert.ok(anim.highSpeedRps() <= SIM.visualMaxHighSpeedRps + 1e-12);
+  assert.ok(anim.highSpeedRps() > SIM.demoRotorRpm / 60, '高速軸比主軸快');
+});
+
+test('第二階段：外觀模式隱藏內部零件；剖視模式顯示；拿掉外殼只隱藏機艙外殼與導流罩', () => {
+  const { scene, mats } = build();
+  const view = createViewController({ root: scene, mats });
+  const st = (mode, shellView) => ({ mode, shellView });
+  const shown = (pred) => { let n = 0, v = 0; scene.traverse((o) => { if (o.isMesh && pred(o)) { n++; if (o.visible) v++; } }); return [v, n]; };
+  view.apply(st('exterior', 'solid'));
+  assert.equal(shown((o) => o.userData.internal)[0], 0);
+  view.apply(st('cutaway', 'transparent'));
+  const [vi, ni] = shown((o) => o.userData.internal);
+  assert.equal(vi, ni);
+  assert.ok(ni > 30, `內部零件網格數 ${ni}`);
+  assert.equal(scene.getObjectByName('nacelleShell').material.transparent, true);
+  view.apply(st('cutaway', 'hidden'));
+  assert.equal(scene.getObjectByName('nacelleShell').visible, false);
+  assert.equal(scene.getObjectByName('spinner').visible, false);
+  assert.equal(scene.getObjectByName('towerShell').visible, true, '塔架不能拿掉，只變透明');
+  view.apply(st('exterior', 'solid'));
+  assert.equal(scene.getObjectByName('nacelleShell').visible, true);
+  assert.equal(scene.getObjectByName('nacelleShell').material.transparent, false);
+});
+
+test('第二階段：內部零件不互相穿插、都在機艙外殼內', () => {
+  const { scene } = build();
+  const box = (name) => new THREE.Box3().setFromObject(scene.getObjectByName(name));
+  const shell = box('nacelleShell');
+  // 主軸會穿出機艙前端接到輪轂，所以不在此列（另有規格測試檢查它接到輪轂法蘭）
+  for (const n of ['gearboxPlanetary', 'gearboxParallel', 'generatorStator', 'controllerBox', 'brakeDisc']) {
+    assert.ok(shell.containsBox(box(n)), `${n} 超出機艙外殼`);
+  }
+  assert.ok(!box('controllerBox').intersectsBox(box('generatorStator')), '控制器與發電機重疊');
+  for (let i = 0; i < 4; i++) {
+    const m = box(`yawMotor${i}`);
+    for (const n of ['gearboxPlanetary', 'gearboxParallel', 'generatorStator']) {
+      assert.ok(!m.intersectsBox(box(n)), `偏航馬達 ${i} 與 ${n} 重疊`);
+    }
+  }
+});
+
+test('第二階段：電纜在任何偏航角都與塔內電纜相接', () => {
+  const { nodes, scene } = build();
+  const last = CABLE_ROUTE.nacelle[CABLE_ROUTE.nacelle.length - 1];
+  for (const yaw of [0, 75, 190]) {
+    nodes.yaw.rotation.y = yaw * DEG;
+    scene.updateMatrixWorld(true);
+    const p = new THREE.Vector3(...last).applyMatrix4(nodes.nacelle.matrixWorld);
+    near(p, new THREE.Vector3(...CABLE_ROUTE.tower[0]), 1e-6);
+  }
 });

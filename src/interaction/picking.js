@@ -1,10 +1,11 @@
 // 點選零件：區分「點一下」與「拖曳旋轉」，只有點一下才選取
 import * as THREE from 'three';
+import { isShown } from '../model/viewState.js';
 
 const TAP_MAX_MOVE = 8; // px
 const TAP_MAX_MS = 450;
 
-export function createPicker({ canvas, camera, scene, onPick }) {
+export function createPicker({ canvas, camera, scene, onPick, skipShells }) {
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
   let down = null;
@@ -15,9 +16,11 @@ export function createPicker({ canvas, camera, scene, onPick }) {
     ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects(scene.children, true);
     for (const h of hits) {
+      if (!isShown(h.object)) continue; // 隱藏的零件（例如外觀模式下的內部零件）不能點
+      if (h.object.userData.shell && skipShells()) continue; // 剖視時點得到外殼後面的零件
       let o = h.object;
       while (o && !o.userData.partId) o = o.parent;
-      if (o && o.visible) return o.userData.partId;
+      if (o) return o.userData.partId;
       // 天空、地面等不可點選物件：繼續找後面的（天空會擋在最後面，因此若先碰到地面就停止）
       if (h.object.name === 'ground') return null;
     }

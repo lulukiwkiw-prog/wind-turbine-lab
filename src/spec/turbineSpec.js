@@ -120,8 +120,40 @@ export const DRIVETRAIN = {
   brake: { z: -2.3, discRadius: 0.42 },
   coupling: { z: -2.9, radius: 0.18 },
   generator: { z0: -6.0, z1: -3.5, radius: 0.72 },
-  controller: { at: [1.1, 0.9, -6.3], size: [0.6, 1.2, 0.5] }, // 機艙局部座標
-  powerCable: { from: 'generator', down: 'tower', to: 'transformer' },
+  controller: { at: [1.1, 0.92, -6.3], size: [0.6, 1.2, 0.5] }, // 機艙局部座標（坐在機座上）
+  shaftFlange: { z0: 3.5, z1: 3.7, radius: 0.75 }, // 主軸前端法蘭（接輪轂）
+  brakeCaliper: { size: [0.16, 0.22, 0.2] },
+  generatorRotorRadius: 0.46,
+};
+
+// ---------------------------------------------------------------------
+// 3b. 其他內部系統（第二階段建模）
+// ---------------------------------------------------------------------
+export const INTERNALS = {
+  // 偏航系統：塔頂內齒環 + 4 組偏航馬達（裝在機座上，隨機艙轉）
+  yaw: {
+    ringInnerRadius: 1.05, ringOuterRadius: 1.32, ringY: [-0.18, 0.0], // 機艙局部 y（塔頂之下）
+    driveCount: 4, driveRadius: 0.93, driveAngleOffsetDeg: 45,
+    motorRadius: 0.15, motorHeight: 0.55, // 馬達在機座上方 y∈[0.3, 0.85]
+    pinionRadius: 0.11,
+  },
+  // 槳距系統：每片葉片一組變槳軸承 + 變槳馬達（裝在輪轂內）
+  pitch: {
+    bearingRadius: 0.95, bearingTube: 0.11, // 位於葉片節點 y = rootR
+    motorRadius: 0.13, motorLength: 0.5, motorOffset: [0.55, 0.95, 0], // 葉片節點局部（不隨槳距轉）
+  },
+  hubBodyRadius: 1.45,
+  cableRadius: 0.07,
+};
+
+// 電力路徑（教學示意）：發電機 → 機艙內 → 偏航中心往下 → 塔架內 → 塔底 → 地下 → 變壓器 → 地下 → 第一根電桿 → 往上接架空線
+// 每一段的起點必須等於上一段的終點（測試會檢查），畫面上才會連續。
+export const CABLE_ROUTE = {
+  nacelle: [[0.6, 1.55, -5.2], [0.6, 0.4, -5.2], [0, 0.4, -5.2], [0, 0.4, 0], [0, -1.0, 0]], // 機艙局部
+  tower: [[0, 77.0, 0], [0, 0.0, 0]], // 世界座標，沿塔架中心往下（77.0 = 塔頂 78.0 − 1.0）
+  underground: [[0, 0, 0], [9, 0, 5], [22, 0, 14]], // 世界座標，地面下（畫成地面上的淡色埋線路徑）
+  riser: [[22, 0, 14], [22, 11.4, 14]], // 世界座標，第一根電桿的引線（到橫擔高度）
+  riserOffset: [-0.3, 0, 0.2], // 引線貼在電桿朝向風機的一側
 };
 
 // ---------------------------------------------------------------------
@@ -194,6 +226,11 @@ export function gearboxRatio(configId = ACTIVE_GEARBOX) {
   return GEARBOX_CONFIGS[configId].stages.reduce((r, s) => r * stageRatio(s), 1);
 }
 
+/** 齒輪箱輸出相對輸入的轉向（+1 同向，-1 反向） */
+export function gearboxDirection(configId = ACTIVE_GEARBOX) {
+  return GEARBOX_CONFIGS[configId].stages.reduce((d, s) => d * stageDirection(s), 1);
+}
+
 /** 高速軸相對主軸中心線的偏移（傳動框架 x, y） */
 export function highSpeedShaftOffset(configId = ACTIVE_GEARBOX) {
   let x = 0, y = 0;
@@ -220,7 +257,8 @@ export const SIM = {
   teachingYawRateDegPerSec: 6, // 教學動畫加速版，介面須標示「教學示意」
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
   maxPitchRateDegPerSec: 8,
-  demoRotorRpm: 8, // 第一階段外觀展示的固定轉速（教學示意）
+  demoRotorRpm: 8, // 第一～三階段展示用的固定葉輪轉速（教學示意）
+  visualMaxHighSpeedRps: 1.2, // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，因此放慢；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快
 };
 
@@ -251,6 +289,9 @@ export const PALETTE = {
   controller: '#45525e',
   cable: '#ff7a1a', // 電力：亮橘
   transformer: '#8aa37b',
+  soil: '#8a6a48',
+  bedplate: '#8d98a3',
+  hubBody: '#9fb0c2',
   pole: '#8c6b4f',
   wire: '#444a50',
   ground: '#8fbf6a',
@@ -276,6 +317,13 @@ export function rotorCenterLocal() {
   return [ox, oy + z * Math.sin(t), oz + z * Math.cos(t)];
 }
 
+/** 傳動框架座標 → 機艙局部座標 */
+export function drivetrainToNacelle([x, y, z]) {
+  const t = DIM.drivetrain.tiltDeg * DEG;
+  const [ox, oy, oz] = DIM.drivetrain.origin;
+  return [ox + x, oy + y * Math.cos(t) + z * Math.sin(t), oz - y * Math.sin(t) + z * Math.cos(t)];
+}
+
 /** 葉輪旋轉軸（機艙局部，指向上風，單位向量） */
 export function rotorAxisLocal() {
   const t = DIM.drivetrain.tiltDeg * DEG;
@@ -294,6 +342,14 @@ export const HIERARCHY = [
   {
     id: 'drivetrain', parent: 'nacelle', position: DIM.drivetrain.origin,
     rotation: [-DIM.drivetrain.tiltDeg, 0, 0], // 繞 X 轉 -tilt → 局部 +Z 往上翹
+  },
+  {
+    id: 'lowSpeedShaft', parent: 'drivetrain', position: [0, 0, 0],
+    rotates: { axis: [0, 0, 1], what: '與葉輪同角度旋轉（主軸）', sign: COORDS.rotorSpinSign },
+  },
+  {
+    id: 'highSpeedShaft', parent: 'drivetrain', position: [...highSpeedShaftOffset(), 0],
+    rotates: { axis: [0, 0, 1], what: '高速軸（含煞車盤、發電機轉子）', sign: COORDS.rotorSpinSign * gearboxDirection() },
   },
   {
     id: 'rotor', parent: 'drivetrain', position: [0, 0, DIM.rotor.centerOnAxis],
@@ -341,6 +397,7 @@ export const PARTS = [
   { id: 'yawSystem', colorKey: 'yaw', group: 'internal', stage: 2, node: 'nacelle' },
   { id: 'controller', colorKey: 'controller', group: 'electrical', stage: 2, node: 'nacelle' },
   { id: 'powerCable', colorKey: 'cable', group: 'electrical', stage: 2, node: 'tower' },
+  { id: 'undergroundCable', colorKey: 'cable', group: 'electrical', stage: 2, node: 'world' },
 ];
 
 // 零件連接關係（給結構圖與測試）：a 帶動 / 連接 b
@@ -354,8 +411,9 @@ export const CONNECTIONS = [
   { from: 'brake', to: 'highSpeedShaft', kind: 'control', label: '必要時煞住' },
   { from: 'highSpeedShaft', to: 'generator', kind: 'mech', label: '高速帶動轉子' },
   { from: 'generator', to: 'powerCable', kind: 'power', label: '電能' },
-  { from: 'powerCable', to: 'transformer', kind: 'power', label: '沿塔架往下' },
-  { from: 'transformer', to: 'powerLine', kind: 'power', label: '升壓後送出' },
+  { from: 'powerCable', to: 'undergroundCable', kind: 'power', label: '沿塔架往下到塔底' },
+  { from: 'undergroundCable', to: 'transformer', kind: 'power', label: '埋在地下' },
+  { from: 'transformer', to: 'powerLine', kind: 'power', label: '升壓後經地下電纜接上電桿' },
   { from: 'anemometer', to: 'controller', kind: 'signal', label: '風速' },
   { from: 'windVane', to: 'controller', kind: 'signal', label: '風向' },
   { from: 'controller', to: 'pitchSystem', kind: 'signal', label: '調整槳距' },
@@ -384,7 +442,7 @@ export const MODES = {
   explode: { label: '機械拆解', stage: 3 },
   experiment: { label: '發電實驗', stage: 4 },
 };
-export const CURRENT_STAGE = 1;
+export const CURRENT_STAGE = 2;
 
 // ---------------------------------------------------------------------
 // 11. 視角與渲染
@@ -400,8 +458,10 @@ export const VIEW = {
     front: { target: [0, 62, 0], camera: [0, 66, 178] },
     side: { target: [0, 62, 0], camera: [178, 66, 4] },
     nacelle: { target: [0, 80, 0], camera: [-16, 86, 18] },
+    cutaway: { target: [0, 80.4, -1.0], camera: [-11.5, 86, -4.5] },
+    cable: { target: [11, 2, 8], camera: [-6, 15, 33] },
   },
-  fitHalfWidth: { full: 52, nacelle: 9 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
+  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
   minDistance: 4,
   maxDistance: 340,
   focusDurationSec: 0.9,

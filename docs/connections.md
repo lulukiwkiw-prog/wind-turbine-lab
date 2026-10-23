@@ -13,6 +13,8 @@ graph TD
   world --> yaw
   yaw --> nacelle
   nacelle --> drivetrain
+  drivetrain --> lowSpeedShaft
+  drivetrain --> highSpeedShaft
   drivetrain --> rotor
   rotor --> blade0
   rotor --> blade1
@@ -47,6 +49,7 @@ graph LR
   yawSystem["偏航系統"]:::internal
   controller["控制器"]:::electrical
   powerCable["電力電纜"]:::electrical
+  undergroundCable["地下電纜"]:::electrical
   blade ==>|葉片固定在輪轂（經變槳軸承）| hub
   pitchSystem -->|轉動葉片改變槳距| blade
   hub ==>|輪轂帶動主軸（低速）| mainShaft
@@ -56,8 +59,9 @@ graph LR
   brake -->|必要時煞住| highSpeedShaft
   highSpeedShaft ==>|高速帶動轉子| generator
   generator -.->|電能| powerCable
-  powerCable -.->|沿塔架往下| transformer
-  transformer -.->|升壓後送出| powerLine
+  powerCable -.->|沿塔架往下到塔底| undergroundCable
+  undergroundCable -.->|埋在地下| transformer
+  transformer -.->|升壓後經地下電纜接上電桿| powerLine
   anemometer -->|風速| controller
   windVane -->|風向| controller
   controller -->|調整槳距| pitchSystem

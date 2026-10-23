@@ -44,11 +44,25 @@ async function openPage(viewport, opts = {}) {
 async function pose(page, view, { part = null, rotor = 20 } = {}) {
   await page.evaluate(({ view, part, rotor }) => {
     const lab = window.__lab;
-    lab.store.set({ paused: true, selectedPart: null, partListOpen: false });
+    lab.store.set({ mode: 'exterior', paused: true, selectedPart: null, partListOpen: false });
     lab.setRotorAngleDeg(rotor);
     lab.jumpView(view);
     if (part) lab.store.set({ selectedPart: part });
   }, { view, part, rotor });
+  await page.waitForTimeout(part ? 1600 : 500);
+}
+
+/** 剖視模式：外殼 transparent / hidden，可選擇聚焦零件 */
+async function cutaway(page, shellView, part = null) {
+  await page.evaluate(({ shellView, part }) => {
+    const lab = window.__lab;
+    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false, paused: true });
+    lab.setRotorAngleDeg(20);
+    lab.store.set({ mode: 'cutaway' });
+    lab.store.set({ shellView });
+    lab.jumpView('cutaway');
+    if (part) lab.selectPart(part);
+  }, { shellView, part });
   await page.waitForTimeout(part ? 1600 : 500);
 }
 
@@ -117,6 +131,43 @@ try {
     await page.waitForTimeout(300);
     await shoot(page, '06-info-expanded');
 
+    // ---------- 第二階段：機艙剖視 ----------
+    await cutaway(page, 'transparent');
+    await shoot(page, '10-cutaway-transparent');
+    await pickCheck(page, 'gearboxParallel', 'gearbox');
+    await pickCheck(page, 'generatorRotor', 'generator', [0, 0, -4.75]);
+    await cutaway(page, 'hidden');
+    await shoot(page, '11-cutaway-shell-removed');
+    await pickCheck(page, 'mainShaftBody', 'mainShaft', [0, 0, 2.1]);
+    await cutaway(page, 'transparent', 'gearbox');
+    await shoot(page, '12-focus-gearbox');
+    await cutaway(page, 'transparent', 'generator');
+    await shoot(page, '13-focus-generator');
+    await cutaway(page, 'transparent', 'pitchSystem');
+    await shoot(page, '14-hub-pitch-system');
+    await cutaway(page, 'transparent', 'yawSystem');
+    await shoot(page, '15-yaw-system');
+    // 電力路徑：塔內電纜 → 地下電纜 → 變壓器 → 電桿
+    await cutaway(page, 'transparent');
+    await page.evaluate(() => window.__lab.jumpView('cable'));
+    await page.waitForTimeout(400);
+    await shoot(page, '16-power-path');
+    await pickCheck(page, 'undergroundStrip1', 'undergroundCable');
+    // 返回外觀：外殼回到實心、內部零件隱藏
+    const back = await page.evaluate(() => {
+      const lab = window.__lab;
+      lab.store.set({ mode: 'exterior' });
+      let internalShown = 0;
+      lab.scene.traverse((o) => { if (o.userData.internal && o.visible) internalShown++; });
+      return { shellView: lab.store.get().shellView, internalShown };
+    });
+    const backOk = back.shellView === 'solid' && back.internalShown === 0;
+    report.push({ name: '返回外觀', ...back, ok: backOk });
+    if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
+    // 外觀模式下點機艙位置，應該點到機艙外殼而不是裡面的齒輪箱
+    await pose(page, 'nacelle');
+    await pickCheck(page, 'gearboxParallel', 'nacelle');
+
     // 點選測試
     await pose(page, 'side');
     await pickCheck(page, 'tower', 'tower', [0, 40, 0]);
@@ -141,6 +192,8 @@ try {
     await page.evaluate(() => window.__lab.store.set({ selectedPart: null, partListOpen: true }));
     await page.waitForTimeout(300);
     await shoot(page, '09-mobile-390-partlist');
+    await cutaway(page, 'transparent');
+    await shoot(page, '17-mobile-390-cutaway');
     // 觸控目標大小檢查
     const small = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
       .filter((b) => b.offsetParent !== null)

@@ -51,6 +51,16 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .btn.mode small { font-size: 12px; font-weight: 500; color: var(--ink-soft); }
 .btn.mode svg { width: 18px; height: 18px; }
 
+/* ---------- 剖視工具列（標題列下方） ---------- */
+.cutbar { flex-basis: 100%; display: none; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cutbar.open { display: flex; }
+.btn.cut { font-size: 16px; }
+.btn.cut.back { background: var(--accent); color: #fff; }
+.cutnote {
+  flex-basis: 100%; margin: 0; font-size: 14px; color: #8a5a00; background: #fff4d6;
+  padding: 4px 10px; border-radius: 10px; width: fit-content; max-width: 100%;
+}
+
 /* ---------- 工具列（桌面：右側直排） ---------- */
 .tools {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -66,7 +76,9 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   opacity: 0; visibility: hidden; transition: opacity 0.15s, transform 0.15s;
 }
 .partlist.open { opacity: 1; visibility: visible; transform: translateY(-50%) scale(1); }
-.partlist h2 { margin: 0 0 10px; font-size: 18px; }
+.partlist h2 { margin: 0 0 6px; font-size: 18px; }
+.partlist h3 { margin: 10px 0 6px; font-size: 15px; color: var(--ink-soft); }
+.partlist { max-height: min(78vh, 640px); overflow-y: auto; }
 .partlist .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .btn.chip { justify-content: flex-start; background: #f4f7fa; box-shadow: none; border: 2px solid var(--panel-line); }
 .btn.chip.active { background: var(--on); border-color: transparent; }
@@ -126,6 +138,11 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   .partlist { left: 8px; right: 8px; width: auto; top: auto; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); transform: scale(0.96); }
   .partlist.open { transform: none; }
   .hint { bottom: calc(max(8px, env(safe-area-inset-bottom)) + 70px); font-size: 14px; }
+  .cutbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .cutbar::-webkit-scrollbar { display: none; }
+  .btn.cut { flex: none; font-size: 15px; padding: 6px 10px; }
+  .cutnote { font-size: 12px; }
+  .partlist { max-height: 60vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {

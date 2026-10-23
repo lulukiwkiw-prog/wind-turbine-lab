@@ -2,10 +2,12 @@
 //
 // 依 turbineSpec.HIERARCHY 建立群組節點，再把網格掛到節點上。
 // 所有幾何只在這裡建立一次；動畫只改節點的旋轉（見 animation/）。
+// userData.shell：true = 剖視時可拿掉的外殼（機艙、導流罩）；'see' = 只會變透明（塔架）。
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { DIM, HIERARCHY } from '../spec/turbineSpec.js';
 import { createBladeGeometry } from './bladeGeometry.js';
+import { buildInternals } from './internals.js';
 
 const DEG = Math.PI / 180;
 
@@ -51,21 +53,21 @@ export function buildTurbine(mats) {
   {
     const t = DIM.tower;
     const h = t.topY - t.baseY;
-    const towerMat = mats.part('tower', 'tower', { roughness: 0.45 });
+    const towerMat = mats.part('tower', 'tower', { roughness: 0.45, shell: true });
     add(nodes.tower, new THREE.CylinderGeometry(t.topRadius, t.baseRadius, h, 48, 1, true), towerMat, 'tower',
-      (m) => { m.position.y = t.baseY + h / 2; });
+      (m) => { m.position.y = t.baseY + h / 2; m.userData.shell = 'see'; m.name = 'towerShell'; });
     // 法蘭（塔架分段接合處，示意）
-    const flangeMat = mats.part('tower', 'towerFlange', { roughness: 0.5 });
+    const flangeMat = mats.part('tower', 'towerFlange', { roughness: 0.5, shell: true });
     for (const frac of [0, 0.36, 0.68, 1]) {
       const y = t.baseY + h * frac;
       const r = t.baseRadius + (t.topRadius - t.baseRadius) * frac + 0.06;
       add(nodes.tower, new THREE.CylinderGeometry(r, r, t.flangeHeight, 48), flangeMat, 'tower',
-        (m) => { m.position.y = Math.min(y, t.topY - t.flangeHeight / 2); });
+        (m) => { m.position.y = Math.min(y, t.topY - t.flangeHeight / 2); m.userData.shell = 'see'; });
     }
     // 塔門（朝世界 +Z）
     const d = t.door;
-    add(nodes.tower, new THREE.BoxGeometry(d.width, d.height, 0.3), mats.part('tower', 'door', { roughness: 0.5 }), 'tower',
-      (m) => { m.position.set(0, d.sillY + d.height / 2, t.baseRadius - 0.07); });
+    add(nodes.tower, new THREE.BoxGeometry(d.width, d.height, 0.3), mats.part('tower', 'door', { roughness: 0.5, shell: true }), 'tower',
+      (m) => { m.position.set(0, d.sillY + d.height / 2, t.baseRadius - 0.07); m.userData.shell = 'see'; });
   }
 
   // ---------- 機艙外殼 ----------
@@ -74,17 +76,17 @@ export function buildTurbine(mats) {
     const size = n.max.map((v, i) => v - n.min[i]);
     const center = n.max.map((v, i) => (v + n.min[i]) / 2);
     add(nodes.nacelle, new RoundedBoxGeometry(size[0], size[1], size[2], 4, n.cornerRadius),
-      mats.part('nacelle', 'nacelle', { roughness: 0.4 }), 'nacelle',
-      (m) => { m.position.fromArray(center); m.name = 'nacelleShell'; });
+      mats.part('nacelle', 'nacelle', { roughness: 0.4, shell: true }), 'nacelle',
+      (m) => { m.position.fromArray(center); m.name = 'nacelleShell'; m.userData.shell = true; });
     // 兩側裝飾條
-    const trimMat = mats.part('nacelle', 'nacelleTrim', { roughness: 0.4 });
+    const trimMat = mats.part('nacelle', 'nacelleTrim', { roughness: 0.4, shell: true });
     for (const sx of [-1, 1]) {
       add(nodes.nacelle, new THREE.BoxGeometry(0.04, 0.35, size[2] * 0.82), trimMat, 'nacelle',
-        (m) => { m.position.set(sx * (size[0] / 2 + 0.01), center[1] - 0.6, center[2] - 0.3); });
+        (m) => { m.position.set(sx * (size[0] / 2 + 0.01), center[1] - 0.6, center[2] - 0.3); m.userData.shell = true; });
     }
     // 機艙底部與塔頂之間的偏航軸承外圈（外觀可見的一圈）
     add(nodes.nacelle, new THREE.CylinderGeometry(DIM.tower.topRadius + 0.12, DIM.tower.topRadius + 0.12, 0.3, 48),
-      mats.part('nacelle', 'towerFlange', { roughness: 0.5 }), 'nacelle', (m) => { m.position.y = 0.15; });
+      mats.part('nacelle', 'towerFlange', { roughness: 0.5, shell: true }), 'nacelle', (m) => { m.position.y = 0.15; m.userData.shell = 'see'; });
   }
 
   // ---------- 導流罩（輪轂外罩） ----------
@@ -99,7 +101,8 @@ export function buildTurbine(mats) {
     }
     const geo = new THREE.LatheGeometry(pts, 40);
     geo.rotateX(Math.PI / 2); // Lathe 繞 Y → 改成繞葉輪軸 Z
-    add(nodes.rotor, geo, mats.part('hub', 'spinner', { roughness: 0.35 }), 'hub');
+    add(nodes.rotor, geo, mats.part('hub', 'spinner', { roughness: 0.35, shell: true }), 'hub',
+      (m) => { m.name = 'spinner'; m.userData.shell = true; });
   }
 
   // ---------- 葉片（三片共用同一個幾何與材質） ----------
@@ -160,6 +163,9 @@ export function buildTurbine(mats) {
       (m) => { m.position.z = -s.windVane.length / 2; });
     sensorParts.windVaneHead = vhead;
   }
+
+  // ---------- 內部機械與電纜（第二階段） ----------
+  buildInternals({ nodes, mats, add });
 
   return { root, nodes, sensorParts };
 }

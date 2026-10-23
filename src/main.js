@@ -10,6 +10,7 @@ import { createAnimator } from './animation/animator.js';
 import { createCameraRig } from './interaction/cameraRig.js';
 import { createPicker } from './interaction/picking.js';
 import { createUI } from './ui/ui.js';
+import { createViewController } from './model/viewState.js';
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -49,12 +50,26 @@ function partBounds(id) {
   return box;
 }
 
+// 只能在剖視模式看到的零件（在外觀模式選到時自動切換到剖視）
+const CUTAWAY_PARTS = new Set(PARTS.filter((p) => p.group === 'internal' || p.id === 'powerCable').map((p) => p.id));
+
 function focusPart(id) {
   const box = partBounds(id);
   if (box.isEmpty()) return;
   const sphere = box.getBoundingSphere(new THREE.Sphere());
-  rig.focusSphere(sphere.center, Math.max(sphere.radius, 4));
+  rig.focusSphere(sphere.center, Math.max(sphere.radius, CUTAWAY_PARTS.has(id) ? 1.8 : 4));
 }
+
+function selectPart(id) {
+  const s = store.get();
+  if (id === s.selectedPart) { focusPart(id); return; } // 再按一次：重新聚焦
+  const patch = { selectedPart: id, partListOpen: false };
+  if (CUTAWAY_PARTS.has(id) && s.mode !== 'cutaway') patch.mode = 'cutaway';
+  store.set(patch);
+}
+
+const view = createViewController({ root: scene, mats });
+view.apply(store.get());
 
 const ui = createUI({
   root: document.getElementById('ui'),
@@ -62,21 +77,38 @@ const ui = createUI({
   actions: {
     resetView: () => rig.reset(),
     preset: (name) => rig.preset(name),
+    selectPart,
   },
 });
 
 const picker = createPicker({
   canvas, camera: rig.camera, scene,
   onPick: (id) => store.set({ selectedPart: id }),
+  skipShells: () => store.get().shellView !== 'solid',
 });
 
-// 選取變化 → 標示與聚焦
+// 模式／外殼／選取變化 → 顯示方式、標示與相機
 store.subscribe((s, prev, changed) => {
-  if (!changed.includes('selectedPart')) return;
-  if (prev.selectedPart) mats.setHighlight(prev.selectedPart, 0);
-  if (s.selectedPart) {
-    mats.setHighlight(s.selectedPart, 0.35);
-    focusPart(s.selectedPart);
+  const modeChanged = changed.includes('mode');
+  if (modeChanged) {
+    if (s.mode === 'cutaway' && s.shellView === 'solid') store.set({ shellView: 'transparent' });
+    if (s.mode === 'exterior') {
+      const patch = { shellView: 'solid' };
+      if (CUTAWAY_PARTS.has(s.selectedPart)) patch.selectedPart = null;
+      store.set(patch);
+    }
+  }
+  if (modeChanged || changed.includes('shellView')) view.apply(s);
+
+  if (changed.includes('selectedPart')) {
+    if (prev.selectedPart) mats.setHighlight(prev.selectedPart, 0);
+    if (s.selectedPart) mats.setHighlight(s.selectedPart, 0.35);
+  }
+  // 相機：有新選取就聚焦它；否則切換模式時移到該模式的視角
+  if (changed.includes('selectedPart') && s.selectedPart) focusPart(s.selectedPart);
+  else if (modeChanged) {
+    if (s.mode === 'cutaway') rig.preset('cutaway');
+    else rig.reset();
   }
 });
 
@@ -126,6 +158,9 @@ window.__lab = {
   nodes: turbine.nodes,
   jumpView: (name) => rig.jump(name),
   setRotorAngleDeg: (a) => animator.setRotorAngleDeg(a),
+  selectPart,
+  focusPart,
+  animator,
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),

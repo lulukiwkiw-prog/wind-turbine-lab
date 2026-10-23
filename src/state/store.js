@@ -11,6 +11,7 @@ const initial = () => ({
   selectedPart: null,
   infoExpanded: false,
   partListOpen: false,
+  shellView: 'solid', // 機艙外殼：solid 實心／transparent 透明／hidden 拿掉
   // 以下為模擬輸入（第四階段使用），預先定義以免各模組各自保存
   windSpeed: 8,
   windAngleDeg: 0,
@@ -25,6 +26,7 @@ const validators = {
   selectedPart: (v) => v === null || PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE),
   infoExpanded: (v) => typeof v === 'boolean',
   partListOpen: (v) => typeof v === 'boolean',
+  shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
   windSpeed: (v) => Number.isFinite(v) && v >= 0 && v <= 30,
   windAngleDeg: (v) => Number.isFinite(v),
   pitchDeg: (v) => Number.isFinite(v) && v >= 0 && v <= 90,
@@ -33,11 +35,15 @@ const validators = {
 export function createStore() {
   let state = initial();
   const listeners = new Set();
+  let dispatching = false;
+  const pending = [];
 
-  return {
+  const api = {
     get: () => state,
     /** 部分更新；不合法的值會被拒絕並在主控台警告，不會丟出錯誤中斷畫面 */
     set(patch) {
+      // 監聽函式裡再呼叫 set 時先排隊，等這一輪通知完再處理，確保每個監聽者都依序看到每次變化
+      if (dispatching) { pending.push(patch); return; }
       const next = { ...state };
       const changed = [];
       for (const [k, v] of Object.entries(patch)) {
@@ -50,7 +56,13 @@ export function createStore() {
       if (changed.includes('selectedPart') && !('infoExpanded' in patch)) next.infoExpanded = false;
       const prev = state;
       state = Object.freeze(next);
-      for (const fn of listeners) fn(state, prev, changed);
+      dispatching = true;
+      try {
+        for (const fn of listeners) fn(state, prev, changed);
+      } finally {
+        dispatching = false;
+      }
+      while (pending.length) api.set(pending.shift());
     },
     subscribe(fn) {
       listeners.add(fn);
@@ -62,6 +74,7 @@ export function createStore() {
       for (const fn of listeners) fn(state, prev, Object.keys(state));
     },
   };
+  return api;
 }
 
 export const store = createStore();

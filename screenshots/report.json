@@ -2,49 +2,141 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 39.714,
-    "colors": 210,
-    "mean": 183.612,
+    "std": 39.805,
+    "colors": 217,
+    "mean": 183.575,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
-    "std": 39.292,
-    "colors": 215,
-    "mean": 185.319,
+    "std": 39.381,
+    "colors": 224,
+    "mean": 185.292,
     "ok": true
   },
   {
     "name": "03-side",
     "darkFrac": 0,
-    "std": 40.628,
-    "colors": 207,
-    "mean": 185.184,
+    "std": 40.721,
+    "colors": 213,
+    "mean": 185.15,
     "ok": true
   },
   {
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
-    "std": 40.625,
-    "colors": 215,
-    "mean": 177.39,
+    "std": 40.806,
+    "colors": 214,
+    "mean": 177.258,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
-    "std": 38.957,
-    "colors": 252,
-    "mean": 192.521,
+    "std": 39.22,
+    "colors": 249,
+    "mean": 192.472,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 39.561,
-    "colors": 252,
-    "mean": 196.509,
+    "std": 39.823,
+    "colors": 249,
+    "mean": 196.462,
+    "ok": true
+  },
+  {
+    "name": "10-cutaway-transparent",
+    "darkFrac": 0,
+    "std": 40.46,
+    "colors": 521,
+    "mean": 154.367,
+    "ok": true
+  },
+  {
+    "name": "點選 gearboxParallel",
+    "expected": "gearbox",
+    "got": "gearbox",
+    "ok": true
+  },
+  {
+    "name": "點選 generatorRotor",
+    "expected": "generator",
+    "got": "generator",
+    "ok": true
+  },
+  {
+    "name": "11-cutaway-shell-removed",
+    "darkFrac": 0,
+    "std": 43.009,
+    "colors": 613,
+    "mean": 151.83,
+    "ok": true
+  },
+  {
+    "name": "點選 mainShaftBody",
+    "expected": "mainShaft",
+    "got": "mainShaft",
+    "ok": true
+  },
+  {
+    "name": "12-focus-gearbox",
+    "darkFrac": 0,
+    "std": 47.614,
+    "colors": 527,
+    "mean": 158.185,
+    "ok": true
+  },
+  {
+    "name": "13-focus-generator",
+    "darkFrac": 0,
+    "std": 46.17,
+    "colors": 491,
+    "mean": 161.582,
+    "ok": true
+  },
+  {
+    "name": "14-hub-pitch-system",
+    "darkFrac": 0,
+    "std": 45.074,
+    "colors": 396,
+    "mean": 163.56,
+    "ok": true
+  },
+  {
+    "name": "15-yaw-system",
+    "darkFrac": 0,
+    "std": 48.008,
+    "colors": 483,
+    "mean": 151.85,
+    "ok": true
+  },
+  {
+    "name": "16-power-path",
+    "darkFrac": 0,
+    "std": 30.311,
+    "colors": 284,
+    "mean": 156.972,
+    "ok": true
+  },
+  {
+    "name": "點選 undergroundStrip1",
+    "expected": "undergroundCable",
+    "got": "undergroundCable",
+    "ok": true
+  },
+  {
+    "name": "返回外觀",
+    "shellView": "solid",
+    "internalShown": 0,
+    "ok": true
+  },
+  {
+    "name": "點選 gearboxParallel",
+    "expected": "nacelle",
+    "got": "nacelle",
     "ok": true
   },
   {
@@ -67,33 +159,41 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 14.471780028943561,
-    "drawCalls": 26,
-    "triangles": 18592,
+    "fps": 15.371313286580296,
+    "drawCalls": 27,
+    "triangles": 18604,
     "pixelRatio": 1
   },
   {
     "name": "07-mobile-390",
     "darkFrac": 0,
-    "std": 43.666,
-    "colors": 213,
-    "mean": 185.126,
+    "std": 44.077,
+    "colors": 227,
+    "mean": 185.266,
     "ok": true
   },
   {
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
-    "std": 38.563,
-    "colors": 240,
-    "mean": 208.007,
+    "std": 38.91,
+    "colors": 239,
+    "mean": 208.173,
     "ok": true
   },
   {
     "name": "09-mobile-390-partlist",
     "darkFrac": 0,
-    "std": 33.944,
-    "colors": 185,
-    "mean": 222.084,
+    "std": 37.557,
+    "colors": 223,
+    "mean": 224.988,
+    "ok": true
+  },
+  {
+    "name": "17-mobile-390-cutaway",
+    "darkFrac": 0,
+    "std": 43.397,
+    "colors": 529,
+    "mean": 162.465,
     "ok": true
   },
   {
@@ -104,9 +204,9 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 15.20767987834058,
-    "drawCalls": 48,
-    "triangles": 20280,
+    "fps": 13.839462238037477,
+    "drawCalls": 95,
+    "triangles": 28200,
     "pixelRatio": 2
   }
 ]

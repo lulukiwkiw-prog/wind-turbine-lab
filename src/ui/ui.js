@@ -1,6 +1,6 @@
 // 兒童介面：大按鈕、簡短繁體中文、不需輸入文字
 // UI 只讀寫集中 store，不另外保存模式／速度／選取等狀態。
-import { MODES, PARTS, PALETTE, CURRENT_STAGE, ANIMATION } from '../spec/turbineSpec.js';
+import { MODES, PARTS, PALETTE, CURRENT_STAGE, ANIMATION, gearboxRatio } from '../spec/turbineSpec.js';
 import { partText } from '../learning/partsData.js';
 import { ICONS } from './icons.js';
 
@@ -15,6 +15,7 @@ const el = (tag, attrs = {}, html = '') => {
 };
 
 const SPEED_LABEL = { 1: '正常', 0.5: '慢動作', 0.25: '超慢' };
+const GROUP_TITLE = { exterior: '外觀', internal: '機艙裡面', electrical: '電力' };
 
 export function createUI({ root, store, actions }) {
   // ---------- 標題 ----------
@@ -55,20 +56,42 @@ export function createUI({ root, store, actions }) {
   mk('nacelle', ICONS.nacelle, '看機艙', () => actions.preset('nacelle'));
   const listBtn = mk('list', ICONS.list, '零件', () => store.set({ partListOpen: !store.get().partListOpen }));
 
-  // ---------- 零件清單 ----------
+  // ---------- 零件清單（依外觀／機艙內部／電力分組） ----------
   const list = el('div', { class: 'partlist', role: 'dialog', 'aria-label': '零件清單' });
   list.append(el('h2', {}, '點一個零件看看'));
-  const grid = el('div', { class: 'grid' });
   const listButtons = {};
-  for (const p of PARTS.filter((q) => q.stage <= CURRENT_STAGE)) {
-    const t = partText(p.id, store.get().difficulty);
-    const b = el('button', { class: 'btn chip', type: 'button', 'data-part': p.id },
-      `<i class="dot" style="background:${PALETTE[p.colorKey]}"></i><span>${t.name}</span>`);
-    b.addEventListener('click', () => store.set({ selectedPart: p.id, partListOpen: false }));
-    listButtons[p.id] = b;
-    grid.append(b);
+  for (const [group, title] of Object.entries(GROUP_TITLE)) {
+    const parts = PARTS.filter((q) => q.stage <= CURRENT_STAGE && q.group === group);
+    if (!parts.length) continue;
+    list.append(el('h3', {}, title));
+    const grid = el('div', { class: 'grid' });
+    for (const p of parts) {
+      const t = partText(p.id, store.get().difficulty);
+      const b = el('button', { class: 'btn chip', type: 'button', 'data-part': p.id },
+        `<i class="dot" style="background:${PALETTE[p.colorKey]}"></i><span>${t.name}</span>`);
+      b.addEventListener('click', () => actions.selectPart(p.id));
+      listButtons[p.id] = b;
+      grid.append(b);
+    }
+    list.append(grid);
   }
-  list.append(grid);
+
+  // ---------- 剖視工具列 ----------
+  const cutbar = el('div', { class: 'cutbar', role: 'toolbar', 'aria-label': '機艙剖視' });
+  const cutBtn = (id, label, fn, cls = '') => {
+    const b = el('button', { class: `btn cut ${cls}`, type: 'button', 'data-cut': id }, label);
+    b.addEventListener('click', fn);
+    cutbar.append(b);
+    return b;
+  };
+  cutBtn('back', '返回外觀', () => store.set({ mode: 'exterior', selectedPart: null }), 'back');
+  const seeBtn = cutBtn('transparent', '外殼透明', () => store.set({ shellView: 'transparent' }));
+  const hideBtn = cutBtn('hidden', '拿掉外殼', () => store.set({ shellView: 'hidden' }));
+  cutBtn('gearbox', '看齒輪箱', () => actions.selectPart('gearbox'));
+  cutBtn('generator', '看發電機', () => actions.selectPart('generator'));
+  cutBtn('pitch', '看輪轂裡面', () => actions.selectPart('pitchSystem'));
+  const cutNote = el('p', { class: 'cutnote' },
+    `教學示意：高速軸實際約比主軸快 ${Math.round(gearboxRatio())} 倍，畫面已經放慢。`);
 
   // ---------- 零件介紹卡 ----------
   const info = el('section', { class: 'info', 'aria-live': 'polite' });
@@ -91,6 +114,7 @@ export function createUI({ root, store, actions }) {
   // ---------- 零件標籤（跟著 3D 位置移動） ----------
   const marker = el('div', { class: 'marker' });
 
+  header.append(cutbar, cutNote);
   root.append(header, tools, list, info, hint, marker);
 
   function render(s) {
@@ -103,6 +127,10 @@ export function createUI({ root, store, actions }) {
     listBtn.classList.toggle('on', s.partListOpen);
     list.classList.toggle('open', s.partListOpen);
     for (const [id, b] of Object.entries(listButtons)) b.classList.toggle('active', id === s.selectedPart);
+    cutbar.classList.toggle('open', s.mode === 'cutaway');
+    cutNote.hidden = s.mode !== 'cutaway';
+    seeBtn.classList.toggle('active', s.shellView === 'transparent');
+    hideBtn.classList.toggle('active', s.shellView === 'hidden');
 
     const t = s.selectedPart && partText(s.selectedPart, s.difficulty);
     info.classList.toggle('open', !!t);
