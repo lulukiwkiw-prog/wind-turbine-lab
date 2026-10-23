@@ -23,6 +23,7 @@ export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
   controls.update();
 
   let tween = null;
+  controls.addEventListener('start', () => { tween = null; follow = null; }); // 使用者自己轉動：停止自動移動
 
   /** 直式螢幕視野較窄：沿觀看方向拉遠，確保預設視角看得到需要的寬度 */
   function fitted(name, p) {
@@ -41,7 +42,10 @@ export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
   }
   const presetOf = (name) => (name === 'default' ? { target: VIEW.defaultTarget, camera: VIEW.defaultCamera } : VIEW.presets[name]);
 
+  let follow = null; // 鏡頭沿路徑移動：{ t, duration, fn, fromT, fromP }
+
   function flyTo(target, position, duration = VIEW.focusDurationSec) {
+    follow = null;
     tween = {
       t: 0, duration,
       fromT: controls.target.clone(), toT: new THREE.Vector3().copy(target),
@@ -76,6 +80,17 @@ export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
       const dist = THREE.MathUtils.clamp((radius / Math.sin(fov / 2)) * 1.3 / Math.min(camera.aspect, 1), VIEW.minDistance + 0.5, VIEW.maxDistance);
       flyTo(center, center.clone().addScaledVector(dir, dist));
     },
+    /**
+     * 鏡頭跟著路徑走：fn(u) 回傳 u∈[0,1] 時的 { target, position }；duration 秒走完。
+     * 開頭先平順地從目前位置接上路徑；使用者自己轉動畫面就停止跟隨。
+     */
+    followPath(fn, duration) {
+      tween = null;
+      follow = { t: 0, duration, fn, fromT: controls.target.clone(), fromP: camera.position.clone() };
+    },
+    isFollowing: () => follow !== null,
+    /** 飛到指定的相機位置，看著 target（兩者都是世界座標） */
+    lookFrom(target, position) { flyTo(target, position); },
     preset(name) {
       const { target, pos } = fitted(name, presetOf(name));
       flyTo(target, pos);
@@ -88,6 +103,7 @@ export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
     jump(name) {
       const { target, pos } = fitted(name, presetOf(name));
       tween = null;
+      follow = null;
       controls.target.copy(target);
       camera.position.copy(pos);
       controls.update();
@@ -105,6 +121,13 @@ export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
         controls.target.lerpVectors(tween.fromT, tween.toT, k);
         camera.position.lerpVectors(tween.fromP, tween.toP, k);
         if (tween.t >= 1) tween = null;
+      } else if (follow) {
+        follow.t = Math.min(follow.duration, follow.t + dt);
+        const { target, position } = follow.fn(ease(follow.t / follow.duration));
+        const k = ease(Math.min(1, follow.t / VIEW.focusDurationSec)); // 開頭從目前位置接上路徑
+        controls.target.lerpVectors(follow.fromT, target, k);
+        camera.position.lerpVectors(follow.fromP, position, k);
+        if (follow.t >= follow.duration) follow = null;
       }
       clampTarget();
       controls.update();

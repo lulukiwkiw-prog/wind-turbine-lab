@@ -64,6 +64,16 @@ export function createMaterialRegistry() {
         m.depthWrite = !t;
       }
     },
+    /** 單一零件的透明度（例如讓塔架變透明看裡面的電纜）；只改材質參數 */
+    setPartOpacity(partId, opacity) {
+      for (const m of byPart.get(partId)?.values() ?? []) {
+        const t = opacity < 1;
+        if (m.transparent !== t) m.needsUpdate = true;
+        m.transparent = t;
+        m.opacity = opacity;
+        m.depthWrite = !t;
+      }
+    },
     partIds: () => [...byPart.keys()],
   };
 }

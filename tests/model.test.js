@@ -160,6 +160,12 @@ test('第二階段：主軸與葉輪同角度；高速軸同向、畫面轉速�
   assert.ok(Math.sign(nodes.highSpeedShaft.rotation.z) === Math.sign(nodes.rotor.rotation.z), '高速軸與葉輪同向');
   assert.ok(anim.highSpeedRps() <= SIM.visualMaxHighSpeedRps + 1e-12);
   assert.ok(anim.highSpeedRps() > anim.rotorRpm() / 60, '高速軸比主軸快');
+  // 依固定比例放慢：葉輪轉得比較慢時，高速軸畫面也比較慢（看得出風小風大的差別）
+  const fast = anim.highSpeedRps() / anim.rotorRpm();
+  store.set({ windSpeed: 4 });
+  for (let i = 0; i < 300; i++) anim.update(0.2);
+  assert.ok(anim.rotorRpm() < SIM.rotorRatedRpm * 0.8);
+  assert.ok(Math.abs(anim.highSpeedRps() / anim.rotorRpm() - fast) < 1e-9, '高速軸與葉輪的畫面轉速成固定比例');
 });
 
 test('第二階段：外觀模式隱藏內部零件；剖視模式顯示；拿掉外殼只隱藏機艙外殼與導流罩', () => {

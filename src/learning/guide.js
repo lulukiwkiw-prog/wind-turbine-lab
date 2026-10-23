@@ -17,8 +17,10 @@ const bladeLength = Math.round(DIM.rotor.radius - DIM.hub.radius); // 葉片從�
  * 每一段：
  * - setup：要套用到 store 的狀態（mode 會先單獨設定，因為切換模式時會重設外殼等狀態）
  * - part：要標示的零件（黃色標籤＋發亮）
- * - camera：'preset:<名稱>'、'part:<零件>'（飛到零件旁邊）或 'gears'（看齒輪）
+ * - camera：'preset:<名稱>'、'part:<零件>'（飛到零件旁邊）、'gears'（看齒輪）或 'blade'（葉輪停住，靠近看一片葉片）
  * - minSec：至少停留幾秒（讓畫面上的變化來得及發生，例如風機停下來）
+ * - fastForwardSec：開始時先把模擬快轉幾秒（直接看到穩定後的樣子，字幕卡標示「快轉」）
+ * - meter：字幕卡顯示風速、轉速、發電量長條；figure：另外顯示的小圖（'airfoil' 葉片切面）
  */
 export const GUIDE = [
   // ---------- 第 1 章 ----------
@@ -34,8 +36,8 @@ export const GUIDE = [
   },
   {
     chapter: 'wind', title: '葉片像飛機的翅膀',
-    text: '葉片的形狀像飛機的翅膀。風吹過葉片時，兩面的空氣跑得不一樣快，就產生一個往旁邊推的力，叫做升力。三片葉片一起被推著繞圈，葉輪就轉起來了。',
-    setup: { mode: 'experiment', windSpeed: 8, windAngleDeg: 0 }, part: 'blade', camera: 'preset:front', minSec: 6,
+    text: '我們先讓葉輪停一下，靠近看一片葉片。小圖是把葉片切開來看：一面比較彎，就像飛機的翅膀。風吹過時，兩面的空氣跑得不一樣快，產生一個往旁邊推的力，叫做升力。升力推著葉片繞圈，葉輪就轉起來了。',
+    setup: { mode: 'experiment', windSpeed: 8, windAngleDeg: 0, paused: true }, part: 'blade', camera: 'blade', figure: 'airfoil', minSec: 8,
   },
   {
     chapter: 'wind', title: '慢慢轉，力氣大',
@@ -71,8 +73,8 @@ export const GUIDE = [
   // ---------- 第 3 章 ----------
   {
     chapter: 'grid', title: '電纜往下走',
-    text: '電從發電機出來，沿著電纜，從塔架裡面一路往下走到地面，再從地下電纜送出去。',
-    setup: { mode: 'experiment', windSpeed: 8, windAngleDeg: 0, shellView: 'transparent' }, part: 'powerCable', camera: 'part:powerCable', minSec: 5,
+    text: '我們讓塔架變透明，跟著電走一趟。電從發電機出來，沿著電纜，在塔架裡面一路往下走到地面，再鑽進埋在地下的電纜，送到旁邊的變壓器。',
+    setup: { mode: 'experiment', windSpeed: 8, windAngleDeg: 0, shellView: 'transparent', towerXray: true }, part: 'powerCable', camera: 'cable', minSec: 12,
   },
   {
     chapter: 'grid', title: '變壓器把電壓升高',
@@ -87,23 +89,25 @@ export const GUIDE = [
   // ---------- 第 4 章 ----------
   {
     chapter: 'weather', title: '風太小',
-    text: `風太小的時候，每秒不到 ${SIM.cutInSpeed} 公尺，風的力量不夠，風機會慢慢停下來，也不發電。`,
-    setup: { mode: 'experiment', windSpeed: 2.5, windAngleDeg: 0, pitchAuto: true }, camera: 'preset:experiment', minSec: 9,
+    text: `風太小的時候，每秒不到 ${SIM.cutInSpeed} 公尺，葉輪只能慢慢空轉，力量不夠，發電機不接上去，所以不發電。看看長條：發電量是 0，發電機也沒有發亮。`,
+    setup: { mode: 'experiment', windSpeed: 2.5, windAngleDeg: 0, pitchAuto: true, shellView: 'transparent' },
+    part: 'generator', camera: 'preset:cutaway', meter: true, fastForwardSec: 30, minSec: 9,
   },
   {
     chapter: 'weather', title: '風大，發電多',
-    text: `風愈大，發的電愈多。風速到了每秒 ${SIM.ratedSpeed} 公尺左右，發電機已經發到最大的 ${SIM.ratedPowerKW} kW。風再變大時，控制器會把葉片轉一個角度，叫做變槳，讓葉片少接一點風，轉速就不會太快。`,
-    setup: { mode: 'experiment', windSpeed: 15, windAngleDeg: 0, pitchAuto: true }, camera: 'preset:front', minSec: 10,
+    text: `風變大了！葉輪和發電機都轉得更快，發電機亮起來，發的電變多。風速到了每秒 ${SIM.ratedSpeed} 公尺左右，就發到最大的 ${SIM.ratedPowerKW} kW。風再變大，控制器會把葉片轉一個角度，叫做變槳，讓轉速不會太快。`,
+    setup: { mode: 'experiment', windSpeed: 15, windAngleDeg: 0, pitchAuto: true, shellView: 'transparent' },
+    part: 'generator', camera: 'preset:cutaway', meter: true, fastForwardSec: 20, minSec: 10,
   },
   {
     chapter: 'weather', title: '風太大，停下來保護自己',
     text: `風太大，每秒超過 ${SIM.cutOutSpeed} 公尺時，為了安全，葉片會轉到側面對著風，這叫做順槳。風機慢慢停下來，等風變小再重新開始發電。`,
-    setup: { mode: 'experiment', windSpeed: 27, windAngleDeg: 0, pitchAuto: true }, camera: 'preset:front', minSec: 12,
+    setup: { mode: 'experiment', windSpeed: 27, windAngleDeg: 0, pitchAuto: true }, camera: 'preset:front', meter: true, minSec: 12,
   },
   {
     chapter: 'weather', title: '風向變了，跟著轉',
     text: '風向改變的時候，機艙上的風向標會發現。偏航系統就把整個機艙慢慢轉過去，讓葉輪正對著風。畫面上轉得比真的風機快很多，這是教學示意。',
-    setup: { mode: 'experiment', windSpeed: 10, windAngleDeg: 90, pitchAuto: true }, camera: 'preset:experiment', minSec: 16,
+    setup: { mode: 'experiment', windSpeed: 10, windAngleDeg: 90, pitchAuto: true }, camera: 'preset:experiment', meter: true, minSec: 16,
   },
   {
     chapter: 'weather', title: '換你試試看',
@@ -159,7 +163,9 @@ export function createGuidePlayer({ store, speech, actions, script = GUIDE }) {
     // 先換模式（切換模式會重設外殼等），再套用這一段的其他設定
     apply({ guideStep: i, selectedPart: null, openPanel: null, tourStep: null, quizIndex: null, quizPicked: null });
     if (mode) apply({ mode });
-    apply({ ...(mode === 'explode' ? {} : { shellView: 'solid' }), ...rest });
+    // 預設：動畫在播放（只有需要停住畫面的那一段才暫停）、外殼實心
+    apply({ paused: false, towerXray: false, ...(mode === 'explode' ? {} : { shellView: 'solid' }), ...rest });
+    if (scene.fastForwardSec) actions.fastForward?.(scene.fastForwardSec);
     if (scene.part) apply({ selectedPart: scene.part });
     applying = true; // 相機動作可能順便改狀態（例如看齒輪時藏起擋住的零件）
     try { actions.camera(scene.camera); } finally { applying = false; }
@@ -172,7 +178,7 @@ export function createGuidePlayer({ store, speech, actions, script = GUIDE }) {
     if (store.get().guideStep === null) return;
     token++;
     speech.stop();
-    apply({ guideStep: null, guidePaused: false, ...(keepSelection ? {} : { selectedPart: null }) });
+    apply({ guideStep: null, guidePaused: false, towerXray: false, ...(keepSelection ? {} : { selectedPart: null }) });
   }
 
   store.subscribe((s, prev, changed) => {
