@@ -1,7 +1,7 @@
 // 進入點：把模型、動畫、互動、學習資料與 UI 組合起來
 import * as THREE from 'three';
 import './ui/style.css';
-import { VIEW, PALETTE, PARTS, EXPLODE } from './spec/turbineSpec.js';
+import { VIEW, PALETTE, PARTS, EXPLODE, SIM } from './spec/turbineSpec.js';
 import { store } from './state/store.js';
 import { createMaterialRegistry } from './model/materials.js';
 import { buildTurbine } from './model/turbine.js';
@@ -102,6 +102,70 @@ function selectPart(id) {
   store.set(patch);
 }
 
+/**
+ * 靠近看一片葉片：先把第 0 片葉片轉到水平，再從葉尖外側斜看回葉根，看得到翼型斷面。
+ * 葉輪要先停住（由呼叫端暫停動畫），否則葉片會轉走。
+ */
+const BLADE_VIEW = { targetR: 16, camR: 51, upwind: 6, up: 2.5, lead: 0 }; // 公尺：看向半徑 targetR 處；相機在半徑 camR，往上風、上方、前緣方向偏移
+function focusBlade(v = BLADE_VIEW) {
+  const up = new THREE.Vector3(0, 1, 0);
+  const dir = new THREE.Vector3();
+  const upwind = new THREE.Vector3();
+  const tip = (a) => {
+    animator.setRotorAngleDeg(a);
+    turbine.root.updateMatrixWorld(true);
+    return dir.set(0, 1, 0).transformDirection(turbine.nodes.pitch0.matrixWorld);
+  };
+  turbine.root.updateMatrixWorld(true);
+  turbine.nodes.rotor.getWorldDirection(upwind); // 葉輪局部 +Z = 上風
+  const right = new THREE.Vector3().crossVectors(upwind, up); // 從上風看的左右，固定挑同一邊
+  let best = 0, score = Infinity;
+  for (let a = 0; a < 360; a += 1) {
+    const d = tip(a);
+    const sc = Math.abs(d.y) + (d.dot(right) < 0 ? 10 : 0);
+    if (sc < score) { score = sc; best = a; }
+  }
+  const d = tip(best).clone();
+  const lead = new THREE.Vector3(1, 0, 0).transformDirection(turbine.nodes.pitch0.matrixWorld); // 葉片前緣方向
+  const hub = turbine.nodes.rotor.getWorldPosition(new THREE.Vector3());
+  const target = hub.clone().addScaledVector(d, v.targetR);
+  const pos = hub.clone().addScaledVector(d, v.camR).addScaledVector(upwind, v.upwind).addScaledVector(up, v.up).addScaledVector(lead, v.lead);
+  rig.lookFrom(target, pos);
+}
+
+/**
+ * 跟著電走：鏡頭從發電機沿著送電路徑（機艙 → 塔架裡 → 地下電纜）往下走到變壓器。
+ * 鏡頭在「塔架 → 變壓器」這條線的側邊（挑下風那一側），塔架不會擋住變壓器，葉片也不會擋住鏡頭。
+ */
+const CABLE_FOLLOW = { durationSec: 10, side: 16, up: 4, minY: 10 };
+function followCable() {
+  turbine.root.updateMatrixWorld(true);
+  const end = flows.transformerDistance(); // 走到變壓器
+  const downwind = turbine.nodes.rotor.getWorldDirection(new THREE.Vector3()).negate().setY(0).normalize();
+  const toTransformer = flows.pathPoint(end).setY(0).normalize();
+  const side = new THREE.Vector3(0, 1, 0).cross(toTransformer).normalize();
+  if (side.dot(downwind) < 0) side.negate();
+  const target = new THREE.Vector3();
+  const position = new THREE.Vector3();
+  rig.followPath((u) => {
+    flows.pathPoint(u * end, target);
+    position.copy(target).addScaledVector(side, CABLE_FOLLOW.side);
+    position.y = Math.max(target.y + CABLE_FOLLOW.up, CABLE_FOLLOW.minY); // 到地面時從斜上方看
+    return { target, position };
+  }, CABLE_FOLLOW.durationSec);
+}
+
+/** 地面上的零件（例如變壓器）：從塔架的另一邊看過去，塔架不會擋在中間 */
+const GROUND_PARTS = new Set(['transformer', 'substation', 'undergroundCable']);
+function focusAwayFromTower(id) {
+  scene.updateMatrixWorld(true);
+  const sphere = partBounds(id).getBoundingSphere(new THREE.Sphere());
+  const dir = sphere.center.clone().setY(0);
+  if (dir.lengthSq() < 1e-6) dir.set(1, 0, 0);
+  dir.normalize().setY(0.45).normalize();
+  rig.viewFrom(sphere.center, dir, Math.max(sphere.radius, 4));
+}
+
 const view = createViewController({ root: scene, mats });
 view.apply(store.get());
 const exploder = createExploder({ root: scene, nodes: turbine.nodes });
@@ -150,8 +214,15 @@ const guide = createGuidePlayer({
   actions: {
     camera(spec) {
       if (spec === 'gears') focusGears();
+      else if (spec === 'blade') focusBlade();
+      else if (spec === 'cable') followCable();
+      else if (spec.startsWith('part:') && GROUND_PARTS.has(spec.slice(5))) focusAwayFromTower(spec.slice(5));
       else if (spec.startsWith('part:')) focusPart(spec.slice(5));
       else rig.preset(spec.replace(/^preset:/, ''));
+    },
+    /** 快轉模擬（直接看到穩定後的樣子） */
+    fastForward(sec) {
+      for (let t = 0; t < sec; t += 0.1) sim.step(0.1);
     },
   },
 });
@@ -187,6 +258,7 @@ store.subscribe((s, prev, changed) => {
     store.set(patch);
   }
   if (modeChanged || changed.some((k) => ['shellView', 'hiddenParts', 'soloPart'].includes(k))) view.apply(s);
+  if (changed.includes('towerXray')) mats.setPartOpacity('tower', s.towerXray ? 0.25 : 1);
 
   if (changed.includes('selectedPart')) {
     if (prev.selectedPart) mats.setHighlight(prev.selectedPart, 0);
@@ -219,11 +291,18 @@ const viewShift = { cx: 0, cy: 0, scale: 1 }; // 相對螢幕中心的位移（p
 const guideEl = guidePanel.element;
 function targetShift() {
   const w = window.innerWidth, h = window.innerHeight;
-  if (store.get().guideStep !== null) { // 導覽字幕卡在下方：畫面中心移到標題列與字幕卡之間
-    const top = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+  if (store.get().guideStep !== null) { // 導覽字幕卡在下方：畫面中心移到標題列（和小圖）與字幕卡之間
+    let top = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+    let left = 0;
     const bottom = guideEl.getBoundingClientRect().top;
-    const bandH = Math.max(80, bottom - top);
-    return { cx: 0, cy: (top + bottom) / 2 - h / 2, scale: Math.min(1, Math.max(0.5, bandH / (h * 0.8))) };
+    if (guidePanel.figure.classList.contains('open')) {
+      const f = guidePanel.figure.getBoundingClientRect();
+      if (f.width > w * 0.6) top = Math.max(top, f.bottom); // 手機：小圖在上方
+      else left = f.right; // 桌面：小圖在左邊
+    }
+    const bandW = w - left, bandH = Math.max(80, bottom - top);
+    const scale = Math.min(1, Math.max(0.5, Math.min(bandH / (h * 0.8), bandW / (w * 0.8))));
+    return { cx: (left + w) / 2 - w / 2, cy: (top + bottom) / 2 - h / 2, scale };
   }
   if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden) return { cx: 0, cy: 0, scale: 1 };
   const r = xpEl.getBoundingClientRect();
@@ -280,8 +359,17 @@ function frame() {
   flows.update(st.paused ? 0 : dt * st.animSpeed, st.mode === 'experiment');
   readoutT += dt;
   guide.update(Math.min(raw, 1)); // 導覽計時用真實時間（不受慢動作與低幀率影響）
-  if (readoutT > 0.2) { readoutT = 0; const now = sim.get(); panel.update(now); guidePanel.update(now); checkMissions(); }
-  rig.update(dt);
+  if (readoutT > 0.2) {
+    readoutT = 0;
+    const now = sim.get();
+    panel.update(now);
+    guidePanel.update(now);
+    checkMissions();
+    // 導覽看風小、風大時：發電機發亮的程度表示發電量（教學示意）
+    const scene = st.guideStep !== null ? guide.script[st.guideStep] : null;
+    if (scene?.meter && st.selectedPart === 'generator') mats.setHighlight('generator', 0.05 + 0.6 * Math.min(1, Math.max(0, now.powerKW) / SIM.ratedPowerKW));
+  }
+  rig.update(Math.min(raw, 0.25)); // 相機移動用真實時間（低幀率時也跟得上導覽）
   updateViewShift(dt);
   renderer.render(scene, rig.camera);
   ui.placeMarker(markerScreen());
@@ -301,6 +389,7 @@ window.__lab = {
   selectPart,
   focusPart,
   focusGears,
+  focusBlade,
   animator,
   exploder,
   sim,

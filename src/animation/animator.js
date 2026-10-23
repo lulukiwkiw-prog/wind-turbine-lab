@@ -22,9 +22,13 @@ export function createAnimator({ nodes, sensorParts, store, sim = createSim(stor
     return Math.min(sim.get().rotorRpm, SIM.visualMaxRotorRpm);
   }
 
-  /** 高速軸畫面轉速（每秒圈數）：實際為主軸 × 速比，但畫面上限放慢，避免閃爍（教學示意） */
+  /**
+   * 高速軸畫面轉速（每秒圈數）：實際為主軸 × 速比，太快會閃爍，所以畫面依固定比例放慢（教學示意）：
+   * 葉輪在額定轉速時，高速軸畫面每秒轉 visualMaxHighSpeedRps 圈；風小轉慢時也看得出比較慢。
+   */
+  const hsSlowdown = SIM.visualMaxHighSpeedRps / ((SIM.rotorRatedRpm / 60) * ratio);
   function highSpeedRps() {
-    return Math.min((rotorRpm() / 60) * ratio, SIM.visualMaxHighSpeedRps);
+    return Math.min((rotorRpm() / 60) * ratio * hsSlowdown, SIM.visualMaxHighSpeedRps);
   }
 
   /** 風速計：杯子中心的速度約為風速的 1/3 */

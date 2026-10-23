@@ -122,6 +122,7 @@ export function createFlows({ scene, nodes, sim, store }) {
       const path = buildPath();
       flowT = (flowT + SIM.energyDotSpeed * dt) % path.length;
       const frac = Math.min(1, now.powerKW / SIM.ratedPowerKW);
+      const xray = store.get().towerXray; // 塔架透明時，塔內的點大一點才看得到
       const spacing = path.length / DOT_COUNT;
       for (let i = 0; i < DOT_COUNT; i++) {
         const show = order[i] < frac;
@@ -129,12 +130,21 @@ export function createFlows({ scene, nodes, sim, store }) {
         pointAt(path, d, v3);
         // 機艙與塔內的點小一點，戶外的點大一點才看得到
         const inside = Math.hypot(v3.x, v3.z) < 3 && v3.y > 1;
-        const r = show ? (inside ? 0.14 : 0.55 + Math.min(d / path.length, 1) * 0.6) : 0;
+        const r = show ? (inside ? (xray ? 0.35 : 0.14) : 0.55 + Math.min(d / path.length, 1) * 0.6) : 0;
         m.compose(v3, q.identity(), sc.set(r, r, r));
         dots.setMatrixAt(i, m);
       }
       dots.instanceMatrix.needsUpdate = true;
     },
     pathLength: () => buildPath().length,
+    /** 送電路徑上距發電機 d 公尺的點（世界座標） */
+    pathPoint(d, out = new THREE.Vector3()) { return pointAt(buildPath(), d, out); },
+    /** 從發電機沿路徑走到變壓器（地下電纜的轉折點）的距離 */
+    transformerDistance() {
+      const path = buildPath();
+      const tr = CABLE_ROUTE.underground[1];
+      const i = path.all.findIndex((p) => Math.abs(p.x - tr[0]) < 1e-6 && Math.abs(p.z - tr[2]) < 1e-6);
+      return path.cum[i];
+    },
   };
 }

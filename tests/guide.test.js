@@ -23,7 +23,10 @@ test('導覽劇本：四個章節依序都有；零件、模式、視角都存�
     if (g.part) assert.ok(parts.has(g.part), `零件 ${g.part}`);
     if (kind === 'part') assert.equal(arg, g.part, '飛到的零件也要標示');
     else if (kind === 'preset') assert.ok(arg in VIEW.presets, `視角 ${arg}`);
-    else assert.equal(g.camera, 'gears');
+    else assert.ok(['gears', 'blade', 'cable'].includes(g.camera), g.camera);
+    if (g.camera === 'cable') assert.equal(g.setup.towerXray, true, '跟著電走時塔架要透明，看得到裡面的電纜');
+    if (g.figure) assert.equal(g.figure, 'airfoil');
+    if (g.camera === 'blade') assert.equal(g.setup.paused, true, '靠近看葉片時葉輪要停住，不然葉片會轉走');
     // 每個設定值都要通過 store 的檢查（不合法的值會被拒絕）
     for (const [k, v] of Object.entries(g.setup)) {
       if (k === 'mode') continue;
@@ -68,10 +71,18 @@ test('導覽說的物理現象：模擬真的會這樣', () => {
   now = run(store, sim, { windSpeed: storm.setup.windSpeed }, storm.minSec);
   assert.equal(now.status, 'shutdown');
   assert.ok(now.pitchDeg > 60, `順槳 ${now.pitchDeg}°`);
-  // 風太小：不發電
+  // 風太小（快轉後）：葉輪只是慢慢空轉、不發電
   const calm = GUIDE.find((g) => g.setup.windSpeed < SIM.cutInSpeed);
-  now = run(store, sim, { windSpeed: calm.setup.windSpeed }, 120);
+  run(store, sim, { windSpeed: 8 }, 120);
+  now = run(store, sim, { windSpeed: calm.setup.windSpeed }, calm.fastForwardSec);
   assert.ok(now.powerKW <= 0.5, `風太小時發電 ${now.powerKW}`);
+  assert.ok(now.rotorRpm > 0 && now.rotorRpm < SIM.rotorRatedRpm * 0.5, `風太小時空轉 ${now.rotorRpm}`);
+  // 接著風大（快轉後）：已經滿載，轉速明顯比風小時快
+  const strong = GUIDE.find((g) => g.setup.windSpeed > SIM.ratedSpeed && g.setup.windSpeed < SIM.cutOutSpeed);
+  const calmRpm = now.rotorRpm;
+  now = run(store, sim, { windSpeed: strong.setup.windSpeed }, strong.fastForwardSec);
+  assert.ok(now.powerKW > SIM.ratedPowerKW * 0.97, `快轉後滿載 ${now.powerKW}`);
+  assert.ok(now.rotorRpm > calmRpm * 2, '風大時轉速是風小時的兩倍以上');
   // 風向轉 90°：在這一段停留的時間內，機艙要轉到對準風
   const turn = GUIDE.find((g) => g.setup.windAngleDeg === 90);
   run(store, sim, { windSpeed: 10, windAngleDeg: 0 }, 60);
@@ -101,9 +112,10 @@ function setup({ available = true } = {}) {
   const store = createStore();
   const speech = fakeSpeech(available);
   const cams = [];
-  const player = createGuidePlayer({ store, speech, actions: { camera: (c) => cams.push(c) } });
+  const ffs = [];
+  const player = createGuidePlayer({ store, speech, actions: { camera: (c) => cams.push(c), fastForward: (sec) => ffs.push(sec) } });
   const tick = (sec) => { for (let t = 0; t < sec; t += 0.1) player.update(0.1); };
-  return { store, speech, cams, player, tick };
+  return { store, speech, cams, ffs, player, tick };
 }
 
 test('播放器：開始、照語音換段、唸完前不換、語音沒回報也不會卡住', () => {
@@ -164,8 +176,8 @@ test('播放器：暫停不計時、繼續重唸這一段；上一段／下一�
   assert.equal(store.get().guideStep, null, '最後一段之後就結束');
 });
 
-test('播放器：每一段的狀態都正確套用（外殼、選取、拆解模式）', () => {
-  const { store, player } = setup();
+test('播放器：每一段的狀態都正確套用（外殼、選取、拆解模式、塔架透明、快轉）', () => {
+  const { store, ffs, player } = setup();
   player.start();
   for (let i = 0; i < GUIDE.length; i++) {
     const g = GUIDE[i];
@@ -177,9 +189,14 @@ test('播放器：每一段的狀態都正確套用（外殼、選取、拆解�
     else assert.equal(s.shellView, g.setup.shellView ?? 'solid', g.title);
     assert.equal(s.selectedPart, g.part ?? null, g.title);
     for (const k of ['windSpeed', 'windAngleDeg']) if (k in g.setup) assert.equal(s[k], g.setup[k]);
+    assert.equal(s.paused, g.setup.paused ?? false, `${g.title}：只有指定的段落暫停動畫`);
+    assert.equal(s.towerXray, g.setup.towerXray ?? false, `${g.title}：只有指定的段落塔架透明`);
+    if (g.fastForwardSec) assert.equal(ffs.at(-1), g.fastForwardSec);
     player.next();
   }
   assert.equal(store.get().guideStep, null);
+  assert.equal(store.get().towerXray, false, '導覽結束後塔架恢復');
+  assert.equal(ffs.length, GUIDE.filter((g) => g.fastForwardSec).length);
 });
 
 test('播放器：小朋友自己操作（換模式、點零件、調風速…）就停止導覽', () => {

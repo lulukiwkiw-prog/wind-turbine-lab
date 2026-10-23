@@ -350,7 +350,7 @@ export const SIM = {
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
   maxPitchRateDegPerSec: 10,
   // ---- 畫面 ----
-  visualMaxHighSpeedRps: 1.2, // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍；教學示意）
+  visualMaxHighSpeedRps: 1.2, // 葉輪在額定轉速時，高速軸畫面每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，依比例放慢；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快
   visualMaxAnemometerRps: 2, // 風速計畫面上限
   energyDotSpeed: 14, // m/s，能量流動點的移動速度（教學示意，不是電的速度）

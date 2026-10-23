@@ -497,7 +497,7 @@ try {
     if (!startOk) fail(`開始失敗 ${JSON.stringify(started)}`);
     // 2. 每一段：畫面焦點不被字幕卡或標題列擋住
     const scenes = await page.evaluate(() => window.__lab.guide.script.map((g) => ({ title: g.title, camera: g.camera, part: g.part ?? null, mode: g.setup.mode })));
-    const shots = { 0: 'start', 2: 'blade', 6: 'gears', 7: 'generator', 11: 'grid', 14: 'storm' };
+    const shots = { 0: 'start', 2: 'blade', 6: 'gears', 7: 'generator', 10: 'transformer', 11: 'grid', 12: 'calm', 13: 'strong', 14: 'storm' };
     for (let i = 0; i < scenes.length; i++) {
       const sc = scenes[i];
       await page.evaluate((i) => window.__lab.guide.start(i), i);
@@ -508,19 +508,82 @@ try {
         const p = lab.partScreen(id);
         // 點得到 = 沒有被別的東西（例如葉片）擋住。電纜在塔架裡面，從外面本來就點不到；
         // 三片葉片的包圍盒中心是葉片之間的空隙，也不適用（看截圖確認）
-        const picked = ['powerCable', 'blade'].includes(id) || camera === 'preset:grid' ? id : lab.pickAt(p.x, p.y);
+        let picked = ['powerCable', 'blade'].includes(id) || camera === 'preset:grid' ? id : lab.pickAt(p.x, p.y);
+        if (camera === 'blade') { // 靠近看葉片：畫面的視覺中心（避開標題列、小圖與字幕卡）要點得到葉片
+          const sh = lab.viewShift();
+          const c = { x: innerWidth / 2 + sh.cx, y: innerHeight / 2 + sh.cy };
+          picked = lab.pickAt(c.x, c.y);
+          Object.assign(p, c, { front: true });
+        }
         const card = document.querySelector('.guide').getBoundingClientRect();
         const head = document.querySelector('#ui .top').getBoundingClientRect();
         const s = lab.store.get();
         return { id, p, picked, cardTop: card.top, headBottom: head.bottom, w: innerWidth, step: s.guideStep, mode: s.mode, shell: s.shellView, cardScroll: document.querySelector('.guide').scrollHeight > document.querySelector('.guide').clientHeight + 1 };
       }, sc);
-      // 送電路線的視角是看整條線路，風機本身可以在畫面邊緣
-      const needFocus = sc.camera !== 'preset:grid';
+      // 送電路線的視角是看整條線路，風機本身可以在畫面邊緣；跟著電走的鏡頭一路移動，另外檢查（2c）
+      const needFocus = sc.camera !== 'preset:grid' && sc.camera !== 'cable';
       const visible = r.p.front && r.p.x > 0 && r.p.x < r.w && r.p.y > r.headBottom && r.p.y < r.cardTop;
       const ok = r.step === i && r.mode === sc.mode && (!needFocus || (visible && (!sc.part || r.picked === r.id))) && (sc.mode !== 'explode' || r.shell === 'hidden') && !r.cardScroll;
       report.push({ name: `${tag}導覽 ${i + 1}「${sc.title}」：焦點在字幕卡上方`, focus: r.id, picked: r.picked, x: Math.round(r.p.x), y: Math.round(r.p.y), cardTop: Math.round(r.cardTop), shell: r.shell, ok });
       if (!ok) fail(`第 ${i + 1} 段「${sc.title}」${JSON.stringify(r)}`);
       if (shots[i]) await shoot(page, `${mobile ? '41' : '40'}-guide-${device}-${String(i + 1).padStart(2, '0')}-${shots[i]}`);
+    }
+    // 2b. 靠近看葉片：葉輪停住、小圖出現，小圖不擋字幕卡
+    {
+      await page.evaluate(() => window.__lab.guide.start(2));
+      await page.waitForTimeout(800);
+      const r = await page.evaluate(() => {
+        const f = document.querySelector('.guide-figure').getBoundingClientRect();
+        const c = document.querySelector('.guide').getBoundingClientRect();
+        const h = document.querySelector('#ui .top').getBoundingClientRect();
+        return { open: f.height > 0, paused: window.__lab.store.get().paused, figBottom: f.bottom, figTop: f.top, cardTop: c.top, headBottom: h.bottom, svg: !!document.querySelector('.guide-figure svg path.af-blade') };
+      });
+      const ok = r.open && r.paused && r.svg && r.figBottom < r.cardTop && r.figTop >= r.headBottom - 1;
+      report.push({ name: `${tag}導覽：葉片切面小圖`, ...r, ok });
+      if (!ok) fail(`葉片切面小圖 ${JSON.stringify(r)}`);
+    }
+    // 2c. 跟著電走：塔架變透明，鏡頭一路往下，最後看得到變壓器（不被塔架擋住）
+    {
+      const idx = scenes.findIndex((g) => g.camera === 'cable');
+      await page.evaluate((i) => window.__lab.guide.start(i), idx);
+      const probe = () => page.evaluate(() => {
+        const lab = window.__lab;
+        const cam = lab.scene.userData.camera;
+        const p = lab.partScreen('transformer');
+        let towerOpacity = 1;
+        lab.scene.traverse((o) => { if (o.isMesh && o.userData.partId === 'tower') towerOpacity = Math.min(towerOpacity, o.material.opacity); });
+        return { y: Math.round(cam.position.y), picked: lab.pickAt(p.x, p.y), towerOpacity };
+      });
+      await page.waitForTimeout(3500);
+      const mid = await probe();
+      await page.waitForTimeout(8500);
+      const end = await probe();
+      await shoot(page, `${mobile ? '41' : '40'}-guide-${device}-10-cable-end`);
+      await page.evaluate((i) => window.__lab.guide.start(i), idx + 1);
+      await page.waitForTimeout(300);
+      const after = await probe();
+      const ok = mid.towerOpacity < 1 && mid.y > end.y && end.y < 20 && end.picked === 'transformer' && after.towerOpacity === 1;
+      report.push({ name: `${tag}導覽：跟著電走到變壓器`, mid, end, afterTowerOpacity: after.towerOpacity, ok });
+      if (!ok) fail(`跟著電走 ${JSON.stringify({ mid, end, after })}`);
+    }
+    // 2d. 風小、風大：長條與發電機轉速看得出差別
+    {
+      const calm = scenes.findIndex((g) => g.title === '風太小');
+      const read = () => page.evaluate(() => ({
+        meter: getComputedStyle(document.querySelector('.guide-meter')).display !== 'none',
+        power: document.querySelector('.meter-row.power b').textContent,
+        hs: window.__lab.animator.highSpeedRps(),
+        kw: window.__lab.sim.get().powerKW,
+      }));
+      await page.evaluate((i) => window.__lab.guide.start(i), calm);
+      await page.waitForTimeout(800);
+      const a = await read();
+      await page.evaluate((i) => window.__lab.guide.start(i), calm + 1);
+      await page.waitForTimeout(800);
+      const b = await read();
+      const ok = a.meter && b.meter && a.power === '沒有發電' && a.kw <= 0.5 && b.kw > 1950 && b.hs > a.hs * 2;
+      report.push({ name: `${tag}導覽：風小、風大的差別`, calm: a, strong: b, ok });
+      if (!ok) fail(`風小風大 ${JSON.stringify({ a, b })}`);
     }
     // 3. 字幕卡的按鈕：暫停、下一段、上一段
     await page.evaluate(() => window.__lab.guide.start(3));

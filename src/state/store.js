@@ -29,6 +29,7 @@ const initial = () => ({
   xpFolded: false, // 發電實驗面板收起（手機上只留一行摘要）
   guideStep: null, // 自動導覽：第幾段（null = 沒有在播放）
   guidePaused: false, // 自動導覽暫停中
+  towerXray: false, // 塔架變透明，看得到裡面的電纜（自動導覽「電纜往下走」用）
 });
 
 const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
@@ -49,6 +50,7 @@ const validators = {
   xpFolded: (v) => typeof v === 'boolean',
   guideStep: (v) => v === null || (Number.isInteger(v) && v >= 0),
   guidePaused: (v) => typeof v === 'boolean',
+  towerXray: (v) => typeof v === 'boolean',
   shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
   exploded: (v) => typeof v === 'boolean',
   hiddenParts: (v) => Array.isArray(v) && v.every(isCurrentPart) && new Set(v).size === v.length,
