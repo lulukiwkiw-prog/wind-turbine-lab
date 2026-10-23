@@ -104,6 +104,27 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
 }
 
 /** 檢查風機輪轂在面板沒擋住的地方 */
+/** 剖視／拆解的說明預設收起來（不擋住 3D 畫面），點按鈕才展開 */
+async function notesCheck(page, name, shot) {
+  const state = () => page.evaluate(() => {
+    const vis = (sel) => [...document.querySelectorAll(sel)].some((e) => e.offsetParent !== null && getComputedStyle(e).display !== 'none' && !e.hidden);
+    return { speeds: vis('.speedrow'), note: vis('.top .cutnote'), headBottom: Math.round(document.querySelector('#ui .top').getBoundingClientRect().bottom) };
+  });
+  const closed = await state();
+  const explodeMode = await page.evaluate(() => window.__lab.store.get().mode === 'explode');
+  if (explodeMode) await page.click('.cutbar.open [data-ex="speeds"]');
+  await page.click('.cutbar.open .note-toggle');
+  await page.waitForTimeout(200);
+  const open = await state();
+  if (shot) await shoot(page, shot);
+  if (explodeMode) await page.click('.cutbar.open [data-ex="speeds"]');
+  await page.click('.cutbar.open .note-toggle');
+  const again = await state();
+  const ok = !closed.speeds && !closed.note && open.note && open.speeds === explodeMode && open.headBottom > closed.headBottom && !again.note && !again.speeds;
+  report.push({ name, closed, open, ok });
+  if (!ok) failures.push(`${name}：${JSON.stringify({ closed, open, again })}`);
+}
+
 /** 實際點「看機艙裡面」：外殼要變透明、鏡頭要飛到機艙旁；再點一次回到整台風機 */
 async function insideButtonCheck(page, name, shot) {
   const btn = page.locator('.xp-views .btn', { hasText: '看機艙裡面' });
@@ -261,6 +282,7 @@ try {
     await pickCheck(page, 'planetMesh0', 'planetGear');
     await explode(page, { gears: true });
     await shoot(page, '20b-gear-view-front');
+    await notesCheck(page, '桌面拆解：轉速比較、教學示意預設收起，點了才展開', '20c-explode-notes-open');
     await pickCheck(page, 'ringGearMesh', 'ringGear', [0.18, 1.0, 0.17]);
     await pickCheck(page, 'sunGearMesh', 'sunGear', [0, 0.21, 0.17]);
     await explode(page, { part: 'generator', solo: 'generator' });
@@ -417,8 +439,10 @@ try {
     await shoot(page, '09-mobile-390-partlist');
     await cutaway(page, 'transparent');
     await shoot(page, '17-mobile-390-cutaway');
+    await notesCheck(page, '手機剖視：教學示意預設收起，點了才展開');
     await explode(page, { gears: true, hidden: ['gearbox'] });
     await shoot(page, '23-mobile-390-explode-gears');
+    await notesCheck(page, '手機拆解：轉速比較、教學示意預設收起，點了才展開', '23b-mobile-390-explode-notes-open');
     await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', openPanel: 'learn' }));
     await page.waitForTimeout(300);
     await shoot(page, '35-mobile-390-learn');
