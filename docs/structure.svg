@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" font-family="Noto Sans TC, PingFang TC, Microsoft JhengHei, sans-serif" font-size="14">
+<title>風力發電機結構示意圖（側視）</title>
+<rect width="900" height="720" fill="#f7fbff"/>
+<text x="20" y="32" font-size="22" font-weight="700" fill="#17324d">結構示意圖（側視，示意比例 1 單位 = 1 m）</text>
+<text x="20" y="54" fill="#46607a">由 src/spec/turbineSpec.js 自動產生 · 非特定廠牌、不具工程精度</text>
+<line x1="20" y1="650" x2="880" y2="650" stroke="#7fb05c" stroke-width="3"/>
+<rect x="415.04" y="647.36" width="29.92" height="2.64" fill="#a9a39a"/>
+<rect x="394.8" y="650" width="70.4" height="11" fill="#a9a39a" opacity="0.45"/>
+<polygon points="420.8,647.4 424.3,306.8 435.7,306.8 439.2,647.4" fill="#e9ecef" stroke="#9aa5b1"/>
+<rect x="399.2" y="287.88" width="44" height="17.6" rx="3" fill="#eef1f4" stroke="#9aa5b1"/>
+<line x1="451.9" y1="296.1" x2="390.5506899555669" y2="301.45136741280726" stroke="#3f7fd1" stroke-width="2" stroke-dasharray="6 4"/>
+<line x1="443.3" y1="98.3" x2="477.8" y2="492.4" stroke="#b9c3cc" stroke-width="5" stroke-linecap="round"/>
+<circle cx="451.9162833580184" cy="296.0825736595515" r="8.8" fill="#dfe7ef" stroke="#9aa5b1"/>
+<!-- 尺寸標註 -->
+<g stroke="#17324d" fill="#17324d">
+  <line x1="270" y1="650" x2="270" y2="296.0825736595515" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="130" y="473.04128682977574" stroke="none">輪轂高度 ≈ 80.4 m</text>
+  <line x1="580" y1="98.27102578634367" x2="580" y2="492.388656211566" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="590" y="336.0825736595515" stroke="none">葉輪直徑 90 m</text>
+  <line x1="370" y1="647.36" x2="370" y2="306.79999999999995" stroke-dasharray="3 3"/>
+  <text x="280" y="461.23999999999995" stroke="none">塔架 77.4 m</text>
+</g>
+<defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<!-- 說明 -->
+<g fill="#17324d">
+  <text x="200" y="293.59999999999997">機艙（長 10 m）</text>
+  <text x="465.9162833580184" y="282.0825736595515">輪轂中心：機艙前方 5 m</text>
+  <text x="590" y="496.388656211566">葉尖離地 ≈ 35.8 m，離塔架 ≈ 9.1 m</text>
+  <text x="590" y="358.0825736595515">傾角 5°、錐角 2.5°</text>
+</g>
+<!-- 座標軸與風 -->
+<g transform="translate(70 610)" stroke-width="2.5">
+  <line x1="0" y1="0" x2="0" y2="-60" stroke="#2e9d4f" marker-end="url(#a)"/><text x="6" y="-62" fill="#2e9d4f">+Y 上</text>
+  <line x1="0" y1="0" x2="60" y2="0" stroke="#1e7fd6" marker-end="url(#a)"/><text x="42" y="18" fill="#1e7fd6">+Z</text>
+  <circle r="6" fill="none" stroke="#d24f9b"/><circle r="1.6" fill="#d24f9b"/><text x="-60" y="22" fill="#d24f9b">+X 朝向讀者</text>
+</g>
+<g transform="translate(690 120)">
+  <text x="0" y="0" fill="#17324d" font-weight="700">北風（0°）：從 +Z（北）吹來</text>
+  <line x1="170" y1="24" x2="40" y2="24" stroke="#5aa0d6" stroke-width="4" marker-end="url(#a)"/>
+  <text x="0" y="56" fill="#46607a">葉輪在塔架上風側（上風式）</text>
+  <text x="0" y="76" fill="#46607a">從上風看：葉輪順時針轉</text>
+</g>
+</svg>

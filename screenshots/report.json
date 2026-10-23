@@ -1,0 +1,562 @@
+[
+  {
+    "name": "01-overview",
+    "darkFrac": 0,
+    "std": 40.037,
+    "colors": 214,
+    "mean": 183.095,
+    "ok": true
+  },
+  {
+    "name": "02-front",
+    "darkFrac": 0,
+    "std": 39.66,
+    "colors": 215,
+    "mean": 184.251,
+    "ok": true
+  },
+  {
+    "name": "03-side",
+    "darkFrac": 0,
+    "std": 41.83,
+    "colors": 207,
+    "mean": 184.099,
+    "ok": true
+  },
+  {
+    "name": "04-nacelle-closeup",
+    "darkFrac": 0,
+    "std": 40.693,
+    "colors": 208,
+    "mean": 177.169,
+    "ok": true
+  },
+  {
+    "name": "05-select-hub",
+    "darkFrac": 0,
+    "std": 39.169,
+    "colors": 244,
+    "mean": 192.478,
+    "ok": true
+  },
+  {
+    "name": "06-info-expanded",
+    "darkFrac": 0,
+    "std": 39.523,
+    "colors": 241,
+    "mean": 196.595,
+    "ok": true
+  },
+  {
+    "name": "10-cutaway-transparent",
+    "darkFrac": 0,
+    "std": 40.634,
+    "colors": 518,
+    "mean": 155.035,
+    "ok": true
+  },
+  {
+    "name": "點選 gearboxParallel",
+    "expected": "gearbox",
+    "got": "gearbox",
+    "ok": true
+  },
+  {
+    "name": "點選 generatorRotor",
+    "expected": "generator",
+    "got": "generator",
+    "ok": true
+  },
+  {
+    "name": "11-cutaway-shell-removed",
+    "darkFrac": 0,
+    "std": 43.279,
+    "colors": 606,
+    "mean": 152.454,
+    "ok": true
+  },
+  {
+    "name": "點選 mainShaftBody",
+    "expected": "mainShaft",
+    "got": "mainShaft",
+    "ok": true
+  },
+  {
+    "name": "12-focus-gearbox",
+    "darkFrac": 0,
+    "std": 48.189,
+    "colors": 558,
+    "mean": 158.999,
+    "ok": true
+  },
+  {
+    "name": "13-focus-generator",
+    "darkFrac": 0,
+    "std": 47.101,
+    "colors": 502,
+    "mean": 161.952,
+    "ok": true
+  },
+  {
+    "name": "14-hub-pitch-system",
+    "darkFrac": 0,
+    "std": 45.666,
+    "colors": 385,
+    "mean": 164.148,
+    "ok": true
+  },
+  {
+    "name": "15-yaw-system",
+    "darkFrac": 0,
+    "std": 48.231,
+    "colors": 475,
+    "mean": 150.954,
+    "ok": true
+  },
+  {
+    "name": "16-power-path",
+    "darkFrac": 0,
+    "std": 30.663,
+    "colors": 261,
+    "mean": 156.555,
+    "ok": true
+  },
+  {
+    "name": "點選 undergroundStrip1",
+    "expected": "undergroundCable",
+    "got": "undergroundCable",
+    "ok": true
+  },
+  {
+    "name": "16b-substation-grid",
+    "darkFrac": 0,
+    "std": 33.993,
+    "colors": 168,
+    "mean": 161.845,
+    "ok": true
+  },
+  {
+    "name": "點選 substationHouse",
+    "expected": "substation",
+    "got": "substation",
+    "ok": true
+  },
+  {
+    "name": "點選 hvTower0",
+    "expected": "powerLine",
+    "got": "powerLine",
+    "ok": true
+  },
+  {
+    "name": "返回外觀",
+    "shellView": "solid",
+    "internalShown": 0,
+    "ok": true
+  },
+  {
+    "name": "18-explode",
+    "darkFrac": 0,
+    "std": 44.962,
+    "colors": 610,
+    "mean": 158.928,
+    "ok": true
+  },
+  {
+    "name": "點選 generatorStator",
+    "expected": "generator",
+    "got": "generator",
+    "ok": true
+  },
+  {
+    "name": "點選 gearboxParallel",
+    "expected": "gearbox",
+    "got": "gearbox",
+    "ok": true
+  },
+  {
+    "name": "19-gear-train-side",
+    "darkFrac": 0,
+    "std": 42.59,
+    "colors": 520,
+    "mean": 161.94,
+    "ok": true
+  },
+  {
+    "name": "點選 stage1Driver",
+    "expected": "parallelGears",
+    "got": "parallelGears",
+    "ok": true
+  },
+  {
+    "name": "20-planetary-closeup",
+    "darkFrac": 0,
+    "std": 48.614,
+    "colors": 428,
+    "mean": 165.261,
+    "ok": true
+  },
+  {
+    "name": "點選 planetMesh0",
+    "expected": "planetGear",
+    "got": "planetGear",
+    "ok": true
+  },
+  {
+    "name": "20b-gear-view-front",
+    "darkFrac": 0,
+    "std": 42.605,
+    "colors": 386,
+    "mean": 151.971,
+    "ok": true
+  },
+  {
+    "name": "點選 ringGearMesh",
+    "expected": "ringGear",
+    "got": "ringGear",
+    "ok": true
+  },
+  {
+    "name": "點選 sunGearMesh",
+    "expected": "sunGear",
+    "got": "sunGear",
+    "ok": true
+  },
+  {
+    "name": "21-solo-generator",
+    "darkFrac": 0,
+    "std": 43.101,
+    "colors": 261,
+    "mean": 176.005,
+    "ok": true
+  },
+  {
+    "name": "22-explode-closed",
+    "darkFrac": 0,
+    "std": 43.397,
+    "colors": 597,
+    "mean": 159.814,
+    "ok": true
+  },
+  {
+    "name": "合起來",
+    "amount": 0,
+    "ok": true
+  },
+  {
+    "name": "桌面實驗：風機不被左側面板擋住",
+    "hub": {
+      "x": 882,
+      "y": 266
+    },
+    "panelTop": 84,
+    "panelRight": 372,
+    "ok": true
+  },
+  {
+    "name": "24-experiment-8ms",
+    "darkFrac": 0,
+    "std": 44.102,
+    "colors": 257,
+    "mean": 197.225,
+    "ok": true
+  },
+  {
+    "name": "25-experiment-15ms-rated",
+    "darkFrac": 0,
+    "std": 44.385,
+    "colors": 263,
+    "mean": 196.555,
+    "ok": true
+  },
+  {
+    "name": "26-experiment-27ms-shutdown",
+    "darkFrac": 0,
+    "std": 44.16,
+    "colors": 254,
+    "mean": 197.184,
+    "ok": true
+  },
+  {
+    "name": "27-experiment-yawing-east-wind",
+    "darkFrac": 0,
+    "std": 44.189,
+    "colors": 266,
+    "mean": 197.409,
+    "ok": true
+  },
+  {
+    "name": "28-experiment-manual-overspeed",
+    "darkFrac": 0,
+    "std": 43.513,
+    "colors": 249,
+    "mean": 197.063,
+    "ok": true
+  },
+  {
+    "name": "29-experiment-inside",
+    "darkFrac": 0,
+    "std": 52.691,
+    "colors": 518,
+    "mean": 177.398,
+    "ok": true
+  },
+  {
+    "name": "點選 generatorStator",
+    "expected": "generator",
+    "got": "generator",
+    "ok": true
+  },
+  {
+    "name": "30-experiment-power-to-grid",
+    "darkFrac": 0,
+    "std": 48.023,
+    "colors": 221,
+    "mean": 184.744,
+    "ok": true
+  },
+  {
+    "name": "模擬：8 m/s 發電中",
+    "status": "generating",
+    "kW": 822,
+    "pitch": 0,
+    "rpm": 10.7,
+    "ok": true
+  },
+  {
+    "name": "模擬：15 m/s 滿載並變槳",
+    "status": "rated",
+    "kW": 2000,
+    "pitch": 19,
+    "rpm": 16,
+    "ok": true
+  },
+  {
+    "name": "模擬：27 m/s 停機",
+    "status": "shutdown",
+    "kW": 0,
+    "pitch": 90,
+    "rpm": 0,
+    "ok": true
+  },
+  {
+    "name": "模擬：改成東風：轉向中、功率下降",
+    "status": "yawing",
+    "kW": 296,
+    "pitch": 0,
+    "rpm": 7.6,
+    "ok": true
+  },
+  {
+    "name": "模擬：手動槳距 0、18 m/s：超速保護",
+    "status": "overspeed",
+    "kW": 2000,
+    "pitch": 26,
+    "rpm": 16,
+    "ok": true
+  },
+  {
+    "name": "實驗面板顯示讀數",
+    "ok": true
+  },
+  {
+    "name": "點選 gearboxParallel",
+    "expected": "nacelle",
+    "got": "nacelle",
+    "ok": true
+  },
+  {
+    "name": "點選 tower",
+    "expected": "tower",
+    "got": "tower",
+    "ok": true
+  },
+  {
+    "name": "點選 nacelleShell",
+    "expected": "nacelle",
+    "got": "nacelle",
+    "ok": true
+  },
+  {
+    "name": "點選 rotor",
+    "expected": "hub",
+    "got": "hub",
+    "ok": true
+  },
+  {
+    "name": "渲染統計（桌面）",
+    "fps": 13.671875000000004,
+    "drawCalls": 27,
+    "triangles": 18604,
+    "pixelRatio": 1
+  },
+  {
+    "name": "32-first-tour",
+    "darkFrac": 0,
+    "std": 40.929,
+    "colors": 149,
+    "mean": 142.423,
+    "ok": true
+  },
+  {
+    "name": "第一次進入顯示導覽",
+    "ok": true
+  },
+  {
+    "name": "朗讀：zh-TW 語音、難詞讀音",
+    "spoken": [
+      "轉一轉、放大縮小。用一根手指拖曳可以轉動",
+      "獎句控制系統。轉動葉片的角度，控制葉輪轉"
+    ],
+    "ok": true
+  },
+  {
+    "name": "33-missions-toast",
+    "darkFrac": 0,
+    "std": 49.596,
+    "colors": 428,
+    "mean": 198.18,
+    "ok": true
+  },
+  {
+    "name": "小任務自動完成",
+    "done": [
+      "find-generator"
+    ],
+    "ok": true
+  },
+  {
+    "name": "重新整理後保留進度、不再顯示導覽",
+    "done": [
+      "find-generator"
+    ],
+    "tour": null,
+    "ok": true
+  },
+  {
+    "name": "34-quiz-feedback",
+    "darkFrac": 0,
+    "std": 53.014,
+    "colors": 203,
+    "mean": 155.776,
+    "ok": true
+  },
+  {
+    "name": "考考你：答錯時說明",
+    "ok": true
+  },
+  {
+    "name": "沒有中文語音時隱藏朗讀按鈕",
+    "ok": true
+  },
+  {
+    "name": "07-mobile-390",
+    "darkFrac": 0,
+    "std": 44.689,
+    "colors": 218,
+    "mean": 185.908,
+    "ok": true
+  },
+  {
+    "name": "08-mobile-390-select-blade",
+    "darkFrac": 0,
+    "std": 38.994,
+    "colors": 245,
+    "mean": 208.936,
+    "ok": true
+  },
+  {
+    "name": "09-mobile-390-partlist",
+    "darkFrac": 0,
+    "std": 37.803,
+    "colors": 217,
+    "mean": 225.388,
+    "ok": true
+  },
+  {
+    "name": "17-mobile-390-cutaway",
+    "darkFrac": 0,
+    "std": 44.893,
+    "colors": 526,
+    "mean": 163.346,
+    "ok": true
+  },
+  {
+    "name": "23-mobile-390-explode-gears",
+    "darkFrac": 0,
+    "std": 51.243,
+    "colors": 481,
+    "mean": 163.499,
+    "ok": true
+  },
+  {
+    "name": "35-mobile-390-learn",
+    "darkFrac": 0,
+    "std": 39.927,
+    "colors": 161,
+    "mean": 225.2,
+    "ok": true
+  },
+  {
+    "name": "36-mobile-390-quiz",
+    "darkFrac": 0,
+    "std": 62.593,
+    "colors": 154,
+    "mean": 188.894,
+    "ok": true
+  },
+  {
+    "name": "手機實驗（展開）：風機在面板上方",
+    "hub": {
+      "x": 213,
+      "y": 227
+    },
+    "panelTop": 430,
+    "panelRight": 382,
+    "ok": true
+  },
+  {
+    "name": "31-mobile-390-experiment",
+    "darkFrac": 0,
+    "std": 51.097,
+    "colors": 259,
+    "mean": 203.528,
+    "ok": true
+  },
+  {
+    "name": "手機實驗（收起）：風機在面板上方",
+    "hub": {
+      "x": 226,
+      "y": 330
+    },
+    "panelTop": 700,
+    "panelRight": 382,
+    "ok": true
+  },
+  {
+    "name": "31b-mobile-390-experiment-folded",
+    "darkFrac": 0,
+    "std": 41.713,
+    "colors": 237,
+    "mean": 192.663,
+    "ok": true
+  },
+  {
+    "name": "手機實驗模式觸控目標 < 44px",
+    "count": 0,
+    "items": [],
+    "ok": true
+  },
+  {
+    "name": "手機觸控目標 < 44px 的按鈕",
+    "count": 0,
+    "items": [],
+    "ok": true
+  },
+  {
+    "name": "渲染統計（手機）",
+    "fps": 14.099069461416782,
+    "drawCalls": 75,
+    "triangles": 43696,
+    "pixelRatio": 2
+  }
+]

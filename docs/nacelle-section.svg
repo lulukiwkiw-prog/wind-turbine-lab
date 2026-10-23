@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" font-family="Noto Sans TC, PingFang TC, Microsoft JhengHei, sans-serif" font-size="14">
+<title>機艙剖面示意圖</title>
+<rect width="1100" height="620" fill="#f7fbff"/>
+<text x="20" y="30" font-size="22" font-weight="700" fill="#17324d">機艙剖面示意圖（從 +X 側看，往右為上風）</text>
+<text x="20" y="52" fill="#46607a">由 turbineSpec.js 自動產生；齒輪箱為教學簡化，齒數與模數是示意值。高速軸另往 +X 偏移 0.6 m（此視角看不到）。</text>
+<rect x="154" y="190.60000000000002" width="580" height="232" rx="31.900000000000002" fill="#eef1f4" fill-opacity="0.35" stroke="#9aa5b1" stroke-width="2" stroke-dasharray="8 5"/>
+<rect x="484.6" y="440" width="150.8" height="60" fill="#e9ecef" stroke="#9aa5b1"/>
+<rect x="477.64" y="422.6" width="164.72" height="17.4" fill="#d24f9b"/>
+<polygon points="596.6,342.9 592.7,299 771.9,283.3 775.7,327.3" fill="#3f7fd1" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="716.7,351 709.6,270.2 738.5,267.6 745.5,348.5" fill="#7b8794" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="623.8,354.5 617.5,282.9 646.4,280.3 652.7,352" fill="#7b8794" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="455.7,396 444.8,271.2 589.2,258.6 600.1,383.4" fill="#3fae6a" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="454,376.9 442.4,244 534.8,236 546.5,368.9" fill="#3fae6a" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="360,300.2 359.1,289.8 445.7,282.2 446.6,292.6" fill="#9b59d0" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="422.3,313.9 418.1,265.4 423.8,264.9 428.1,313.4" fill="#e2463d" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="212.9,349.7 205.6,266.5 350.1,253.9 357.4,337.1" fill="#f2b632" stroke="#17324d" stroke-opacity="0.35"/>
+<polygon points="223,332.1 218.7,282.1 340,271.5 344.4,321.4" fill="#d98a1c" stroke="#17324d" stroke-opacity="0.35"/>
+<rect x="180.10000000000002" y="351.84000000000003" width="29" height="69.6" fill="#45525e"/>
+<ellipse cx="895.1" cy="294.7" rx="127.6" ry="116" transform="rotate(-5 895.1 294.7)" fill="#dfe7ef" fill-opacity="0.5" stroke="#9aa5b1" stroke-dasharray="6 4"/>
+<circle cx="848.8964624466062" cy="298.72483460317915" r="92.80000000000001" fill="#cfd8e3" fill-opacity="0.8" stroke="#7b8794"/>
+<rect x="796.6964624466061" y="188.52483460317916" width="104.4" height="17.4" fill="#27b3a8"/>
+<rect x="796.6964624466061" y="78.32483460317917" width="104.4" height="110.19999999999999" fill="#f5f7f9" stroke="#9aa5b1"/>
+<line x1="188.39999999999998" y1="190.60000000000002" x2="188.39999999999998" y2="126.79999999999995" stroke="#f29f3d" stroke-width="4"/>
+<line x1="212.39999999999998" y1="190.60000000000002" x2="212.39999999999998" y2="126.79999999999995" stroke="#f29f3d" stroke-width="4"/>
+<line x1="184.4" y1="356.9" x2="1051.1" y2="281" stroke="#17324d" stroke-dasharray="10 4 2 4"/>
+<line x1="710.2" y1="310.9" x2="750.2" y2="430.9" stroke="#46607a"/><circle cx="750.2" cy="430.9" r="6" fill="#3f7fd1" stroke="#17324d"/><text x="760.2" y="435.9" fill="#17324d">主軸（低速軸）（藍）</text>
+<line x1="727.6" y1="309.3" x2="757.6" y2="159.3" stroke="#46607a"/><circle cx="757.6" cy="159.3" r="6" fill="#7b8794" stroke="#17324d"/><text x="767.6" y="164.3" fill="#17324d">主軸承</text>
+<line x1="560" y1="324" x2="650" y2="474" stroke="#46607a"/><circle cx="650" cy="474" r="6" fill="#3fae6a" stroke="#17324d"/><text x="660" y="479" fill="#17324d">齒輪箱（綠）總速比 1:112</text>
+<line x1="405.7" y1="290.9" x2="415.7" y2="130.9" stroke="#46607a"/><circle cx="415.7" cy="130.9" r="6" fill="#9b59d0" stroke="#17324d"/><text x="425.7" y="135.9" fill="#17324d">高速軸</text>
+<line x1="423.1" y1="289.4" x2="483.1" y2="179.4" stroke="#46607a"/><circle cx="483.1" cy="179.4" r="6" fill="#e2463d" stroke="#17324d"/><text x="493.1" y="184.4" fill="#17324d">煞車</text>
+<line x1="281.5" y1="301.8" x2="161.5" y2="166.8" stroke="#46607a"/><circle cx="161.5" cy="166.8" r="6" fill="#f2b632" stroke="#17324d"/><text x="171.5" y="171.8" fill="#17324d">發電機（定子黃／轉子橘）</text>
+<line x1="194.6" y1="386.6" x2="134.6" y2="466.6" stroke="#46607a"/><circle cx="134.6" cy="466.6" r="6" fill="#45525e" stroke="#17324d"/><text x="144.6" y="471.6" fill="#17324d">控制器</text>
+<line x1="560" y1="431.3" x2="390" y2="481.3" stroke="#46607a"/><circle cx="390" cy="481.3" r="6" fill="#d24f9b" stroke="#17324d"/><text x="400" y="486.3" fill="#17324d">偏航系統</text>
+<line x1="848.9" y1="197.2" x2="788.9" y2="117.2" stroke="#46607a"/><circle cx="788.9" cy="117.2" r="6" fill="#27b3a8" stroke="#17324d"/><text x="798.9" y="122.2" fill="#17324d">槳距控制系統（變槳軸承）</text>
+<line x1="848.9" y1="298.7" x2="908.9" y2="418.7" stroke="#46607a"/><circle cx="908.9" cy="418.7" r="6" fill="#cfd8e3" stroke="#17324d"/><text x="918.9" y="423.7" fill="#17324d">輪轂</text>
+<line x1="188.4" y1="132.6" x2="228.4" y2="92.6" stroke="#46607a"/><circle cx="228.4" cy="92.6" r="6" fill="#f29f3d" stroke="#17324d"/><text x="238.4" y="97.6" fill="#17324d">風速計／風向標</text>
+<g fill="#46607a" font-size="12"><text x="20" y="564">planetary：太陽 24／行星 36×3／環 96，速比 5，中心距 0.600 m</text><text x="20" y="580">parallel-1：80→20，速比 4，中心距 0.800 m</text><text x="20" y="596">parallel-2：84→15，速比 5.6，中心距 0.594 m</text></g>
+<text x="770" y="602" fill="#46607a" font-size="12">傳動軸傾角 5°（葉輪端抬高）</text>
+</svg>

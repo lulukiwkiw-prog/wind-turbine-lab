@@ -1,0 +1,27 @@
+{
+  "name": "wind-turbine-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "風力發電機探索實驗室：給國小學童的互動式 3D 風力發電機",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "lint": "eslint .",
+    "test:spec": "node --test tests/*.test.js",
+    "shots": "node tools/screenshots.mjs",
+    "check": "npm run lint && npm run test:spec && npm run docs && npm run build && npm run shots",
+    "docs": "node tools/gen-diagrams.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.28.0",
+    "eslint": "9.28.0",
+    "globals": "16.2.0",
+    "playwright-core": "1.56.0",
+    "vite": "6.3.5"
+  }
+}
