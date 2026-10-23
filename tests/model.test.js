@@ -76,8 +76,8 @@ test('動畫：葉輪從上風看順時針轉，槳距角讓前緣轉向上風',
   const tip1 = new THREE.Vector3(0, 40, 0).applyMatrix4(nodes.pitch0.matrixWorld);
   assert.ok(tip1.x > tip0.x, '朝上的葉片應往 +X（從上風看的右方）移動 → 順時針');
 
-  store.set({ pitchDeg: 30 });
-  anim.update(0);
+  store.set({ pitchAuto: false, pitchDeg: 30 });
+  for (let i = 0; i < 50; i++) anim.update(0.1); // 變槳速率有上限，要一點時間才轉到 30°
   nodes.rotor.updateMatrixWorld(true);
   const le = new THREE.Vector3(1, 0, 0).transformDirection(nodes.pitch0.matrixWorld);
   assert.ok(le.z > 0.4, '槳距 30° 時前緣朝上風');
@@ -138,7 +138,7 @@ test('集中狀態：拒絕不合法或尚未開放的值', () => {
   const s = createStore();
   const warn = console.warn;
   console.warn = () => {};
-  s.set({ mode: 'experiment' }); // 第四階段才開放
+  s.set({ mode: 'lab' }); // 不存在的模式
   s.set({ animSpeed: 3 });
   s.set({ selectedPart: 'flywheel' }); // 不存在的零件
   s.set({ shellView: 'glass' });
@@ -159,7 +159,7 @@ test('第二階段：主軸與葉輪同角度；高速軸同向、畫面轉速�
   assert.equal(nodes.lowSpeedShaft.rotation.z, nodes.rotor.rotation.z);
   assert.ok(Math.sign(nodes.highSpeedShaft.rotation.z) === Math.sign(nodes.rotor.rotation.z), '高速軸與葉輪同向');
   assert.ok(anim.highSpeedRps() <= SIM.visualMaxHighSpeedRps + 1e-12);
-  assert.ok(anim.highSpeedRps() > SIM.demoRotorRpm / 60, '高速軸比主軸快');
+  assert.ok(anim.highSpeedRps() > anim.rotorRpm() / 60, '高速軸比主軸快');
 });
 
 test('第二階段：外觀模式隱藏內部零件；剖視模式顯示；拿掉外殼只隱藏機艙外殼與導流罩', () => {
@@ -299,11 +299,11 @@ test('偏航：風向改變時機艙對準風（氣象慣例）', () => {
   const anim = createAnimator({ nodes, sensorParts, store });
   for (const th of [0, 90, 200]) {
     store.set({ windAngleDeg: th });
-    anim.update(0);
+    for (let i = 0; i < 600; i++) anim.update(0.1); // 偏航有速率限制，慢慢轉過去
     scene.updateMatrixWorld(true);
     const face = new THREE.Vector3(0, 0, 1).transformDirection(nodes.nacelle.matrixWorld);
     const u = upwindVector(th);
-    assert.ok(face.distanceTo(new THREE.Vector3(...u)) < 1e-9, `風向 ${th}° 時機艙沒有對準風`);
+    assert.ok(face.angleTo(new THREE.Vector3(...u)) <= (SIM.yawDeadbandDeg + 0.01) * DEG, `風向 ${th}° 時機艙沒有對準風`);
   }
 });
 

@@ -95,7 +95,7 @@ test('風向定義（氣象慣例）：0° 北風從 +Z 吹來、90° 東風從 
   assert.equal(windName(-45), '西北風');
 });
 
-test('物理合理性：葉尖速比、Betz 極限、發電機同步轉速、展示轉速', () => {
+test('物理合理性：葉尖速比、Betz 極限、發電機同步轉速', () => {
   const R = DIM.rotor.radius, rho = 1.225;
   const omega = (rpm) => (rpm * 2 * Math.PI) / 60;
   const tsrRated = (omega(SIM.rotorRatedRpm) * R) / SIM.ratedSpeed;
@@ -104,8 +104,7 @@ test('物理合理性：葉尖速比、Betz 極限、發電機同步轉速、展
   const cp = (SIM.ratedPowerKW * 1000) / (0.5 * rho * Math.PI * R * R * SIM.ratedSpeed ** 3);
   assert.ok(cp > 0.2 && cp < 16 / 27, `額定 Cp ${cp} 必須低於 Betz 極限 0.593`);
   assert.ok(Math.abs(SIM.rotorRatedRpm * gearboxRatio() - 1800) / 1800 < 0.02, '60 Hz 四極發電機同步轉速 1800 rpm');
-  const tsrDemo = (omega(SIM.demoRotorRpm) * R) / 8; // 預設風速 8 m/s
-  assert.ok(tsrDemo > 6 && tsrDemo < 8, `展示轉速在預設風速下的葉尖速比 ${tsrDemo}`);
+
 });
 
 test('輸電路徑：電桿 → 變電所 → 高壓鐵塔一路往遠方，不會斷在半路', () => {
@@ -191,7 +190,7 @@ test('齒輪：行星齒數關係、中心距、總速比與模擬參數一致',
 
 test('模擬參數：切入 < 額定 < 切出，展示轉速不超過上限', () => {
   assert.ok(SIM.cutInSpeed < SIM.ratedSpeed && SIM.ratedSpeed < SIM.cutOutSpeed);
-  assert.ok(SIM.demoRotorRpm <= SIM.visualMaxRotorRpm);
+  assert.ok(SIM.rotorRatedRpm * SIM.overspeedFactor <= SIM.visualMaxRotorRpm, '保護觸發前的轉速不會被畫面上限截斷');
   assert.ok(SIM.teachingYawRateDegPerSec > SIM.maxYawRateDegPerSec, '教學版偏航較快，介面需標示「教學示意」');
 });
 

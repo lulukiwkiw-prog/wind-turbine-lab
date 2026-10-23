@@ -1,23 +1,25 @@
-// 動畫：只改節點旋轉，不重建幾何。速度與暫停一律讀集中 store。
+// 動畫：只改節點旋轉，不重建幾何。速度與暫停一律讀集中 store；轉速、偏航、槳距來自模擬。
 import { COORDS, SIM, DIM, gearboxRatio, gearboxDirection, gearTrainAngles, gearLayout, yawForWind } from '../spec/turbineSpec.js';
+import { createSim } from '../sim/turbineSim.js';
 
 const DEG = Math.PI / 180;
 const TAU = Math.PI * 2;
+const wrap180 = (a) => ((((a + 180) % 360) + 360) % 360) - 180;
 
-export function createAnimator({ nodes, sensorParts, store }) {
+export function createAnimator({ nodes, sensorParts, store, sim = createSim(store) }) {
   // 動畫內部的「相位」不是可讓使用者切換的狀態，只是累積角度
   let rotorAngle = 0;
   let anemoAngle = 0;
   let highAngle = 0;
   const ratio = gearboxRatio();
   const hsDir = COORDS.rotorSpinSign * gearboxDirection();
-
   const planetCount = gearLayout().planets.length;
+  const cupR = DIM.sensors.anemometer.cupRadius;
 
   function rotorRpm() {
-    // 拆解模式：齒輪依真實速比連動，葉輪放慢；其他模式：固定展示轉速（教學示意）。第四階段改由模擬決定
+    // 拆解模式：齒輪依真實速比連動，葉輪放慢（教學示意）；其他模式：由模擬決定
     if (store.get().mode === 'explode') return SIM.gearDemoRotorRpm;
-    return Math.min(SIM.demoRotorRpm, SIM.visualMaxRotorRpm);
+    return Math.min(sim.get().rotorRpm, SIM.visualMaxRotorRpm);
   }
 
   /** 高速軸畫面轉速（每秒圈數）：實際為主軸 × 速比，但畫面上限放慢，避免閃爍（教學示意） */
@@ -25,9 +27,15 @@ export function createAnimator({ nodes, sensorParts, store }) {
     return Math.min((rotorRpm() / 60) * ratio, SIM.visualMaxHighSpeedRps);
   }
 
+  /** 風速計：杯子中心的速度約為風速的 1/3 */
+  function anemometerRps() {
+    return Math.min(store.get().windSpeed / 3 / (TAU * cupR), SIM.visualMaxAnemometerRps);
+  }
+
   function applyPose() {
     const s = store.get();
-    nodes.yaw.rotation.y = yawForWind(s.windAngleDeg) * DEG; // 第一～三階段：機艙正對風向（氣象慣例）
+    const now = sim.get();
+    nodes.yaw.rotation.y = now.yawDeg * DEG; // 偏航：模擬中的實際機艙方向（會慢慢追風）
     nodes.rotor.rotation.z = rotorAngle;
     nodes.lowSpeedShaft.rotation.z = rotorAngle; // 主軸與葉輪剛性連接，角度相同
     // 齒輪組：全部由主軸（行星架）角度推得，保證齒對齒溝
@@ -38,18 +46,22 @@ export function createAnimator({ nodes, sensorParts, store }) {
     // 高速軸：拆解模式用真實速比（看得到末級齒輪咬合）；其他模式用放慢的展示角度
     nodes.highSpeedShaft.rotation.z = s.mode === 'explode' ? g.high : highAngle;
     for (let i = 0; i < DIM.rotor.bladeCount; i++) {
-      nodes[`pitch${i}`].rotation.y = COORDS.pitchSign * s.pitchDeg * DEG;
+      nodes[`pitch${i}`].rotation.y = COORDS.pitchSign * now.pitchDeg * DEG;
     }
     sensorParts.anemometerHead.rotation.y = anemoAngle;
+    // 風向標指向真正的風向（機艙還在轉向時，兩者會有差距）
+    sensorParts.windVaneHead.rotation.y = wrap180(yawForWind(s.windAngleDeg) - now.yawDeg) * DEG;
   }
 
   return {
+    sim,
     update(dt) {
       const s = store.get();
       if (!s.paused) {
         const k = dt * s.animSpeed;
+        sim.step(k);
         rotorAngle = (rotorAngle + COORDS.rotorSpinSign * (rotorRpm() / 60) * TAU * k) % TAU;
-        anemoAngle = (anemoAngle + 1.2 * TAU * k) % TAU;
+        anemoAngle = (anemoAngle + anemometerRps() * TAU * k) % TAU;
         highAngle = (highAngle + hsDir * highSpeedRps() * TAU * k) % TAU;
       }
       applyPose();
@@ -59,5 +71,6 @@ export function createAnimator({ nodes, sensorParts, store }) {
     rotorAngleDeg: () => rotorAngle / DEG,
     highSpeedAngleDeg: () => highAngle / DEG,
     highSpeedRps,
+    rotorRpm,
   };
 }

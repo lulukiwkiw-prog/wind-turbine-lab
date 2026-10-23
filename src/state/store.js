@@ -18,7 +18,8 @@ const initial = () => ({
   // 以下為模擬輸入（第四階段使用），預先定義以免各模組各自保存
   windSpeed: 8,
   windAngleDeg: 0,
-  pitchDeg: 0,
+  pitchDeg: 0, // 手動模式的槳距設定（實際槳距由模擬決定）
+  pitchAuto: true, // true：控制器自動變槳；false：小朋友手動
 });
 
 const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
@@ -38,6 +39,7 @@ const validators = {
   windSpeed: (v) => Number.isFinite(v) && v >= 0 && v <= 30,
   windAngleDeg: (v) => Number.isFinite(v),
   pitchDeg: (v) => Number.isFinite(v) && v >= 0 && v <= 90,
+  pitchAuto: (v) => typeof v === 'boolean',
 };
 
 export function createStore() {

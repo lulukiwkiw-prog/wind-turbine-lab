@@ -12,6 +12,8 @@ import { createPicker } from './interaction/picking.js';
 import { createUI } from './ui/ui.js';
 import { createViewController } from './model/viewState.js';
 import { createExploder } from './animation/exploder.js';
+import { createFlows } from './animation/flows.js';
+import { createExperimentPanel } from './ui/experimentPanel.js';
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -31,9 +33,11 @@ const turbine = buildTurbine(mats);
 scene.add(turbine.root);
 scene.add(buildSite(mats));
 
-const rig = createCameraRig(canvas);
+const rig = createCameraRig(canvas, { yawAngle: () => turbine.nodes.yaw.rotation.y });
 scene.userData.camera = rig.camera; // 測試用
 const animator = createAnimator({ nodes: turbine.nodes, sensorParts: turbine.sensorParts, store });
+const sim = animator.sim;
+const flows = createFlows({ scene, nodes: turbine.nodes, sim, store });
 
 // 零件 → 網格清單（初始化時建立一次）
 const partMeshes = new Map();
@@ -87,6 +91,7 @@ function selectPart(id) {
   const patch = { selectedPart: id, partListOpen: false };
   if (GEAR_PARTS.has(id) && s.mode !== 'explode') patch.mode = 'explode';
   else if (CUTAWAY_PARTS.has(id) && s.mode === 'exterior') patch.mode = 'cutaway';
+  else if (CUTAWAY_PARTS.has(id) && s.mode === 'experiment' && s.shellView === 'solid') patch.shellView = 'transparent';
   if (s.mode === 'explode' && s.hiddenParts.includes(id)) patch.hiddenParts = s.hiddenParts.filter((x) => x !== id);
   store.set(patch);
 }
@@ -104,6 +109,12 @@ const ui = createUI({
     selectPart,
     focusGears,
   },
+});
+
+const panel = createExperimentPanel({
+  root: document.getElementById('ui'),
+  store,
+  actions: { preset: (name) => rig.preset(name) },
 });
 
 const picker = createPicker({
@@ -127,6 +138,10 @@ store.subscribe((s, prev, changed) => {
       patch.shellView = 'solid';
       if (INSIDE_PARTS.has(s.selectedPart)) patch.selectedPart = null;
     }
+    if (s.mode === 'experiment') {
+      patch.shellView = 'solid';
+      if (GEAR_PARTS.has(s.selectedPart) || CUTAWAY_PARTS.has(s.selectedPart)) patch.selectedPart = null;
+    }
     store.set(patch);
   }
   if (modeChanged || changed.some((k) => ['shellView', 'hiddenParts', 'soloPart'].includes(k))) view.apply(s);
@@ -140,6 +155,7 @@ store.subscribe((s, prev, changed) => {
   else if (modeChanged) {
     if (s.mode === 'cutaway') rig.preset('cutaway');
     else if (s.mode === 'explode') rig.preset('explode');
+    else if (s.mode === 'experiment') rig.preset('experiment');
     else rig.reset();
   }
 });
@@ -171,11 +187,15 @@ const clock = new THREE.Clock();
 let frames = 0;
 let fpsT = 0;
 let fps = 0;
+let readoutT = 1;
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1); // 切換分頁回來時避免大跳
   animator.update(dt);
   const st = store.get();
   exploder.update(dt, st.mode === 'explode' && st.exploded ? 1 : 0);
+  flows.update(st.paused ? 0 : dt * st.animSpeed, st.mode === 'experiment');
+  readoutT += dt;
+  if (readoutT > 0.2) { readoutT = 0; panel.update(sim.get()); }
   rig.update(dt);
   renderer.render(scene, rig.camera);
   ui.placeMarker(markerScreen());
@@ -197,6 +217,8 @@ window.__lab = {
   focusGears,
   animator,
   exploder,
+  sim,
+  flows,
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),

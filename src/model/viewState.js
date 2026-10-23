@@ -14,7 +14,7 @@ export function createViewController({ root, mats }) {
   return {
     apply(state) {
       const explode = state.mode === 'explode';
-      const inside = state.mode === 'cutaway' || explode;
+      const inside = state.mode === 'cutaway' || explode || (state.mode === 'experiment' && state.shellView !== 'solid');
       const hidden = new Set(explode ? state.hiddenParts : []);
       const solo = explode ? state.soloPart : null;
       for (const m of meshes) {

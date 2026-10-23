@@ -2,57 +2,57 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 40.151,
-    "colors": 224,
-    "mean": 183.315,
+    "std": 40.219,
+    "colors": 213,
+    "mean": 183.29,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
-    "std": 39.779,
-    "colors": 225,
-    "mean": 184.474,
+    "std": 39.851,
+    "colors": 215,
+    "mean": 184.449,
     "ok": true
   },
   {
     "name": "03-side",
     "darkFrac": 0,
-    "std": 41.948,
-    "colors": 216,
-    "mean": 184.362,
+    "std": 42.016,
+    "colors": 206,
+    "mean": 184.337,
     "ok": true
   },
   {
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
-    "std": 40.763,
+    "std": 40.869,
     "colors": 208,
-    "mean": 177.323,
+    "mean": 177.313,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
-    "std": 39.249,
-    "colors": 249,
-    "mean": 192.681,
+    "std": 39.324,
+    "colors": 242,
+    "mean": 192.655,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 39.581,
-    "colors": 246,
-    "mean": 196.797,
+    "std": 39.658,
+    "colors": 239,
+    "mean": 196.772,
     "ok": true
   },
   {
     "name": "10-cutaway-transparent",
     "darkFrac": 0,
-    "std": 41.008,
-    "colors": 523,
-    "mean": 155.395,
+    "std": 41.051,
+    "colors": 518,
+    "mean": 155.372,
     "ok": true
   },
   {
@@ -70,9 +70,9 @@
   {
     "name": "11-cutaway-shell-removed",
     "darkFrac": 0,
-    "std": 43.651,
-    "colors": 612,
-    "mean": 152.815,
+    "std": 43.695,
+    "colors": 607,
+    "mean": 152.792,
     "ok": true
   },
   {
@@ -84,41 +84,41 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 48.003,
-    "colors": 532,
-    "mean": 159.876,
+    "std": 48.059,
+    "colors": 529,
+    "mean": 159.851,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 46.964,
-    "colors": 484,
-    "mean": 162.679,
+    "std": 47.021,
+    "colors": 480,
+    "mean": 162.65,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 45.665,
-    "colors": 389,
-    "mean": 164.459,
+    "std": 45.967,
+    "colors": 387,
+    "mean": 164.485,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
-    "std": 48.373,
-    "colors": 481,
-    "mean": 151.391,
+    "std": 48.589,
+    "colors": 479,
+    "mean": 151.341,
     "ok": true
   },
   {
     "name": "16-power-path",
     "darkFrac": 0,
-    "std": 30.892,
-    "colors": 282,
-    "mean": 156.917,
+    "std": 31.192,
+    "colors": 261,
+    "mean": 156.895,
     "ok": true
   },
   {
@@ -130,9 +130,9 @@
   {
     "name": "16b-substation-grid",
     "darkFrac": 0,
-    "std": 34.379,
-    "colors": 177,
-    "mean": 162.203,
+    "std": 34.417,
+    "colors": 170,
+    "mean": 162.182,
     "ok": true
   },
   {
@@ -156,9 +156,9 @@
   {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 45.125,
-    "colors": 617,
-    "mean": 159.238,
+    "std": 45.151,
+    "colors": 612,
+    "mean": 159.215,
     "ok": true
   },
   {
@@ -176,9 +176,9 @@
   {
     "name": "19-gear-train-side",
     "darkFrac": 0,
-    "std": 42.74,
-    "colors": 527,
-    "mean": 162.249,
+    "std": 42.77,
+    "colors": 522,
+    "mean": 162.227,
     "ok": true
   },
   {
@@ -190,9 +190,9 @@
   {
     "name": "20-planetary-closeup",
     "darkFrac": 0,
-    "std": 48.581,
-    "colors": 433,
-    "mean": 165.525,
+    "std": 48.804,
+    "colors": 428,
+    "mean": 165.465,
     "ok": true
   },
   {
@@ -204,9 +204,9 @@
   {
     "name": "20b-gear-view-front",
     "darkFrac": 0,
-    "std": 42.649,
-    "colors": 392,
-    "mean": 152.236,
+    "std": 42.884,
+    "colors": 387,
+    "mean": 152.176,
     "ok": true
   },
   {
@@ -224,22 +224,128 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.23,
-    "colors": 262,
-    "mean": 176.23,
+    "std": 43.258,
+    "colors": 258,
+    "mean": 176.219,
     "ok": true
   },
   {
     "name": "22-explode-closed",
     "darkFrac": 0,
-    "std": 43.609,
-    "colors": 603,
-    "mean": 160.037,
+    "std": 43.637,
+    "colors": 598,
+    "mean": 160.015,
     "ok": true
   },
   {
     "name": "合起來",
     "amount": 0,
+    "ok": true
+  },
+  {
+    "name": "24-experiment-8ms",
+    "darkFrac": 0,
+    "std": 43.381,
+    "colors": 265,
+    "mean": 198.368,
+    "ok": true
+  },
+  {
+    "name": "25-experiment-15ms-rated",
+    "darkFrac": 0,
+    "std": 43.664,
+    "colors": 273,
+    "mean": 197.79,
+    "ok": true
+  },
+  {
+    "name": "26-experiment-27ms-shutdown",
+    "darkFrac": 0,
+    "std": 43.483,
+    "colors": 248,
+    "mean": 198.322,
+    "ok": true
+  },
+  {
+    "name": "27-experiment-yawing-east-wind",
+    "darkFrac": 0,
+    "std": 43.795,
+    "colors": 262,
+    "mean": 198.455,
+    "ok": true
+  },
+  {
+    "name": "28-experiment-manual-overspeed",
+    "darkFrac": 0,
+    "std": 43.757,
+    "colors": 267,
+    "mean": 197.741,
+    "ok": true
+  },
+  {
+    "name": "29-experiment-inside",
+    "darkFrac": 0,
+    "std": 53.615,
+    "colors": 516,
+    "mean": 173.422,
+    "ok": true
+  },
+  {
+    "name": "點選 generatorStator",
+    "expected": "generator",
+    "got": "generator",
+    "ok": true
+  },
+  {
+    "name": "30-experiment-power-to-grid",
+    "darkFrac": 0,
+    "std": 48.159,
+    "colors": 231,
+    "mean": 183.661,
+    "ok": true
+  },
+  {
+    "name": "模擬：8 m/s 發電中",
+    "status": "generating",
+    "kW": 822,
+    "pitch": 0,
+    "rpm": 10.7,
+    "ok": true
+  },
+  {
+    "name": "模擬：15 m/s 滿載並變槳",
+    "status": "rated",
+    "kW": 2000,
+    "pitch": 19,
+    "rpm": 16,
+    "ok": true
+  },
+  {
+    "name": "模擬：27 m/s 停機",
+    "status": "shutdown",
+    "kW": 0,
+    "pitch": 90,
+    "rpm": 0,
+    "ok": true
+  },
+  {
+    "name": "模擬：改成東風：轉向中、功率下降",
+    "status": "yawing",
+    "kW": 197,
+    "pitch": 0,
+    "rpm": 5.1,
+    "ok": true
+  },
+  {
+    "name": "模擬：手動槳距 0、18 m/s：超速保護",
+    "status": "overspeed",
+    "kW": 2000,
+    "pitch": 26,
+    "rpm": 16,
+    "ok": true
+  },
+  {
+    "name": "實驗面板顯示讀數",
     "ok": true
   },
   {
@@ -268,7 +374,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 14.839730906213925,
+    "fps": 13.987411329804482,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -276,41 +382,55 @@
   {
     "name": "07-mobile-390",
     "darkFrac": 0,
-    "std": 44.539,
-    "colors": 227,
-    "mean": 185.57,
+    "std": 44.849,
+    "colors": 217,
+    "mean": 185.678,
     "ok": true
   },
   {
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
-    "std": 38.933,
-    "colors": 247,
-    "mean": 208.632,
+    "std": 39.226,
+    "colors": 242,
+    "mean": 208.743,
     "ok": true
   },
   {
     "name": "09-mobile-390-partlist",
     "darkFrac": 0,
-    "std": 37.869,
-    "colors": 226,
-    "mean": 225.151,
+    "std": 38.122,
+    "colors": 218,
+    "mean": 225.263,
     "ok": true
   },
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 44.465,
-    "colors": 529,
-    "mean": 162.909,
+    "std": 44.969,
+    "colors": 522,
+    "mean": 163.108,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 50.647,
-    "colors": 481,
-    "mean": 162.98,
+    "std": 51.265,
+    "colors": 479,
+    "mean": 163.287,
+    "ok": true
+  },
+  {
+    "name": "31-mobile-390-experiment",
+    "darkFrac": 0,
+    "std": 40.349,
+    "colors": 208,
+    "mean": 220.673,
+    "ok": true
+  },
+  {
+    "name": "手機實驗模式觸控目標 < 44px",
+    "count": 0,
+    "items": [],
     "ok": true
   },
   {
@@ -321,9 +441,9 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 13.330794134452649,
-    "drawCalls": 69,
-    "triangles": 28140,
+    "fps": 14.340344168260037,
+    "drawCalls": 75,
+    "triangles": 43696,
     "pixelRatio": 2
   }
 ]

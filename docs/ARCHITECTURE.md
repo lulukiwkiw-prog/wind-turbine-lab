@@ -19,7 +19,11 @@ wind-turbine-lab/
 │  │  ├─ bladeGeometry.js     葉片斷面放樣（扭轉、漸縮、圓→翼型）
 │  │  ├─ turbine.js           依 HIERARCHY 建節點並掛上網格
 │  │  └─ site.js              地面、天空、樹（Instanced）、變壓器、輸電線
-│  ├─ animation/animator.js   每幀只改旋轉角；讀 store 的暫停／速度
+│  ├─ sim/turbineSim.js       發電實驗模擬：Cp(λ,β)、控制區間、偏航與解纜、停機保護（純函式，可測試）
+│  ├─ animation/
+│  │  ├─ animator.js          每幀只改旋轉角；轉速、偏航、槳距來自模擬
+│  │  ├─ exploder.js          機械拆解的位移動畫
+│  │  └─ flows.js             風的流線與能量流動點（InstancedMesh）
 │  ├─ interaction/
 │  │  ├─ cameraRig.js         OrbitControls、預設視角、聚焦動畫、直式螢幕自動拉遠
 │  │  └─ picking.js           點一下（非拖曳）才選取；Raycaster

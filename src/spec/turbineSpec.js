@@ -324,20 +324,33 @@ export function gearTrainAngles(thetaC, configId = ACTIVE_GEARBOX) {
 // 5. 模擬參數（教學示意值；第四階段使用）
 // ---------------------------------------------------------------------
 export const SIM = {
-  cutInSpeed: 3.5, // m/s 切入風速
-  ratedSpeed: 12.0, // m/s 額定風速
-  cutOutSpeed: 25.0, // m/s 切出風速
+  // ---- 運轉區間（代表性數值） ----
+  cutInSpeed: 3.5, // m/s 切入風速：低於此風速不發電
+  ratedSpeed: 11.0, // m/s 額定風速：由下方空氣動力模型算出約 10.9 m/s（測試檢查兩者一致）
+  cutOutSpeed: 25.0, // m/s 切出風速：高於此風速停機保護
+  restartSpeed: 20.0, // m/s 停機後風速降到此值以下才重新啟動（避免反覆開關）
   ratedPowerKW: 2000,
   rotorRatedRpm: 16.0,
   generatorRatedRpm: 1800, // 約略 60 Hz 四極發電機同步轉速
+  // ---- 空氣動力模型（教學簡化，但物理上合理） ----
+  airDensity: 1.225, // kg/m³，海平面 15 °C
+  efficiency: 0.94, // 齒輪箱 + 發電機 + 變頻器的總效率（示意）
+  // Cp(λ, β)：常用的經驗公式（Heier／Slootweg 型），最大約 0.44（λ ≈ 6.3、β = 0），永遠低於 Betz 極限 16/27
+  cpCoeffs: { c1: 0.22, c2: 116, c3: 0.4, c4: 5, c5: 12.5, c6: 0 },
+  overspeedFactor: 1.15, // 超過額定轉速 15% 觸發超速保護（自動順槳）
+  // ---- 動態（教學示意：真實葉輪慣量更大、反應更慢） ----
+  rotorTimeConstantSec: 2.5, // 轉速追上平衡點的時間常數
   maxYawRateDegPerSec: 0.5, // 真實偏航很慢（約 0.3–0.5 °/s）
   teachingYawRateDegPerSec: 6, // 教學動畫加速版，介面須標示「教學示意」
+  yawDeadbandDeg: 2, // 偏差小於此角度不轉
+  cableTwistLimitTurns: 2, // 電纜最多扭 2 圈，超過就繞回去「解纜」（真實約 2～3 圈）
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
   maxPitchRateDegPerSec: 8,
-  demoRotorRpm: 12, // 第一～三階段展示用的固定轉速：預設風速 8 m/s、葉尖速比約 7 時約 12 rpm（教學示意）
-  visualMaxHighSpeedRps: 1.2,
-  // 拆解模式要看齒輪「真的」咬合，所有齒輪依速比連動；為了不讓高速軸轉太快，葉輪放慢到 1.2 × 60 / 112 ≈ 0.64 rpm（教學示意） // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，因此放慢；教學示意）
+  // ---- 畫面 ----
+  visualMaxHighSpeedRps: 1.2, // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快
+  visualMaxAnemometerRps: 2, // 風速計畫面上限
+  energyDotSpeed: 14, // m/s，能量流動點的移動速度（教學示意，不是電的速度）
 };
 // 拆解模式：齒輪依速比連動，葉輪放慢到讓高速軸剛好達到畫面上限（約 0.64 rpm，教學示意）
 SIM.gearDemoRotorRpm = (SIM.visualMaxHighSpeedRps * 60) / gearboxRatio();
@@ -377,6 +390,8 @@ export const PALETTE = {
   gearCarrier: '#a7c4b2',
   gearParallel: '#56c27a',
   arrow: '#17324d', // 轉向箭頭：深藍黑，不與任何零件顏色混淆
+  energy: '#ffc400', // 能量流動點（電）
+  wind: '#cdeeff', // 風的流線（淡藍）
   bedplate: '#8d98a3',
   hubBody: '#9fb0c2',
   substation: '#9aa7b3',
@@ -560,7 +575,7 @@ export const MODES = {
   explode: { label: '機械拆解', stage: 3 },
   experiment: { label: '發電實驗', stage: 4 },
 };
-export const CURRENT_STAGE = 3;
+export const CURRENT_STAGE = 4;
 
 // ---------------------------------------------------------------------
 // 11. 視角與渲染
@@ -573,15 +588,16 @@ export const VIEW = {
   defaultTarget: [0, 62, 0],
   defaultCamera: [-108, 74, 140],
   presets: {
-    front: { target: [0, 62, 0], camera: [0, 66, 178] },
-    side: { target: [0, 62, 0], camera: [178, 66, 4] },
-    nacelle: { target: [0, 80, 0], camera: [-16, 86, 18] },
-    cutaway: { target: [0, 80.4, -1.0], camera: [-11.5, 86, -4.5] },
+    front: { frame: 'yaw', target: [0, 62, 0], camera: [0, 66, 178] },
+    side: { frame: 'yaw', target: [0, 62, 0], camera: [178, 66, 4] },
+    nacelle: { frame: 'yaw', target: [0, 80, 0], camera: [-16, 86, 18] },
+    cutaway: { frame: 'yaw', target: [0, 80.4, -1.0], camera: [-11.5, 86, -4.5] },
     cable: { target: [11, 2, 8], camera: [-6, 15, 33] },
     grid: { target: [122, 8, 73], camera: [62, 34, 128] },
-    explode: { target: [0, 81.2, -2.0], camera: [-15.5, 88.5, -7.5] },
+    experiment: { frame: 'yaw', target: [0, 52, -12], camera: [-128, 66, 128] },
+    explode: { frame: 'yaw', target: [0, 81.2, -2.0], camera: [-15.5, 88.5, -7.5] },
   },
-  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18, explode: 10, grid: 40 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
+  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18, explode: 10, grid: 40, experiment: 70 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
   minDistance: 4,
   maxDistance: 340,
   focusDurationSec: 0.9,

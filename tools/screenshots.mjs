@@ -82,6 +82,25 @@ async function explode(page, { view = 'explode', part = null, gears = false, hid
   await page.waitForTimeout(part || gears ? 1600 : 500);
 }
 
+/** 發電實驗：設定風速／風向／槳距後讓模擬跑一段時間，再暫停截圖 */
+async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'experiment', shell = 'solid', pitchAuto = true, pitchDeg = 0, after = null } = {}) {
+  const now = await page.evaluate(({ wind, angle, seconds, view, shell, pitchAuto, pitchDeg, after }) => {
+    const lab = window.__lab;
+    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false });
+    lab.store.set({ mode: 'experiment' });
+    lab.store.set({ paused: false, windSpeed: wind, windAngleDeg: angle, pitchAuto, pitchDeg, shellView: shell });
+    for (let t = 0; t < seconds; t += 0.05) lab.sim.step(0.05);
+    if (after) { lab.store.set(after.patch); for (let t = 0; t < after.seconds; t += 0.05) lab.sim.step(0.05); }
+    lab.store.set({ paused: true });
+    lab.animator.update(0);
+    lab.flows.update(0.016, true);
+    lab.jumpView(view);
+    return lab.sim.get();
+  }, { wind, angle, seconds, view, shell, pitchAuto, pitchDeg, after });
+  await page.waitForTimeout(700);
+  return now;
+}
+
 /** 截圖並以像素統計檢查不是黑畫面／空白畫面 */
 async function shoot(page, name) {
   const buf = await page.screenshot();
@@ -217,6 +236,38 @@ try {
     await shoot(page, '22-explode-closed');
     report.push({ name: '合起來', amount: closed, ok: closed === 0 });
 
+    // ---------- 第四階段：發電實驗 ----------
+    const xpChecks = [];
+    let now = await experiment(page, { wind: 8 });
+    await shoot(page, '24-experiment-8ms');
+    xpChecks.push(['8 m/s 發電中', now.status === 'generating' && now.powerKW > 600 && now.powerKW < 1000, now]);
+    now = await experiment(page, { wind: 15 });
+    await shoot(page, '25-experiment-15ms-rated');
+    xpChecks.push(['15 m/s 滿載並變槳', now.status === 'rated' && now.pitchDeg > 10, now]);
+    now = await experiment(page, { wind: 27 });
+    await shoot(page, '26-experiment-27ms-shutdown');
+    xpChecks.push(['27 m/s 停機', now.status === 'shutdown' && now.powerKW === 0, now]);
+    now = await experiment(page, { wind: 9, angle: 0, after: { patch: { windAngleDeg: 90 }, seconds: 6 } });
+    await shoot(page, '27-experiment-yawing-east-wind');
+    xpChecks.push(['改成東風：轉向中、功率下降', now.status === 'yawing' && Math.abs(now.yawErrorDeg) > 20, now]);
+    now = await experiment(page, { wind: 18, pitchAuto: false, pitchDeg: 0 });
+    await shoot(page, '28-experiment-manual-overspeed');
+    xpChecks.push(['手動槳距 0、18 m/s：超速保護', now.status === 'overspeed', now]);
+    now = await experiment(page, { wind: 10, shell: 'transparent', view: 'cutaway' });
+    await shoot(page, '29-experiment-inside');
+    await pickCheck(page, 'generatorStator', 'generator', [0, 0, -4.75]);
+    now = await experiment(page, { wind: 10, view: 'grid' });
+    await shoot(page, '30-experiment-power-to-grid');
+    for (const [name, ok, st] of xpChecks) {
+      report.push({ name: `模擬：${name}`, status: st.status, kW: Math.round(st.powerKW), pitch: Math.round(st.pitchDeg), rpm: Math.round(st.rotorRpm * 10) / 10, ok });
+      if (!ok) failures.push(`模擬檢查失敗：${name} ${JSON.stringify(st)}`);
+    }
+    // 讀數面板有顯示數字
+    const panelText = await page.evaluate(() => document.querySelector('.xp')?.innerText ?? '');
+    const panelOk = /kW/.test(panelText) && /m\/s/.test(panelText);
+    report.push({ name: '實驗面板顯示讀數', ok: panelOk });
+    if (!panelOk) failures.push('實驗面板沒有顯示讀數');
+
     // 外觀模式下點機艙位置，應該點到機艙外殼而不是裡面的齒輪箱
     await pose(page, 'nacelle');
     await pickCheck(page, 'gearboxParallel', 'nacelle');
@@ -249,6 +300,16 @@ try {
     await shoot(page, '17-mobile-390-cutaway');
     await explode(page, { gears: true, hidden: ['gearbox'] });
     await shoot(page, '23-mobile-390-explode-gears');
+    await experiment(page, { wind: 12 });
+    await shoot(page, '31-mobile-390-experiment');
+    const smallXp = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
+      .filter((b) => b.offsetParent !== null)
+      .map((b) => ({ t: b.textContent.trim(), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height }))
+      .filter((r) => r.w < 44 || r.h < 44));
+    report.push({ name: '手機實驗模式觸控目標 < 44px', count: smallXp.length, items: smallXp, ok: smallXp.length === 0 });
+    if (smallXp.length) failures.push(`手機實驗模式有過小的按鈕：${JSON.stringify(smallXp)}`);
+    const overflowXp = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    if (overflowXp) failures.push('手機實驗模式出現水平捲動');
     // 觸控目標大小檢查
     const small = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
       .filter((b) => b.offsetParent !== null)

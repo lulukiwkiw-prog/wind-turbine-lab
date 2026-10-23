@@ -3,9 +3,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VIEW } from '../spec/turbineSpec.js';
 
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export function createCameraRig(canvas) {
+/** yawAngle：回傳偏航節點目前角度（弧度）；frame: 'yaw' 的預設視角會跟著機艙轉 */
+export function createCameraRig(canvas, { yawAngle = () => 0 } = {}) {
   const camera = new THREE.PerspectiveCamera(VIEW.fovDeg, 1, VIEW.near, VIEW.far);
   camera.position.fromArray(VIEW.defaultCamera);
   const controls = new OrbitControls(camera, canvas);
@@ -26,6 +28,11 @@ export function createCameraRig(canvas) {
   function fitted(name, p) {
     const target = new THREE.Vector3().fromArray(p.target);
     const pos = new THREE.Vector3().fromArray(p.camera);
+    if (p.frame === 'yaw') { // 偏航軸通過世界原點（x = z = 0），繞 +Y 旋轉即可
+      const a = yawAngle();
+      target.applyAxisAngle(Y_AXIS, a);
+      pos.applyAxisAngle(Y_AXIS, a);
+    }
     const half = VIEW.fitHalfWidth[name] ?? VIEW.fitHalfWidth.full;
     const need = half / (Math.tan((camera.fov * Math.PI) / 360) * camera.aspect);
     const d = pos.distanceTo(target);
