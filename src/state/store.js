@@ -26,6 +26,7 @@ const initial = () => ({
   quizPicked: null, // 這一題選了哪個答案（null = 還沒選）
   quizScore: 0,
   tourStep: null, // 導覽：第幾步（null = 不顯示）
+  xpFolded: false, // 發電實驗面板收起（手機上只留一行摘要）
 });
 
 const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
@@ -43,6 +44,7 @@ const validators = {
   quizPicked: (v) => v === null || (Number.isInteger(v) && v >= 0),
   quizScore: (v) => Number.isInteger(v) && v >= 0,
   tourStep: (v) => v === null || (Number.isInteger(v) && v >= 0),
+  xpFolded: (v) => typeof v === 'boolean',
   shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
   exploded: (v) => typeof v === 'boolean',
   hiddenParts: (v) => Array.isArray(v) && v.every(isCurrentPart) && new Set(v).size === v.length,

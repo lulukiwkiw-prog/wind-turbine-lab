@@ -192,6 +192,40 @@ window.addEventListener('resize', resize);
 resize();
 rig.jump('default'); // 依螢幕比例調整初始視角
 
+// 面板擋住畫面時，把 3D 畫面的中心移到「沒被擋住的區域」中央，必要時稍微縮小，讓整台風機看得到
+// （手機：上方標題列與下方面板之間；桌面：左側面板右邊）。只改相機的投影位移，點選與標籤位置會跟著正確。
+const xpEl = document.querySelector('.xp');
+const headerEl = document.querySelector('#ui .top');
+const viewShift = { cx: 0, cy: 0, scale: 1 }; // 相對螢幕中心的位移（px）與縮放
+function targetShift() {
+  const w = window.innerWidth, h = window.innerHeight;
+  if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden) return { cx: 0, cy: 0, scale: 1 };
+  const r = xpEl.getBoundingClientRect();
+  let left = 0, top = 0, bottom = h;
+  if (r.width > w * 0.6) { // 下方面板（手機）
+    bottom = r.top;
+    top = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+  } else {
+    left = r.right; // 左側面板（桌面）
+  }
+  const bandW = w - left, bandH = Math.max(80, bottom - top);
+  const scale = Math.min(1, Math.max(0.5, Math.min(bandH / (h * 0.8), bandW / (w * 0.8))));
+  return { cx: (left + w) / 2 - w / 2, cy: (top + bottom) / 2 - h / 2, scale };
+}
+function updateViewShift(dt) {
+  const t = targetShift();
+  const k = Math.min(1, dt * 6); // 平滑移動，不突然跳
+  for (const key of ['cx', 'cy', 'scale']) viewShift[key] += (t[key] - viewShift[key]) * k;
+  const w = window.innerWidth, h = window.innerHeight;
+  if (Math.abs(viewShift.cx) < 0.5 && Math.abs(viewShift.cy) < 0.5 && Math.abs(viewShift.scale - 1) < 0.002) {
+    rig.camera.clearViewOffset();
+    return;
+  }
+  // 完整影像縮成 scale 倍，並讓它的中心落在「沒被擋住區域」的中心
+  const fw = w * viewShift.scale, fh = h * viewShift.scale;
+  rig.camera.setViewOffset(fw, fh, fw / 2 - (w / 2 + viewShift.cx), fh / 2 - (h / 2 + viewShift.cy), w, h);
+}
+
 // 標籤位置：所選零件包圍盒的頂端中央
 const tmp = new THREE.Vector3();
 function markerScreen() {
@@ -220,6 +254,7 @@ function frame() {
   readoutT += dt;
   if (readoutT > 0.2) { readoutT = 0; panel.update(sim.get()); checkMissions(); }
   rig.update(dt);
+  updateViewShift(dt);
   renderer.render(scene, rig.camera);
   ui.placeMarker(markerScreen());
   frames++; fpsT += dt;
@@ -244,6 +279,7 @@ window.__lab = {
   flows,
   speech,
   checkMissions,
+  viewShift: () => ({ ...viewShift }),
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),

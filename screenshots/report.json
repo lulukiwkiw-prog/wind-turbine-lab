@@ -84,17 +84,17 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 48.202,
-    "colors": 559,
-    "mean": 158.794,
+    "std": 48.189,
+    "colors": 558,
+    "mean": 158.999,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 47.013,
-    "colors": 509,
-    "mean": 161.531,
+    "std": 47.101,
+    "colors": 502,
+    "mean": 161.952,
     "ok": true
   },
   {
@@ -224,8 +224,8 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.101,
-    "colors": 261,
+    "std": 43.1,
+    "colors": 262,
     "mean": 176.005,
     "ok": true
   },
@@ -243,51 +243,61 @@
     "ok": true
   },
   {
+    "name": "桌面實驗：風機不被左側面板擋住",
+    "hub": {
+      "x": 882,
+      "y": 266
+    },
+    "panelTop": 84,
+    "panelRight": 372,
+    "ok": true
+  },
+  {
     "name": "24-experiment-8ms",
     "darkFrac": 0,
-    "std": 43.631,
-    "colors": 289,
-    "mean": 197.311,
+    "std": 44.103,
+    "colors": 257,
+    "mean": 197.225,
     "ok": true
   },
   {
     "name": "25-experiment-15ms-rated",
     "darkFrac": 0,
-    "std": 44.468,
-    "colors": 298,
-    "mean": 196.231,
+    "std": 44.385,
+    "colors": 263,
+    "mean": 196.555,
     "ok": true
   },
   {
     "name": "26-experiment-27ms-shutdown",
     "darkFrac": 0,
-    "std": 44.334,
-    "colors": 271,
-    "mean": 196.736,
+    "std": 44.16,
+    "colors": 254,
+    "mean": 197.184,
     "ok": true
   },
   {
     "name": "27-experiment-yawing-east-wind",
     "darkFrac": 0,
-    "std": 44.575,
-    "colors": 290,
-    "mean": 196.923,
+    "std": 44.171,
+    "colors": 266,
+    "mean": 197.443,
     "ok": true
   },
   {
     "name": "28-experiment-manual-overspeed",
     "darkFrac": 0,
-    "std": 43.717,
-    "colors": 262,
-    "mean": 197.495,
+    "std": 43.514,
+    "colors": 247,
+    "mean": 197.063,
     "ok": true
   },
   {
     "name": "29-experiment-inside",
     "darkFrac": 0,
-    "std": 53.411,
-    "colors": 515,
-    "mean": 173.085,
+    "std": 52.677,
+    "colors": 509,
+    "mean": 177.41,
     "ok": true
   },
   {
@@ -299,9 +309,9 @@
   {
     "name": "30-experiment-power-to-grid",
     "darkFrac": 0,
-    "std": 48.001,
-    "colors": 227,
-    "mean": 183.343,
+    "std": 48.022,
+    "colors": 221,
+    "mean": 184.745,
     "ok": true
   },
   {
@@ -374,7 +384,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 15.493366902293907,
+    "fps": 13.776815587480254,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -383,8 +393,8 @@
     "name": "32-first-tour",
     "darkFrac": 0,
     "std": 40.93,
-    "colors": 149,
-    "mean": 142.413,
+    "colors": 148,
+    "mean": 142.414,
     "ok": true
   },
   {
@@ -402,9 +412,9 @@
   {
     "name": "33-missions-toast",
     "darkFrac": 0,
-    "std": 49.57,
-    "colors": 415,
-    "mean": 198.065,
+    "std": 51.069,
+    "colors": 437,
+    "mean": 197.223,
     "ok": true
   },
   {
@@ -425,9 +435,9 @@
   {
     "name": "34-quiz-feedback",
     "darkFrac": 0,
-    "std": 52.675,
-    "colors": 190,
-    "mean": 156.059,
+    "std": 53.014,
+    "colors": 203,
+    "mean": 155.775,
     "ok": true
   },
   {
@@ -450,7 +460,7 @@
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
     "std": 38.994,
-    "colors": 245,
+    "colors": 246,
     "mean": 208.936,
     "ok": true
   },
@@ -466,24 +476,24 @@
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
     "std": 44.893,
-    "colors": 525,
+    "colors": 529,
     "mean": 163.346,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 51.243,
-    "colors": 480,
-    "mean": 163.499,
+    "std": 51.244,
+    "colors": 477,
+    "mean": 163.498,
     "ok": true
   },
   {
     "name": "35-mobile-390-learn",
     "darkFrac": 0,
-    "std": 39.976,
-    "colors": 162,
-    "mean": 225.158,
+    "std": 39.927,
+    "colors": 164,
+    "mean": 225.2,
     "ok": true
   },
   {
@@ -495,11 +505,39 @@
     "ok": true
   },
   {
+    "name": "手機實驗（展開）：風機在面板上方",
+    "hub": {
+      "x": 213,
+      "y": 227
+    },
+    "panelTop": 430,
+    "panelRight": 382,
+    "ok": true
+  },
+  {
     "name": "31-mobile-390-experiment",
     "darkFrac": 0,
-    "std": 44.722,
-    "colors": 197,
-    "mean": 217.307,
+    "std": 51.119,
+    "colors": 259,
+    "mean": 203.511,
+    "ok": true
+  },
+  {
+    "name": "手機實驗（收起）：風機在面板上方",
+    "hub": {
+      "x": 226,
+      "y": 330
+    },
+    "panelTop": 700,
+    "panelRight": 382,
+    "ok": true
+  },
+  {
+    "name": "31b-mobile-390-experiment-folded",
+    "darkFrac": 0,
+    "std": 41.71,
+    "colors": 239,
+    "mean": 192.661,
     "ok": true
   },
   {
@@ -516,7 +554,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 16.901408450704228,
+    "fps": 12.927054478301017,
     "drawCalls": 75,
     "triangles": 43696,
     "pixelRatio": 2

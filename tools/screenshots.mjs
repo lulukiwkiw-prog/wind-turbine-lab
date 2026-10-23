@@ -103,6 +103,24 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
   return now;
 }
 
+/** 檢查風機輪轂在面板沒擋住的地方 */
+async function turbineVisibleCheck(page, name) {
+  await page.waitForTimeout(1200); // 等畫面平滑移動完成
+  const r = await page.evaluate(() => {
+    const lab = window.__lab;
+    const cam = lab.scene.userData.camera;
+    cam.updateMatrixWorld();
+    const v = lab.nodes.rotor.getWorldPosition(lab.nodes.rotor.position.clone()).project(cam);
+    const hub = { x: (v.x * 0.5 + 0.5) * innerWidth, y: (-v.y * 0.5 + 0.5) * innerHeight };
+    const rect = document.querySelector('.xp').getBoundingClientRect();
+    return { hub, panel: { top: rect.top, right: rect.right, width: rect.width }, w: innerWidth, h: innerHeight, shift: lab.viewShift() };
+  });
+  const bottomPanel = r.panel.width > r.w * 0.6;
+  const ok = r.hub.x > 0 && r.hub.x < r.w && r.hub.y > 0 && (bottomPanel ? r.hub.y < r.panel.top - 20 : r.hub.x > r.panel.right + 20);
+  report.push({ name, hub: { x: Math.round(r.hub.x), y: Math.round(r.hub.y) }, panelTop: Math.round(r.panel.top), panelRight: Math.round(r.panel.right), ok });
+  if (!ok) failures.push(`${name}：輪轂被面板擋住 ${JSON.stringify(r)}`);
+}
+
 /** 截圖並以像素統計檢查不是黑畫面／空白畫面 */
 async function shoot(page, name) {
   const buf = await page.screenshot();
@@ -241,6 +259,7 @@ try {
     // ---------- 第四階段：發電實驗 ----------
     const xpChecks = [];
     let now = await experiment(page, { wind: 8 });
+    await turbineVisibleCheck(page, '桌面實驗：風機不被左側面板擋住');
     await shoot(page, '24-experiment-8ms');
     xpChecks.push(['8 m/s 發電中', now.status === 'generating' && now.powerKW > 600 && now.powerKW < 1000, now]);
     now = await experiment(page, { wind: 15 });
@@ -386,7 +405,12 @@ try {
     await shoot(page, '36-mobile-390-quiz');
     await page.evaluate(() => window.__lab.store.set({ quizIndex: null, quizPicked: null }));
     await experiment(page, { wind: 12 });
+    await turbineVisibleCheck(page, '手機實驗（展開）：風機在面板上方');
     await shoot(page, '31-mobile-390-experiment');
+    await page.evaluate(() => window.__lab.store.set({ xpFolded: true }));
+    await turbineVisibleCheck(page, '手機實驗（收起）：風機在面板上方');
+    await shoot(page, '31b-mobile-390-experiment-folded');
+    await page.evaluate(() => window.__lab.store.set({ xpFolded: false }));
     const smallXp = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
       .filter((b) => b.offsetParent !== null)
       .map((b) => ({ t: b.textContent.trim(), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height }))

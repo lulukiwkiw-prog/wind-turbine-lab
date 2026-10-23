@@ -45,13 +45,11 @@ export function createExperimentPanel({ root, store, actions }) {
   const panel = el('section', { class: 'xp', 'aria-label': '發電實驗' });
   const head = el('div', { class: 'xp-head' });
   const title = el('h2', {}, '發電實驗');
+  // 收起時只留一行摘要（狀態、發電量、風速），手機上才看得到風機
+  const summary = el('div', { class: 'xp-summary', 'aria-hidden': 'true' });
   const fold = el('button', { class: 'btn icon xp-fold', type: 'button', 'aria-expanded': 'true' }, '收起');
-  fold.addEventListener('click', () => {
-    const closed = panel.classList.toggle('folded');
-    fold.textContent = closed ? '展開' : '收起';
-    fold.setAttribute('aria-expanded', String(!closed));
-  });
-  head.append(title, fold);
+  fold.addEventListener('click', () => store.set({ xpFolded: !store.get().xpFolded }));
+  head.append(title, summary, fold);
 
   const body = el('div', { class: 'xp-body' });
 
@@ -166,6 +164,9 @@ export function createExperimentPanel({ root, store, actions }) {
 
   function renderInputs(s) {
     panel.hidden = s.mode !== 'experiment';
+    panel.classList.toggle('folded', s.xpFolded);
+    fold.textContent = s.xpFolded ? '調整' : '收起';
+    fold.setAttribute('aria-expanded', String(!s.xpFolded));
     root.classList.toggle('mode-experiment', s.mode === 'experiment');
     windValue.textContent = `${s.windSpeed.toFixed(1)} m/s`;
     windDesc.textContent = windWords(s.windSpeed);
@@ -190,6 +191,7 @@ export function createExperimentPanel({ root, store, actions }) {
       if (s.pitchAuto) pitchSlider.value = String(Math.round(now.pitchDeg));
       pitchValue.textContent = `${Math.round(now.pitchDeg)}°`;
       const st = STATUS[now.status];
+      summary.innerHTML = `<i class="${st.tone}">${st.icon}</i><b>${Math.round(now.powerKW).toLocaleString('zh-TW')} kW</b><span>${now.windSpeed.toFixed(1)} m/s</span>`;
       status.className = `xp-status ${st.tone}`;
       status.innerHTML = `<i aria-hidden="true">${st.icon}</i><span>${st.text}</span>`;
       powerValue.textContent = `${Math.round(now.powerKW).toLocaleString('zh-TW')} kW`;
