@@ -38,6 +38,7 @@ export function createSpeech() {
   const synth = typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function'
     ? window.speechSynthesis : null;
   let voice = null;
+  let queue = []; // 保留正在唸的句子：有些瀏覽器會把沒有被引用的句子回收掉，就收不到「唸完」通知
   const listeners = new Set();
 
   function refresh() {
@@ -57,16 +58,25 @@ export function createSpeech() {
     available: () => !!voice,
     /** 語音清單是非同步載入的：狀態改變時通知（用來顯示／隱藏朗讀按鈕） */
     onChange(fn) { listeners.add(fn); fn(!!voice); return () => listeners.delete(fn); },
-    speak(text) {
+    /**
+     * text 可以是一段文字或多句（陣列）：多句會依序排隊唸，避免部分瀏覽器唸太長的一句會中斷。
+     * onEnd：最後一句唸完（或被打斷）時呼叫；回傳 false 表示沒有唸（呼叫端要自己估計時間）。
+     */
+    speak(text, { onEnd } = {}) {
       if (!synth || !voice) return false;
       try {
         synth.cancel();
-        const u = new window.SpeechSynthesisUtterance(speechText(text));
-        u.voice = voice;
-        u.lang = voice.lang || 'zh-TW';
-        u.rate = 0.9; // 稍慢，適合兒童
-        u.pitch = 1.05;
-        synth.speak(u);
+        const parts = (Array.isArray(text) ? text : [text]).filter((x) => String(x).trim());
+        queue = parts.map((p, i) => {
+          const u = new window.SpeechSynthesisUtterance(speechText(p));
+          u.voice = voice;
+          u.lang = voice.lang || 'zh-TW';
+          u.rate = 0.9; // 稍慢，適合兒童
+          u.pitch = 1.05;
+          if (onEnd && i === parts.length - 1) { u.onend = onEnd; u.onerror = onEnd; }
+          return u;
+        });
+        for (const u of queue) synth.speak(u);
         return true;
       } catch {
         return false; // 任何錯誤都不打斷畫面

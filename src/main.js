@@ -15,6 +15,8 @@ import { createExploder } from './animation/exploder.js';
 import { createFlows } from './animation/flows.js';
 import { createExperimentPanel } from './ui/experimentPanel.js';
 import { createLearnPanel } from './ui/learnPanel.js';
+import { createGuidePanel } from './ui/guidePanel.js';
+import { createGuidePlayer } from './learning/guide.js';
 import { createSpeech } from './learning/speech.js';
 import { missionsFor } from './learning/missions.js';
 import { loadProgress, saveProgress } from './learning/progress.js';
@@ -129,6 +131,7 @@ store.subscribe((s, prev, changed) => {
 });
 function checkMissions() {
   const s = store.get();
+  if (s.guideStep !== null) return; // 自動導覽時是導覽在操作，不替小朋友完成任務
   const ctx = { state: s, sim: sim.get() };
   const newly = missionsFor(s.difficulty).filter((m) => !s.missionsDone.includes(m.id) && m.check(ctx)).map((m) => m.id);
   if (newly.length) store.set({ missionsDone: [...s.missionsDone, ...newly] });
@@ -139,6 +142,22 @@ const panel = createExperimentPanel({
   store,
   actions: { preset: (name) => rig.preset(name) },
 });
+
+// 自動導覽：每一段切換模式與相機，字幕＋語音說明
+const guide = createGuidePlayer({
+  store,
+  speech,
+  actions: {
+    camera(spec) {
+      if (spec === 'gears') focusGears();
+      else if (spec.startsWith('part:')) focusPart(spec.slice(5));
+      else rig.preset(spec.replace(/^preset:/, ''));
+    },
+  },
+});
+const guidePanel = createGuidePanel({ root: document.getElementById('ui'), header: document.querySelector('#ui .top'), store, player: guide });
+// 小朋友自己拖曳、縮放或點畫面，就表示想自己玩：導覽停止
+for (const type of ['pointerdown', 'wheel']) canvas.addEventListener(type, () => guide.stop(), { passive: true });
 
 const picker = createPicker({
   canvas, camera: rig.camera, scene,
@@ -197,8 +216,15 @@ rig.jump('default'); // 依螢幕比例調整初始視角
 const xpEl = document.querySelector('.xp');
 const headerEl = document.querySelector('#ui .top');
 const viewShift = { cx: 0, cy: 0, scale: 1 }; // 相對螢幕中心的位移（px）與縮放
+const guideEl = guidePanel.element;
 function targetShift() {
   const w = window.innerWidth, h = window.innerHeight;
+  if (store.get().guideStep !== null) { // 導覽字幕卡在下方：畫面中心移到標題列與字幕卡之間
+    const top = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+    const bottom = guideEl.getBoundingClientRect().top;
+    const bandH = Math.max(80, bottom - top);
+    return { cx: 0, cy: (top + bottom) / 2 - h / 2, scale: Math.min(1, Math.max(0.5, bandH / (h * 0.8))) };
+  }
   if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden) return { cx: 0, cy: 0, scale: 1 };
   const r = xpEl.getBoundingClientRect();
   let left = 0, top = 0, bottom = h;
@@ -246,13 +272,15 @@ let fpsT = 0;
 let fps = 0;
 let readoutT = 1;
 function frame() {
-  const dt = Math.min(clock.getDelta(), 0.1); // 切換分頁回來時避免大跳
+  const raw = clock.getDelta();
+  const dt = Math.min(raw, 0.1); // 切換分頁回來時避免大跳
   animator.update(dt);
   const st = store.get();
   exploder.update(dt, st.mode === 'explode' && st.exploded ? 1 : 0);
   flows.update(st.paused ? 0 : dt * st.animSpeed, st.mode === 'experiment');
   readoutT += dt;
-  if (readoutT > 0.2) { readoutT = 0; panel.update(sim.get()); checkMissions(); }
+  guide.update(Math.min(raw, 1)); // 導覽計時用真實時間（不受慢動作與低幀率影響）
+  if (readoutT > 0.2) { readoutT = 0; const now = sim.get(); panel.update(now); guidePanel.update(now); checkMissions(); }
   rig.update(dt);
   updateViewShift(dt);
   renderer.render(scene, rig.camera);
@@ -279,9 +307,15 @@ window.__lab = {
   flows,
   speech,
   checkMissions,
+  guide,
   viewShift: () => ({ ...viewShift }),
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
+  /** 零件包圍盒中心在螢幕上的位置（檢查導覽時零件有沒有被字幕卡擋住） */
+  partScreen: (id) => {
+    const c = partBounds(id).getCenter(new THREE.Vector3()).project(rig.camera);
+    return { x: (c.x * 0.5 + 0.5) * window.innerWidth, y: (-c.y * 0.5 + 0.5) * window.innerHeight, front: c.z < 1 };
+  },
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),
   ready: true,
 };

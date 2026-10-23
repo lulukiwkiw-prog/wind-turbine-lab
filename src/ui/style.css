@@ -247,6 +247,34 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .q-feedback.wrong b { color: var(--critical); }
 .tour .modal-card { border-top: 6px solid var(--accent); }
 
+/* ---------- 自動導覽 ---------- */
+.btn.guide-start { flex: none; flex-direction: row; gap: 6px; background: var(--accent); color: #fff; font-weight: 700; }
+.btn.guide-start svg { width: 20px; height: 20px; }
+.btn.guide-start.on { background: var(--critical); }
+.guide {
+  position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  width: min(640px, calc(100vw - 200px)); display: none; z-index: 3;
+  background: var(--panel); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(23, 50, 77, 0.25);
+  padding: 12px 16px 14px; border-top: 6px solid var(--accent);
+}
+.guide.open { display: block; }
+.guide-top { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 700; color: var(--accent); }
+.guide-count { color: var(--ink-soft); font-variant-numeric: tabular-nums; flex: none; }
+.guide h2 { margin: 4px 0 2px; font-size: 22px; }
+.guide-text { margin: 0; font-size: 19px; line-height: 1.6; }
+.guide-live { margin: 6px 0 0; font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.guide-bar { height: 6px; border-radius: 3px; background: var(--accent-soft); margin: 8px 0 10px; overflow: hidden; }
+.guide-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s linear; }
+.guide-controls { display: flex; gap: 8px; }
+.guide-controls .btn { flex: 1; flex-direction: row; gap: 6px; font-size: 16px; }
+.guide-controls .btn svg { width: 20px; height: 20px; }
+.btn.guide-stop { color: var(--critical); }
+/* 導覽時收起其他面板，讓畫面和字幕不互相擋住 */
+#ui.guide-on .xp, #ui.guide-on .info, #ui.guide-on .hint, #ui.guide-on .cutbar,
+#ui.guide-on .cutnote, #ui.guide-on .speedrow, #ui.guide-on .partlist { display: none !important; }
+#ui.guide-on .toast { bottom: auto; top: 84px; transform: translate(-50%, -10px); }
+#ui.guide-on .toast.show { transform: translate(-50%, 0); }
+
 /* ---------- 手機（窄螢幕）：工具列移到底部、介紹卡變成底部面板 ---------- */
 @media (max-width: 720px) {
   .top { gap: 8px; }
@@ -278,6 +306,14 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   .xp-body { gap: 10px; }
   #ui.mode-experiment .info { right: 8px; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); z-index: 2; }
   .speedrow { font-size: 13px; gap: 4px 8px; padding: 4px 8px; }
+  .btn.guide-start { font-size: 15px; padding: 6px 12px; }
+  .guide { left: 8px; right: 8px; width: auto; transform: none; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); max-height: 46vh; overflow-y: auto; padding: 10px 12px 12px; }
+  .guide h2 { font-size: 19px; }
+  .guide-text { font-size: 16px; line-height: 1.55; }
+  .guide-top, .guide-live { font-size: 12px; }
+  .guide-controls { gap: 4px; }
+  .guide-controls .btn { font-size: 14px; padding: 4px 2px; gap: 2px; }
+  #ui.guide-on .toast { top: 118px; }
   .speed small { display: none; }
 }
 

@@ -455,6 +455,115 @@ try {
     if (errors.length) failures.push(`手機頁面錯誤：${errors.join(' | ')}`);
     await ctx.close();
   }
+  // ---------- 自動導覽：字幕＋語音、按鈕啟動／停止 ----------
+  for (const device of ['desktop', 'mobile']) {
+    const mobile = device === 'mobile';
+    // 假的台灣華語語音：window.__speechMs 毫秒後回報「唸完」（Infinity = 一直唸，讓截圖時畫面不換段）
+    const fakeSpeech = () => {
+      window.__spoken = [];
+      window.__speechMs = Infinity;
+      class FakeUtterance { constructor(text) { this.text = text; } }
+      window.SpeechSynthesisUtterance = FakeUtterance;
+      Object.defineProperty(window, 'speechSynthesis', {
+        value: {
+          getVoices: () => [{ lang: 'zh-TW', name: 'Mei-Jia' }],
+          speak: (u) => {
+            window.__spoken.push({ text: u.text, lang: u.lang });
+            if (u.onend && Number.isFinite(window.__speechMs)) setTimeout(() => u.onend(), window.__speechMs);
+          },
+          cancel: () => {},
+          addEventListener: () => {},
+        },
+        configurable: true,
+      });
+    };
+    const { ctx, page, errors } = mobile
+      ? await openPage({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, deviceScaleFactor: 2 }, { init: fakeSpeech })
+      : await openPage({ width: 1280, height: 800 }, {}, { init: fakeSpeech });
+    const tag = mobile ? '手機' : '桌面';
+    const fail = (msg) => failures.push(`${tag}導覽：${msg}`);
+    // 1. 按標題旁的按鈕開始
+    await page.click('.guide-start');
+    await page.waitForTimeout(400);
+    const started = await page.evaluate(() => ({
+      step: window.__lab.store.get().guideStep,
+      card: getComputedStyle(document.querySelector('.guide')).display !== 'none',
+      btn: document.querySelector('.guide-start').textContent.trim(),
+      xpHidden: getComputedStyle(document.querySelector('.xp')).display === 'none',
+      spoken: window.__spoken.map((x) => x.text),
+    }));
+    const startOk = started.step === 0 && started.card && started.btn === '停止導覽' && started.xpHidden && started.spoken.length > 0 && started.spoken[0].includes('風力發電機');
+    report.push({ name: `${tag}導覽：按鈕開始、字幕出現、語音分句唸`, ...started, spoken: started.spoken.slice(0, 3), ok: startOk });
+    if (!startOk) fail(`開始失敗 ${JSON.stringify(started)}`);
+    // 2. 每一段：畫面焦點不被字幕卡或標題列擋住
+    const scenes = await page.evaluate(() => window.__lab.guide.script.map((g) => ({ title: g.title, camera: g.camera, part: g.part ?? null, mode: g.setup.mode })));
+    const shots = { 0: 'start', 2: 'blade', 6: 'gears', 7: 'generator', 11: 'grid', 14: 'storm' };
+    for (let i = 0; i < scenes.length; i++) {
+      const sc = scenes[i];
+      await page.evaluate((i) => window.__lab.guide.start(i), i);
+      await page.waitForTimeout(2200);
+      const r = await page.evaluate(({ camera, part }) => {
+        const lab = window.__lab;
+        const id = part ?? (camera === 'gears' ? 'sunGear' : 'hub');
+        const p = lab.partScreen(id);
+        // 點得到 = 沒有被別的東西（例如葉片）擋住。電纜在塔架裡面，從外面本來就點不到；
+        // 三片葉片的包圍盒中心是葉片之間的空隙，也不適用（看截圖確認）
+        const picked = ['powerCable', 'blade'].includes(id) || camera === 'preset:grid' ? id : lab.pickAt(p.x, p.y);
+        const card = document.querySelector('.guide').getBoundingClientRect();
+        const head = document.querySelector('#ui .top').getBoundingClientRect();
+        const s = lab.store.get();
+        return { id, p, picked, cardTop: card.top, headBottom: head.bottom, w: innerWidth, step: s.guideStep, mode: s.mode, shell: s.shellView, cardScroll: document.querySelector('.guide').scrollHeight > document.querySelector('.guide').clientHeight + 1 };
+      }, sc);
+      // 送電路線的視角是看整條線路，風機本身可以在畫面邊緣
+      const needFocus = sc.camera !== 'preset:grid';
+      const visible = r.p.front && r.p.x > 0 && r.p.x < r.w && r.p.y > r.headBottom && r.p.y < r.cardTop;
+      const ok = r.step === i && r.mode === sc.mode && (!needFocus || (visible && (!sc.part || r.picked === r.id))) && (sc.mode !== 'explode' || r.shell === 'hidden') && !r.cardScroll;
+      report.push({ name: `${tag}導覽 ${i + 1}「${sc.title}」：焦點在字幕卡上方`, focus: r.id, picked: r.picked, x: Math.round(r.p.x), y: Math.round(r.p.y), cardTop: Math.round(r.cardTop), shell: r.shell, ok });
+      if (!ok) fail(`第 ${i + 1} 段「${sc.title}」${JSON.stringify(r)}`);
+      if (shots[i]) await shoot(page, `${mobile ? '41' : '40'}-guide-${device}-${String(i + 1).padStart(2, '0')}-${shots[i]}`);
+    }
+    // 3. 字幕卡的按鈕：暫停、下一段、上一段
+    await page.evaluate(() => window.__lab.guide.start(3));
+    await page.click('.guide-pause');
+    const paused = await page.evaluate(() => window.__lab.store.get().guidePaused);
+    await page.click('.guide-pause');
+    await page.click('.guide-next');
+    const afterNext = await page.evaluate(() => window.__lab.store.get().guideStep);
+    await page.click('.guide-prev');
+    const afterPrev = await page.evaluate(() => window.__lab.store.get().guideStep);
+    const ctlOk = paused === true && afterNext === 4 && afterPrev === 3;
+    report.push({ name: `${tag}導覽：暫停、下一段、上一段按鈕`, paused, afterNext, afterPrev, ok: ctlOk });
+    if (!ctlOk) fail(`控制按鈕 ${JSON.stringify({ paused, afterNext, afterPrev })}`);
+    // 4. 語音唸完會自動換下一段
+    await page.evaluate(() => { window.__speechMs = 200; window.__lab.guide.start(4); });
+    const minSec = await page.evaluate(() => window.__lab.guide.script[4].minSec);
+    await page.waitForTimeout(minSec * 1000 + 2500);
+    const auto = await page.evaluate(() => window.__lab.store.get().guideStep);
+    report.push({ name: `${tag}導覽：語音唸完自動換段`, auto, ok: auto === 5 });
+    if (auto !== 5) fail(`沒有自動換段（停在 ${auto}）`);
+    await page.evaluate(() => { window.__speechMs = Infinity; });
+    // 5. 觸控目標、水平捲動
+    const small = await page.evaluate(() => [...document.querySelectorAll('.guide button, .guide-start')]
+      .filter((b) => b.offsetParent !== null)
+      .map((b) => ({ t: b.textContent.trim(), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height }))
+      .filter((r) => r.w < 44 || r.h < 44));
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    report.push({ name: `${tag}導覽：觸控目標 ≥ 44px、沒有水平捲動`, small, overflow, ok: !small.length && !overflow });
+    if (small.length || overflow) fail(`按鈕過小或水平捲動 ${JSON.stringify({ small, overflow })}`);
+    // 6. 拖曳畫面就停止；再用按鈕開始、停止
+    const box = await page.evaluate(() => { const r = document.querySelector('#ui .top').getBoundingClientRect(); return { x: innerWidth / 2, y: r.bottom + 40 }; });
+    if (mobile) await page.touchscreen.tap(box.x, box.y); else await page.mouse.click(box.x, box.y);
+    const afterTouch = await page.evaluate(() => window.__lab.store.get().guideStep);
+    await page.click('.guide-start');
+    const restarted = await page.evaluate(() => window.__lab.store.get().guideStep);
+    await page.click('.guide-start');
+    const stopped = await page.evaluate(() => ({ step: window.__lab.store.get().guideStep, btn: document.querySelector('.guide-start').textContent.trim(), card: getComputedStyle(document.querySelector('.guide')).display }));
+    const stopOk = afterTouch === null && restarted === 0 && stopped.step === null && stopped.btn === '自動導覽' && stopped.card === 'none';
+    report.push({ name: `${tag}導覽：點畫面停止；按鈕可再開始、停止`, afterTouch, restarted, stopped, ok: stopOk });
+    if (!stopOk) fail(`停止 ${JSON.stringify({ afterTouch, restarted, stopped })}`);
+    if (errors.length) fail(`頁面錯誤：${errors.join(' | ')}`);
+    await ctx.close();
+  }
 } finally {
   await browser.close();
   await new Promise((r) => server.httpServer.close(r));

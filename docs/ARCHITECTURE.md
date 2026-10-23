@@ -33,8 +33,9 @@ wind-turbine-lab/
 │  │  ├─ missions.js          小任務（依難度分層，自動判斷完成）
 │  │  ├─ quiz.js              考考你題目
 │  │  ├─ tour.js              第一次導覽
+│  │  ├─ guide.js             自動導覽：劇本（17 段）與播放器（換段、暫停、停止；可在 Node 測試）
 │  │  └─ progress.js          進度存在這台裝置（localStorage，失敗不影響使用）
-│  └─ ui/                     兒童介面（ui.js、icons.js、style.css）
+│  └─ ui/                     兒童介面（ui.js、experimentPanel.js、learnPanel.js、guidePanel.js 自動導覽字幕卡、icons.js、style.css）
 ├─ tests/
 │  ├─ spec.test.js            規格一致性（純資料）
 │  └─ model.test.js           以 three.js 在 Node 建場景圖，比對世界座標、轉軸與動畫方向
