@@ -147,7 +147,12 @@ export function createExperimentPanel({ root, store, actions }) {
   // ---------- 看哪裡 ----------
   const views = el('div', { class: 'xp-views' });
   const insideBtn = el('button', { class: 'btn', type: 'button' }, '看機艙裡面');
-  insideBtn.addEventListener('click', () => store.set({ shellView: store.get().shellView === 'solid' ? 'transparent' : 'solid' }));
+  // 外殼變透明的同時把鏡頭飛到機艙旁；從整台風機的距離看，機艙太小，會像沒有反應
+  insideBtn.addEventListener('click', () => {
+    const goIn = store.get().shellView === 'solid';
+    store.set({ shellView: goIn ? 'transparent' : 'solid' });
+    actions.preset(goIn ? 'cutaway' : 'experiment');
+  });
   const gridBtn = el('button', { class: 'btn', type: 'button' }, '看送電路線');
   gridBtn.addEventListener('click', () => actions.preset('grid'));
   const allBtn = el('button', { class: 'btn', type: 'button' }, '看整台風機');

@@ -104,6 +104,27 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
 }
 
 /** 檢查風機輪轂在面板沒擋住的地方 */
+/** 實際點「看機艙裡面」：外殼要變透明、鏡頭要飛到機艙旁；再點一次回到整台風機 */
+async function insideButtonCheck(page, name, shot) {
+  const btn = page.locator('.xp-views .btn', { hasText: '看機艙裡面' });
+  const probe = () => page.evaluate(() => {
+    const lab = window.__lab;
+    const cam = lab.scene.userData.camera;
+    const p = lab.nodes.nacelle.getWorldPosition(lab.nodes.nacelle.position.clone());
+    return { shell: lab.store.get().shellView, dist: Math.round(cam.position.distanceTo(p)) };
+  });
+  await btn.click();
+  await page.waitForTimeout(1800);
+  const inside = await probe();
+  await shoot(page, shot);
+  await btn.click();
+  await page.waitForTimeout(1800);
+  const back = await probe();
+  const ok = inside.shell !== 'solid' && inside.dist < 60 && back.shell === 'solid' && back.dist > 80;
+  report.push({ name, inside, back, ok });
+  if (!ok) failures.push(`${name}：${JSON.stringify({ inside, back })}`);
+}
+
 async function turbineVisibleCheck(page, name) {
   await page.waitForTimeout(1200); // 等畫面平滑移動完成
   const r = await page.evaluate(() => {
@@ -260,6 +281,7 @@ try {
     const xpChecks = [];
     let now = await experiment(page, { wind: 8 });
     await turbineVisibleCheck(page, '桌面實驗：風機不被左側面板擋住');
+    await insideButtonCheck(page, '桌面實驗：點「看機艙裡面」會飛到機艙', '24a-experiment-inside');
     await shoot(page, '24-experiment-8ms');
     xpChecks.push(['8 m/s 發電中', now.status === 'generating' && now.powerKW > 600 && now.powerKW < 1000, now]);
     now = await experiment(page, { wind: 15 });
@@ -411,6 +433,7 @@ try {
     await turbineVisibleCheck(page, '手機實驗（收起）：風機在面板上方');
     await shoot(page, '31b-mobile-390-experiment-folded');
     await page.evaluate(() => window.__lab.store.set({ xpFolded: false }));
+    await insideButtonCheck(page, '手機實驗：點「看機艙裡面」會飛到機艙', '31c-mobile-390-experiment-inside');
     const smallXp = await page.evaluate(() => [...document.querySelectorAll('#ui button')]
       .filter((b) => b.offsetParent !== null)
       .map((b) => ({ t: b.textContent.trim(), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height }))
