@@ -19,7 +19,8 @@ const CANDIDATES = [
 const executablePath = CANDIDATES.find((p) => existsSync(p));
 
 const server = await preview({ preview: { port: 4173, strictPort: true }, logLevel: 'warn' });
-const url = 'http://localhost:4173/wind-turbine-lab/';
+const url = 'http://localhost:4173/wind-turbine-lab/?notour';
+const urlWithTour = 'http://localhost:4173/wind-turbine-lab/';
 
 const browser = await chromium.launch({
   executablePath,
@@ -29,13 +30,14 @@ const browser = await chromium.launch({
 const failures = [];
 const report = [];
 
-async function openPage(viewport, opts = {}) {
+async function openPage(viewport, opts = {}, { target = url, init = null } = {}) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, ...opts });
+  if (init) await ctx.addInitScript(init);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto(url);
+  await page.goto(target);
   await page.waitForFunction(() => window.__lab?.ready === true, null, { timeout: 30000 });
   return { ctx, page, errors };
 }
@@ -44,7 +46,7 @@ async function openPage(viewport, opts = {}) {
 async function pose(page, view, { part = null, rotor = 20 } = {}) {
   await page.evaluate(({ view, part, rotor }) => {
     const lab = window.__lab;
-    lab.store.set({ mode: 'exterior', paused: true, selectedPart: null, partListOpen: false });
+    lab.store.set({ mode: 'exterior', paused: true, selectedPart: null, openPanel: null });
     lab.setRotorAngleDeg(rotor);
     lab.jumpView(view);
     if (part) lab.store.set({ selectedPart: part });
@@ -56,7 +58,7 @@ async function pose(page, view, { part = null, rotor = 20 } = {}) {
 async function cutaway(page, shellView, part = null) {
   await page.evaluate(({ shellView, part }) => {
     const lab = window.__lab;
-    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false, paused: true });
+    lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, paused: true });
     lab.setRotorAngleDeg(20);
     lab.store.set({ mode: 'cutaway' });
     lab.store.set({ shellView });
@@ -70,7 +72,7 @@ async function cutaway(page, shellView, part = null) {
 async function explode(page, { view = 'explode', part = null, gears = false, hidden = [], solo = null } = {}) {
   await page.evaluate(({ view, part, gears, hidden, solo }) => {
     const lab = window.__lab;
-    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false, paused: true });
+    lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, paused: true });
     lab.setRotorAngleDeg(20);
     lab.store.set({ mode: 'explode' });
     lab.exploder.setInstant(1);
@@ -86,7 +88,7 @@ async function explode(page, { view = 'explode', part = null, gears = false, hid
 async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'experiment', shell = 'solid', pitchAuto = true, pitchDeg = 0, after = null } = {}) {
   const now = await page.evaluate(({ wind, angle, seconds, view, shell, pitchAuto, pitchDeg, after }) => {
     const lab = window.__lab;
-    lab.store.set({ mode: 'exterior', selectedPart: null, partListOpen: false });
+    lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null });
     lab.store.set({ mode: 'experiment' });
     lab.store.set({ paused: false, windSpeed: wind, windAngleDeg: angle, pitchAuto, pitchDeg, shellView: shell });
     for (let t = 0; t < seconds; t += 0.05) lab.sim.step(0.05);
@@ -286,6 +288,82 @@ try {
     if (errors.length) failures.push(`桌面頁面錯誤：${errors.join(' | ')}`);
     await ctx.close();
   }
+  // ---------- 第五階段：導覽、小任務、考考你、語音朗讀 ----------
+  {
+    // 模擬一個有台灣華語語音的裝置（無頭瀏覽器本身沒有語音）
+    const fakeSpeech = () => {
+      window.__spoken = [];
+      class FakeUtterance { constructor(text) { this.text = text; } }
+      window.SpeechSynthesisUtterance = FakeUtterance;
+      Object.defineProperty(window, 'speechSynthesis', {
+        value: {
+          getVoices: () => [{ lang: 'en-US', name: 'Samantha' }, { lang: 'zh-TW', name: 'Mei-Jia' }],
+          speak: (u) => window.__spoken.push({ text: u.text, lang: u.lang }),
+          cancel: () => {},
+          addEventListener: () => {},
+        },
+        configurable: true,
+      });
+    };
+    const { ctx, page, errors } = await openPage({ width: 1280, height: 800 }, {}, { target: urlWithTour, init: fakeSpeech });
+    await page.waitForTimeout(500);
+    await shoot(page, '32-first-tour');
+    const tourShown = await page.evaluate(() => window.__lab.store.get().tourStep === 0 && !document.querySelector('.tour').hidden);
+    report.push({ name: '第一次進入顯示導覽', ok: tourShown });
+    if (!tourShown) failures.push('第一次進入沒有顯示導覽');
+    await page.click('.tour .speak');
+    await page.click('.tour .btn.primary'); // 下一步
+    await page.click('.tour .btn:not(.primary):not(.speak)'); // 跳過
+    // 有中文語音：零件介紹卡的朗讀按鈕要出現，唸出來的文字用正確讀音
+    await page.evaluate(() => { window.__lab.store.set({ paused: true }); window.__lab.selectPart('pitchSystem'); });
+    await page.waitForTimeout(1200);
+    const speakVisible = await page.evaluate(() => !document.querySelector('.info .speak').hidden);
+    await page.click('.info .speak');
+    const spoken = await page.evaluate(() => window.__spoken);
+    const speakOk = speakVisible && spoken.length >= 2 && spoken.at(-1).text.includes('獎句') && !spoken.at(-1).text.includes('槳') && spoken.at(-1).lang === 'zh-TW';
+    report.push({ name: '朗讀：zh-TW 語音、難詞讀音', spoken: spoken.map((x) => x.text.slice(0, 20)), ok: speakOk });
+    if (!speakOk) failures.push(`朗讀檢查失敗：${JSON.stringify(spoken)}`);
+    // 完成任務 → 提示；打開學習面板
+    await page.evaluate(() => { window.__lab.selectPart('generator'); window.__lab.checkMissions(); });
+    await page.waitForTimeout(400);
+    await page.evaluate(() => window.__lab.store.set({ openPanel: 'learn' }));
+    await page.waitForTimeout(300);
+    await shoot(page, '33-missions-toast');
+    const done = await page.evaluate(() => window.__lab.store.get().missionsDone);
+    const missionOk = done.includes('find-generator') && done.includes('find-gearbox') === false;
+    report.push({ name: '小任務自動完成', done, ok: missionOk });
+    if (!missionOk) failures.push(`小任務檢查失敗：${JSON.stringify(done)}`);
+    // 進度存在這台裝置：重新整理後仍在
+    await page.reload();
+    await page.waitForFunction(() => window.__lab?.ready === true);
+    const kept = await page.evaluate(() => ({ done: window.__lab.store.get().missionsDone, tour: window.__lab.store.get().tourStep }));
+    const keptOk = kept.done.includes('find-generator') && kept.tour === null;
+    report.push({ name: '重新整理後保留進度、不再顯示導覽', ...kept, ok: keptOk });
+    if (!keptOk) failures.push(`進度保存失敗：${JSON.stringify(kept)}`);
+    // 考考你：選錯答案 → 顯示正確答案與說明
+    await page.evaluate(() => window.__lab.store.set({ openPanel: null, quizIndex: 4, quizPicked: null, quizScore: 0 }));
+    await page.waitForTimeout(200);
+    await page.click('.q-options .btn.option >> nth=0');
+    await page.waitForTimeout(300);
+    await shoot(page, '34-quiz-feedback');
+    const fb = await page.evaluate(() => document.querySelector('.q-feedback').innerText);
+    const quizOk = /正確答案是「8 倍」/.test(fb);
+    report.push({ name: '考考你：答錯時說明', ok: quizOk });
+    if (!quizOk) failures.push(`考考你回饋不正確：${fb}`);
+    if (errors.length) failures.push(`學習功能頁面錯誤：${errors.join(' | ')}`);
+    await ctx.close();
+  }
+  // ---------- 沒有中文語音的裝置：朗讀按鈕要隱藏、不報錯 ----------
+  {
+    const { ctx, page, errors } = await openPage({ width: 1280, height: 800 });
+    await page.evaluate(() => { window.__lab.store.set({ paused: true }); window.__lab.selectPart('tower'); });
+    await page.waitForTimeout(500);
+    const hidden = await page.evaluate(() => document.querySelector('.info .speak').hidden && [...document.querySelectorAll('.learn .speak')].every((b) => b.hidden));
+    report.push({ name: '沒有中文語音時隱藏朗讀按鈕', ok: hidden });
+    if (!hidden) failures.push('沒有中文語音時仍顯示朗讀按鈕');
+    if (errors.length) failures.push(`無語音頁面錯誤：${errors.join(' | ')}`);
+    await ctx.close();
+  }
   // ---------- 手機寬度 390px ----------
   {
     const { ctx, page, errors } = await openPage({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
@@ -293,13 +371,20 @@ try {
     await shoot(page, '07-mobile-390');
     await pose(page, 'default', { part: 'blade' });
     await shoot(page, '08-mobile-390-select-blade');
-    await page.evaluate(() => window.__lab.store.set({ selectedPart: null, partListOpen: true }));
+    await page.evaluate(() => window.__lab.store.set({ selectedPart: null, openPanel: 'parts' }));
     await page.waitForTimeout(300);
     await shoot(page, '09-mobile-390-partlist');
     await cutaway(page, 'transparent');
     await shoot(page, '17-mobile-390-cutaway');
     await explode(page, { gears: true, hidden: ['gearbox'] });
     await shoot(page, '23-mobile-390-explode-gears');
+    await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', openPanel: 'learn' }));
+    await page.waitForTimeout(300);
+    await shoot(page, '35-mobile-390-learn');
+    await page.evaluate(() => window.__lab.store.set({ openPanel: null, quizIndex: 0, quizPicked: 1 }));
+    await page.waitForTimeout(300);
+    await shoot(page, '36-mobile-390-quiz');
+    await page.evaluate(() => window.__lab.store.set({ quizIndex: null, quizPicked: null }));
     await experiment(page, { wind: 12 });
     await shoot(page, '31-mobile-390-experiment');
     const smallXp = await page.evaluate(() => [...document.querySelectorAll('#ui button')]

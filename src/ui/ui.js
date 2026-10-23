@@ -19,7 +19,7 @@ const el = (tag, attrs = {}, html = '') => {
 const SPEED_LABEL = { 1: '正常', 0.5: '慢動作', 0.25: '超慢' };
 const GROUP_TITLE = { exterior: '外觀', internal: '機艙裡面', gears: '齒輪箱裡面', electrical: '電力' };
 
-export function createUI({ root, store, actions }) {
+export function createUI({ root, store, actions, speech }) {
   // ---------- 標題 ----------
   const header = el('header', { class: 'top' });
   header.append(el('h1', {}, `${ICONS.turbine}<span>風力發電機探索實驗室</span>`));
@@ -53,10 +53,21 @@ export function createUI({ root, store, actions }) {
     const sp = ANIMATION.speeds;
     store.set({ animSpeed: sp[(sp.indexOf(store.get().animSpeed) + 1) % sp.length] });
   });
-  mk('front', ICONS.front, '正面', () => actions.preset('front'));
-  mk('side', ICONS.side, '側面', () => actions.preset('side'));
-  mk('nacelle', ICONS.nacelle, '看機艙', () => actions.preset('nacelle'));
-  const listBtn = mk('list', ICONS.list, '零件', () => store.set({ partListOpen: !store.get().partListOpen }));
+  const toggle = (name) => store.set({ openPanel: store.get().openPanel === name ? null : name });
+  const viewsBtn = mk('views', ICONS.views, '視角', () => toggle('views'));
+  const listBtn = mk('list', ICONS.list, '零件', () => toggle('parts'));
+  const learnBtn = mk('learn', ICONS.learn, '學習', () => toggle('learn'));
+
+  // ---------- 視角選單 ----------
+  const viewMenu = el('div', { class: 'partlist viewmenu', role: 'dialog', 'aria-label': '視角' });
+  viewMenu.append(el('h2', {}, '從哪裡看？'));
+  const viewGrid = el('div', { class: 'grid' });
+  for (const [id, icon, label] of [['front', ICONS.front, '正面'], ['side', ICONS.side, '側面'], ['nacelle', ICONS.nacelle, '看機艙']]) {
+    const b = el('button', { class: 'btn chip', type: 'button', 'data-view': id }, `${icon}<span>${label}</span>`);
+    b.addEventListener('click', () => { store.set({ openPanel: null }); actions.preset(id); });
+    viewGrid.append(b);
+  }
+  viewMenu.append(viewGrid);
 
   // ---------- 零件清單（依外觀／機艙內部／電力分組） ----------
   const list = el('div', { class: 'partlist', role: 'dialog', 'aria-label': '零件清單' });
@@ -102,7 +113,16 @@ export function createUI({ root, store, actions }) {
   const infoName = el('h2');
   const closeBtn = el('button', { class: 'btn icon', type: 'button', 'aria-label': '關閉' }, ICONS.close);
   closeBtn.addEventListener('click', () => store.set({ selectedPart: null }));
-  infoHead.append(infoDot, infoName, closeBtn);
+  // 朗讀：唸名稱與簡短介紹（展開時連進階說明一起唸）；裝置沒有中文語音時不顯示
+  const speakBtn = el('button', { class: 'btn icon speak', type: 'button', 'aria-label': '唸給我聽' }, ICONS.speaker);
+  speakBtn.addEventListener('click', () => {
+    const s = store.get();
+    const t = s.selectedPart && partText(s.selectedPart, s.difficulty);
+    if (!t) return;
+    speech.speak(t.speak ?? `${t.name}。${t.short}${s.infoExpanded ? `。${t.more}` : ''}`);
+  });
+  speech.onChange((ok) => { speakBtn.hidden = !ok; });
+  infoHead.append(infoDot, infoName, speakBtn, closeBtn);
   const infoShort = el('p', { class: 'short' });
   const moreBtn = el('button', { class: 'btn more', type: 'button' });
   moreBtn.addEventListener('click', () => store.set({ infoExpanded: !store.get().infoExpanded }));
@@ -160,7 +180,7 @@ export function createUI({ root, store, actions }) {
   const exNote = el('p', { class: 'cutnote' }, '教學示意：齒數與齒形是簡化的；葉輪已放慢，讓高速軸每秒轉約 1 圈。');
 
   header.append(cutbar, cutNote, exbar, speedRow, exNote);
-  root.append(header, tools, list, info, hint, marker);
+  root.append(header, tools, list, viewMenu, info, hint, marker);
 
   function render(s) {
     for (const [id, b] of Object.entries(modeButtons)) b.classList.toggle('active', id === s.mode);
@@ -169,8 +189,11 @@ export function createUI({ root, store, actions }) {
     pauseBtn.classList.toggle('on', s.paused);
     slowBtn.querySelector('.lbl').textContent = SPEED_LABEL[s.animSpeed];
     slowBtn.classList.toggle('on', s.animSpeed !== 1);
-    listBtn.classList.toggle('on', s.partListOpen);
-    list.classList.toggle('open', s.partListOpen);
+    listBtn.classList.toggle('on', s.openPanel === 'parts');
+    list.classList.toggle('open', s.openPanel === 'parts');
+    viewsBtn.classList.toggle('on', s.openPanel === 'views');
+    viewMenu.classList.toggle('open', s.openPanel === 'views');
+    learnBtn.classList.toggle('on', s.openPanel === 'learn');
     for (const [id, b] of Object.entries(listButtons)) b.classList.toggle('active', id === s.selectedPart);
     cutbar.classList.toggle('open', s.mode === 'cutaway');
     cutNote.hidden = s.mode !== 'cutaway';
@@ -202,8 +225,11 @@ export function createUI({ root, store, actions }) {
       marker.textContent = t.name;
       hint.classList.add('gone');
     }
+    if (changedPart(s)) speech.stop(); // 換零件或關閉時停止朗讀
     marker.classList.toggle('show', !!t);
   }
+  let lastPart = null;
+  function changedPart(s) { const c = s.selectedPart !== lastPart; lastPart = s.selectedPart; return c; }
   store.subscribe(render);
   render(store.get());
 

@@ -14,6 +14,10 @@ import { createViewController } from './model/viewState.js';
 import { createExploder } from './animation/exploder.js';
 import { createFlows } from './animation/flows.js';
 import { createExperimentPanel } from './ui/experimentPanel.js';
+import { createLearnPanel } from './ui/learnPanel.js';
+import { createSpeech } from './learning/speech.js';
+import { missionsFor } from './learning/missions.js';
+import { loadProgress, saveProgress } from './learning/progress.js';
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -88,7 +92,7 @@ function focusGears() {
 function selectPart(id) {
   const s = store.get();
   if (id === s.selectedPart) { focusPart(id); return; } // 再按一次：重新聚焦
-  const patch = { selectedPart: id, partListOpen: false };
+  const patch = { selectedPart: id, openPanel: null };
   if (GEAR_PARTS.has(id) && s.mode !== 'explode') patch.mode = 'explode';
   else if (CUTAWAY_PARTS.has(id) && s.mode === 'exterior') patch.mode = 'cutaway';
   else if (CUTAWAY_PARTS.has(id) && s.mode === 'experiment' && s.shellView === 'solid') patch.shellView = 'transparent';
@@ -100,9 +104,11 @@ const view = createViewController({ root: scene, mats });
 view.apply(store.get());
 const exploder = createExploder({ root: scene, nodes: turbine.nodes });
 
+const speech = createSpeech();
 const ui = createUI({
   root: document.getElementById('ui'),
   store,
+  speech,
   actions: {
     resetView: () => rig.reset(),
     preset: (name) => rig.preset(name),
@@ -110,6 +116,23 @@ const ui = createUI({
     focusGears,
   },
 });
+
+createLearnPanel({ root: document.getElementById('ui'), store, speech });
+
+// 學習進度：讀取這台裝置上次的進度；第一次來就顯示導覽
+const saved = loadProgress();
+let tourDone = saved.tourDone;
+store.set({ missionsDone: saved.missionsDone, tourStep: tourDone || new URLSearchParams(location.search).has('notour') ? null : 0 });
+store.subscribe((s, prev, changed) => {
+  if (changed.includes('tourStep') && prev.tourStep !== null && s.tourStep === null) tourDone = true;
+  if (changed.includes('missionsDone') || changed.includes('tourStep')) saveProgress({ missionsDone: s.missionsDone, tourDone });
+});
+function checkMissions() {
+  const s = store.get();
+  const ctx = { state: s, sim: sim.get() };
+  const newly = missionsFor(s.difficulty).filter((m) => !s.missionsDone.includes(m.id) && m.check(ctx)).map((m) => m.id);
+  if (newly.length) store.set({ missionsDone: [...s.missionsDone, ...newly] });
+}
 
 const panel = createExperimentPanel({
   root: document.getElementById('ui'),
@@ -195,7 +218,7 @@ function frame() {
   exploder.update(dt, st.mode === 'explode' && st.exploded ? 1 : 0);
   flows.update(st.paused ? 0 : dt * st.animSpeed, st.mode === 'experiment');
   readoutT += dt;
-  if (readoutT > 0.2) { readoutT = 0; panel.update(sim.get()); }
+  if (readoutT > 0.2) { readoutT = 0; panel.update(sim.get()); checkMissions(); }
   rig.update(dt);
   renderer.render(scene, rig.camera);
   ui.placeMarker(markerScreen());
@@ -219,6 +242,8 @@ window.__lab = {
   exploder,
   sim,
   flows,
+  speech,
+  checkMissions,
   stats: () => ({ fps, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
   pickAt: (x, y) => picker.pickAt(x, y),
   partIds: () => PARTS.filter((p) => partMeshes.has(p.id)).map((p) => p.id),

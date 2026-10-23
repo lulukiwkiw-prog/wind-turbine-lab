@@ -10,7 +10,7 @@ const initial = () => ({
   paused: false,
   selectedPart: null,
   infoExpanded: false,
-  partListOpen: false,
+  openPanel: null, // 目前打開的面板：null／'parts' 零件清單／'views' 視角／'learn' 學習
   shellView: 'solid', // 機艙外殼：solid 實心／transparent 透明／hidden 拿掉
   exploded: true, // 拆解模式：true 拆開／false 合起來
   hiddenParts: Object.freeze([]), // 拆解模式中被藏起來的零件
@@ -20,6 +20,12 @@ const initial = () => ({
   windAngleDeg: 0,
   pitchDeg: 0, // 手動模式的槳距設定（實際槳距由模擬決定）
   pitchAuto: true, // true：控制器自動變槳；false：小朋友手動
+  // 學習功能（第五階段）
+  missionsDone: Object.freeze([]), // 完成的小任務 id（存在這台裝置的瀏覽器裡）
+  quizIndex: null, // 考考你：目前第幾題（null = 沒有在作答）
+  quizPicked: null, // 這一題選了哪個答案（null = 還沒選）
+  quizScore: 0,
+  tourStep: null, // 導覽：第幾步（null = 不顯示）
 });
 
 const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
@@ -31,7 +37,12 @@ const validators = {
   paused: (v) => typeof v === 'boolean',
   selectedPart: (v) => v === null || isCurrentPart(v),
   infoExpanded: (v) => typeof v === 'boolean',
-  partListOpen: (v) => typeof v === 'boolean',
+  openPanel: (v) => v === null || ['parts', 'views', 'learn'].includes(v),
+  missionsDone: (v) => Array.isArray(v) && v.every((x) => typeof x === 'string') && new Set(v).size === v.length,
+  quizIndex: (v) => v === null || (Number.isInteger(v) && v >= 0),
+  quizPicked: (v) => v === null || (Number.isInteger(v) && v >= 0),
+  quizScore: (v) => Number.isInteger(v) && v >= 0,
+  tourStep: (v) => v === null || (Number.isInteger(v) && v >= 0),
   shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
   exploded: (v) => typeof v === 'boolean',
   hiddenParts: (v) => Array.isArray(v) && v.every(isCurrentPart) && new Set(v).size === v.length,

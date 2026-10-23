@@ -27,7 +27,13 @@ wind-turbine-lab/
 │  ├─ interaction/
 │  │  ├─ cameraRig.js         OrbitControls、預設視角、聚焦動畫、直式螢幕自動拉遠
 │  │  └─ picking.js           點一下（非拖曳）才選取；Raycaster
-│  ├─ learning/partsData.js   零件文字，依難度分層（elementary / junior）
+│  ├─ learning/
+│  │  ├─ partsData.js         零件文字，依難度分層（elementary / junior）
+│  │  ├─ speech.js            語音朗讀（Web Speech API、zh-TW 優先、讀音修正表）
+│  │  ├─ missions.js          小任務（依難度分層，自動判斷完成）
+│  │  ├─ quiz.js              考考你題目
+│  │  ├─ tour.js              第一次導覽
+│  │  └─ progress.js          進度存在這台裝置（localStorage，失敗不影響使用）
 │  └─ ui/                     兒童介面（ui.js、icons.js、style.css）
 ├─ tests/
 │  ├─ spec.test.js            規格一致性（純資料）

@@ -1,0 +1,25 @@
+# 合併請求與其他分支：程式碼檢查、規格／模型／模擬測試、建置
+# （截圖檢查需要本機 Chromium，在開發環境用 npm run check 執行）
+name: 檢查
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:spec
+      - run: npm run build

@@ -2,57 +2,57 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 40.219,
-    "colors": 213,
-    "mean": 183.29,
+    "std": 40.037,
+    "colors": 214,
+    "mean": 183.095,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
-    "std": 39.851,
+    "std": 39.66,
     "colors": 215,
-    "mean": 184.449,
+    "mean": 184.251,
     "ok": true
   },
   {
     "name": "03-side",
     "darkFrac": 0,
-    "std": 42.016,
-    "colors": 206,
-    "mean": 184.337,
+    "std": 41.83,
+    "colors": 207,
+    "mean": 184.099,
     "ok": true
   },
   {
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
-    "std": 40.869,
+    "std": 40.693,
     "colors": 208,
-    "mean": 177.313,
+    "mean": 177.169,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
-    "std": 39.324,
-    "colors": 242,
-    "mean": 192.655,
+    "std": 39.169,
+    "colors": 244,
+    "mean": 192.478,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 39.658,
-    "colors": 239,
-    "mean": 196.772,
+    "std": 39.523,
+    "colors": 241,
+    "mean": 196.595,
     "ok": true
   },
   {
     "name": "10-cutaway-transparent",
     "darkFrac": 0,
-    "std": 41.051,
+    "std": 40.634,
     "colors": 518,
-    "mean": 155.372,
+    "mean": 155.035,
     "ok": true
   },
   {
@@ -70,9 +70,9 @@
   {
     "name": "11-cutaway-shell-removed",
     "darkFrac": 0,
-    "std": 43.695,
-    "colors": 607,
-    "mean": 152.792,
+    "std": 43.279,
+    "colors": 606,
+    "mean": 152.454,
     "ok": true
   },
   {
@@ -84,41 +84,41 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 48.059,
-    "colors": 529,
-    "mean": 159.851,
+    "std": 48.202,
+    "colors": 559,
+    "mean": 158.794,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 47.021,
-    "colors": 480,
-    "mean": 162.65,
+    "std": 47.013,
+    "colors": 509,
+    "mean": 161.531,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 45.967,
-    "colors": 387,
-    "mean": 164.485,
+    "std": 45.666,
+    "colors": 385,
+    "mean": 164.148,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
-    "std": 48.589,
-    "colors": 479,
-    "mean": 151.341,
+    "std": 48.231,
+    "colors": 475,
+    "mean": 150.954,
     "ok": true
   },
   {
     "name": "16-power-path",
     "darkFrac": 0,
-    "std": 31.192,
+    "std": 30.663,
     "colors": 261,
-    "mean": 156.895,
+    "mean": 156.555,
     "ok": true
   },
   {
@@ -130,9 +130,9 @@
   {
     "name": "16b-substation-grid",
     "darkFrac": 0,
-    "std": 34.417,
-    "colors": 170,
-    "mean": 162.182,
+    "std": 33.993,
+    "colors": 168,
+    "mean": 161.845,
     "ok": true
   },
   {
@@ -156,9 +156,9 @@
   {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 45.151,
-    "colors": 612,
-    "mean": 159.215,
+    "std": 44.962,
+    "colors": 610,
+    "mean": 158.928,
     "ok": true
   },
   {
@@ -176,9 +176,9 @@
   {
     "name": "19-gear-train-side",
     "darkFrac": 0,
-    "std": 42.77,
-    "colors": 522,
-    "mean": 162.227,
+    "std": 42.59,
+    "colors": 520,
+    "mean": 161.94,
     "ok": true
   },
   {
@@ -190,9 +190,9 @@
   {
     "name": "20-planetary-closeup",
     "darkFrac": 0,
-    "std": 48.804,
+    "std": 48.614,
     "colors": 428,
-    "mean": 165.465,
+    "mean": 165.261,
     "ok": true
   },
   {
@@ -204,9 +204,9 @@
   {
     "name": "20b-gear-view-front",
     "darkFrac": 0,
-    "std": 42.884,
-    "colors": 387,
-    "mean": 152.176,
+    "std": 42.605,
+    "colors": 386,
+    "mean": 151.971,
     "ok": true
   },
   {
@@ -224,17 +224,17 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.258,
-    "colors": 258,
-    "mean": 176.219,
+    "std": 43.101,
+    "colors": 261,
+    "mean": 176.005,
     "ok": true
   },
   {
     "name": "22-explode-closed",
     "darkFrac": 0,
-    "std": 43.637,
-    "colors": 598,
-    "mean": 160.015,
+    "std": 43.397,
+    "colors": 597,
+    "mean": 159.814,
     "ok": true
   },
   {
@@ -245,49 +245,49 @@
   {
     "name": "24-experiment-8ms",
     "darkFrac": 0,
-    "std": 43.381,
-    "colors": 265,
-    "mean": 198.368,
+    "std": 43.631,
+    "colors": 289,
+    "mean": 197.311,
     "ok": true
   },
   {
     "name": "25-experiment-15ms-rated",
     "darkFrac": 0,
-    "std": 43.664,
-    "colors": 273,
-    "mean": 197.79,
+    "std": 44.468,
+    "colors": 298,
+    "mean": 196.231,
     "ok": true
   },
   {
     "name": "26-experiment-27ms-shutdown",
     "darkFrac": 0,
-    "std": 43.483,
-    "colors": 248,
-    "mean": 198.322,
+    "std": 44.334,
+    "colors": 271,
+    "mean": 196.736,
     "ok": true
   },
   {
     "name": "27-experiment-yawing-east-wind",
     "darkFrac": 0,
-    "std": 43.795,
-    "colors": 262,
-    "mean": 198.455,
+    "std": 44.575,
+    "colors": 290,
+    "mean": 196.923,
     "ok": true
   },
   {
     "name": "28-experiment-manual-overspeed",
     "darkFrac": 0,
-    "std": 43.757,
-    "colors": 267,
-    "mean": 197.741,
+    "std": 43.717,
+    "colors": 262,
+    "mean": 197.495,
     "ok": true
   },
   {
     "name": "29-experiment-inside",
     "darkFrac": 0,
-    "std": 53.615,
-    "colors": 516,
-    "mean": 173.422,
+    "std": 53.411,
+    "colors": 515,
+    "mean": 173.085,
     "ok": true
   },
   {
@@ -299,9 +299,9 @@
   {
     "name": "30-experiment-power-to-grid",
     "darkFrac": 0,
-    "std": 48.159,
-    "colors": 231,
-    "mean": 183.661,
+    "std": 48.001,
+    "colors": 227,
+    "mean": 183.343,
     "ok": true
   },
   {
@@ -374,57 +374,132 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 13.987411329804482,
+    "fps": 15.493366902293907,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
   },
   {
+    "name": "32-first-tour",
+    "darkFrac": 0,
+    "std": 40.93,
+    "colors": 149,
+    "mean": 142.413,
+    "ok": true
+  },
+  {
+    "name": "第一次進入顯示導覽",
+    "ok": true
+  },
+  {
+    "name": "朗讀：zh-TW 語音、難詞讀音",
+    "spoken": [
+      "轉一轉、放大縮小。用一根手指拖曳可以轉動",
+      "獎句控制系統。轉動葉片的角度，控制葉輪轉"
+    ],
+    "ok": true
+  },
+  {
+    "name": "33-missions-toast",
+    "darkFrac": 0,
+    "std": 49.57,
+    "colors": 415,
+    "mean": 198.065,
+    "ok": true
+  },
+  {
+    "name": "小任務自動完成",
+    "done": [
+      "find-generator"
+    ],
+    "ok": true
+  },
+  {
+    "name": "重新整理後保留進度、不再顯示導覽",
+    "done": [
+      "find-generator"
+    ],
+    "tour": null,
+    "ok": true
+  },
+  {
+    "name": "34-quiz-feedback",
+    "darkFrac": 0,
+    "std": 52.675,
+    "colors": 190,
+    "mean": 156.059,
+    "ok": true
+  },
+  {
+    "name": "考考你：答錯時說明",
+    "ok": true
+  },
+  {
+    "name": "沒有中文語音時隱藏朗讀按鈕",
+    "ok": true
+  },
+  {
     "name": "07-mobile-390",
     "darkFrac": 0,
-    "std": 44.849,
-    "colors": 217,
-    "mean": 185.678,
+    "std": 44.689,
+    "colors": 218,
+    "mean": 185.908,
     "ok": true
   },
   {
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
-    "std": 39.226,
-    "colors": 242,
-    "mean": 208.743,
+    "std": 38.994,
+    "colors": 245,
+    "mean": 208.936,
     "ok": true
   },
   {
     "name": "09-mobile-390-partlist",
     "darkFrac": 0,
-    "std": 38.122,
-    "colors": 218,
-    "mean": 225.263,
+    "std": 37.803,
+    "colors": 217,
+    "mean": 225.388,
     "ok": true
   },
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 44.969,
-    "colors": 522,
-    "mean": 163.108,
+    "std": 44.893,
+    "colors": 525,
+    "mean": 163.346,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 51.265,
-    "colors": 479,
-    "mean": 163.287,
+    "std": 51.243,
+    "colors": 480,
+    "mean": 163.499,
+    "ok": true
+  },
+  {
+    "name": "35-mobile-390-learn",
+    "darkFrac": 0,
+    "std": 39.976,
+    "colors": 162,
+    "mean": 225.158,
+    "ok": true
+  },
+  {
+    "name": "36-mobile-390-quiz",
+    "darkFrac": 0,
+    "std": 62.593,
+    "colors": 154,
+    "mean": 188.894,
     "ok": true
   },
   {
     "name": "31-mobile-390-experiment",
     "darkFrac": 0,
-    "std": 40.349,
-    "colors": 208,
-    "mean": 220.673,
+    "std": 44.722,
+    "colors": 197,
+    "mean": 217.307,
     "ok": true
   },
   {
@@ -441,7 +516,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 14.340344168260037,
+    "fps": 16.901408450704228,
     "drawCalls": 75,
     "triangles": 43696,
     "pixelRatio": 2

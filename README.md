@@ -2,7 +2,9 @@
 
 給國小三年級（後期加入國中模式）的互動式 3D 風力發電機網站。Three.js + Vite，所有 3D 幾何以程式生成，不使用外部模型、照片或貼圖，執行時不依賴外部 CDN。
 
-> 目前進度：**第四階段**（發電實驗：風速、風向、槳距、能量轉換與送電）。
+> 目前進度：**第五階段**（兒童學習功能、語音朗讀、部署）。
+>
+> 網站：https://lulukiwkiw-prog.github.io/wind-turbine-lab/（合併到 `main` 並開啟 GitHub Pages 後）
 
 ## 開發
 
@@ -14,6 +16,12 @@ npm run check      # lint + 規格／模型測試 + 產生圖表 + 建置 + 截�
 ```
 
 截圖檢查使用 `playwright-core` 與本機 Chromium（預設 `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`，可用環境變數 `CHROME_PATH` 指定），以 SwiftShader 軟體 WebGL 渲染。
+
+## 部署到 GitHub Pages
+
+1. 第一次：到 GitHub 的 **Settings → Pages → Build and deployment → Source** 選 **GitHub Actions**。
+2. 之後每次推送（或合併）到 `main`，GitHub Actions 會自動檢查、建置並發布。
+3. 進度可以在 **Actions** 分頁看到；完成後網址是 `https://lulukiwkiw-prog.github.io/wind-turbine-lab/`。
 
 ## 文件
 
