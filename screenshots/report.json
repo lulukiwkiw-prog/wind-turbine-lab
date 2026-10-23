@@ -2,57 +2,57 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 40.037,
-    "colors": 214,
-    "mean": 183.095,
+    "std": 40.372,
+    "colors": 228,
+    "mean": 182.587,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
-    "std": 39.66,
-    "colors": 215,
-    "mean": 184.251,
+    "std": 40.019,
+    "colors": 226,
+    "mean": 183.751,
     "ok": true
   },
   {
     "name": "03-side",
     "darkFrac": 0,
-    "std": 41.83,
-    "colors": 207,
-    "mean": 184.099,
+    "std": 42.169,
+    "colors": 218,
+    "mean": 183.599,
     "ok": true
   },
   {
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
-    "std": 40.693,
-    "colors": 208,
-    "mean": 177.169,
+    "std": 40.925,
+    "colors": 222,
+    "mean": 176.667,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
-    "std": 39.169,
-    "colors": 244,
-    "mean": 192.478,
+    "std": 39.645,
+    "colors": 263,
+    "mean": 191.953,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 39.523,
-    "colors": 241,
-    "mean": 196.595,
+    "std": 40.049,
+    "colors": 260,
+    "mean": 196.07,
     "ok": true
   },
   {
     "name": "10-cutaway-transparent",
     "darkFrac": 0,
-    "std": 40.634,
+    "std": 40.396,
     "colors": 518,
-    "mean": 155.035,
+    "mean": 154.392,
     "ok": true
   },
   {
@@ -70,9 +70,9 @@
   {
     "name": "11-cutaway-shell-removed",
     "darkFrac": 0,
-    "std": 43.279,
-    "colors": 606,
-    "mean": 152.454,
+    "std": 43.017,
+    "colors": 609,
+    "mean": 151.811,
     "ok": true
   },
   {
@@ -84,41 +84,41 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 48.189,
-    "colors": 558,
-    "mean": 158.999,
+    "std": 48.015,
+    "colors": 556,
+    "mean": 158.449,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 47.101,
-    "colors": 502,
-    "mean": 161.952,
+    "std": 46.866,
+    "colors": 505,
+    "mean": 161.451,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 45.666,
-    "colors": 385,
-    "mean": 164.148,
+    "std": 45.705,
+    "colors": 403,
+    "mean": 163.732,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
-    "std": 48.231,
-    "colors": 475,
-    "mean": 150.954,
+    "std": 48.663,
+    "colors": 481,
+    "mean": 152.589,
     "ok": true
   },
   {
     "name": "16-power-path",
     "darkFrac": 0,
-    "std": 30.663,
-    "colors": 261,
-    "mean": 156.555,
+    "std": 30.869,
+    "colors": 269,
+    "mean": 156.402,
     "ok": true
   },
   {
@@ -130,9 +130,9 @@
   {
     "name": "16b-substation-grid",
     "darkFrac": 0,
-    "std": 33.993,
-    "colors": 168,
-    "mean": 161.845,
+    "std": 33.852,
+    "colors": 182,
+    "mean": 161.203,
     "ok": true
   },
   {
@@ -156,9 +156,9 @@
   {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 44.962,
-    "colors": 610,
-    "mean": 158.928,
+    "std": 44.76,
+    "colors": 611,
+    "mean": 158.251,
     "ok": true
   },
   {
@@ -176,9 +176,9 @@
   {
     "name": "19-gear-train-side",
     "darkFrac": 0,
-    "std": 42.59,
-    "colors": 520,
-    "mean": 161.94,
+    "std": 42.425,
+    "colors": 523,
+    "mean": 161.263,
     "ok": true
   },
   {
@@ -190,9 +190,9 @@
   {
     "name": "20-planetary-closeup",
     "darkFrac": 0,
-    "std": 48.614,
-    "colors": 428,
-    "mean": 165.261,
+    "std": 49.17,
+    "colors": 448,
+    "mean": 164.827,
     "ok": true
   },
   {
@@ -204,9 +204,9 @@
   {
     "name": "20b-gear-view-front",
     "darkFrac": 0,
-    "std": 42.605,
-    "colors": 386,
-    "mean": 151.971,
+    "std": 42.703,
+    "colors": 392,
+    "mean": 151.863,
     "ok": true
   },
   {
@@ -224,17 +224,17 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.101,
-    "colors": 261,
-    "mean": 176.005,
+    "std": 43.158,
+    "colors": 263,
+    "mean": 175.327,
     "ok": true
   },
   {
     "name": "22-explode-closed",
     "darkFrac": 0,
-    "std": 43.397,
-    "colors": 597,
-    "mean": 159.814,
+    "std": 43.202,
+    "colors": 598,
+    "mean": 159.137,
     "ok": true
   },
   {
@@ -253,51 +253,71 @@
     "ok": true
   },
   {
+    "name": "24a-experiment-inside",
+    "darkFrac": 0,
+    "std": 52.237,
+    "colors": 529,
+    "mean": 176.331,
+    "ok": true
+  },
+  {
+    "name": "桌面實驗：點「看機艙裡面」會飛到機艙",
+    "inside": {
+      "shell": "transparent",
+      "dist": 15
+    },
+    "back": {
+      "shell": "solid",
+      "dist": 181
+    },
+    "ok": true
+  },
+  {
     "name": "24-experiment-8ms",
     "darkFrac": 0,
-    "std": 44.102,
-    "colors": 257,
-    "mean": 197.225,
+    "std": 43.406,
+    "colors": 269,
+    "mean": 196.882,
     "ok": true
   },
   {
     "name": "25-experiment-15ms-rated",
     "darkFrac": 0,
-    "std": 44.385,
-    "colors": 263,
-    "mean": 196.555,
+    "std": 44.27,
+    "colors": 297,
+    "mean": 196.412,
     "ok": true
   },
   {
     "name": "26-experiment-27ms-shutdown",
     "darkFrac": 0,
-    "std": 44.16,
-    "colors": 254,
-    "mean": 197.184,
+    "std": 44.325,
+    "colors": 286,
+    "mean": 196.382,
     "ok": true
   },
   {
     "name": "27-experiment-yawing-east-wind",
     "darkFrac": 0,
-    "std": 44.189,
-    "colors": 266,
-    "mean": 197.409,
+    "std": 44.436,
+    "colors": 298,
+    "mean": 196.253,
     "ok": true
   },
   {
     "name": "28-experiment-manual-overspeed",
     "darkFrac": 0,
-    "std": 43.513,
-    "colors": 249,
-    "mean": 197.063,
+    "std": 43.362,
+    "colors": 275,
+    "mean": 196.835,
     "ok": true
   },
   {
     "name": "29-experiment-inside",
     "darkFrac": 0,
-    "std": 52.691,
-    "colors": 518,
-    "mean": 177.398,
+    "std": 52.219,
+    "colors": 533,
+    "mean": 176.494,
     "ok": true
   },
   {
@@ -309,9 +329,9 @@
   {
     "name": "30-experiment-power-to-grid",
     "darkFrac": 0,
-    "std": 48.023,
-    "colors": 221,
-    "mean": 184.744,
+    "std": 47.854,
+    "colors": 243,
+    "mean": 184.107,
     "ok": true
   },
   {
@@ -384,7 +404,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 13.671875000000004,
+    "fps": 10.760050865696963,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -392,9 +412,9 @@
   {
     "name": "32-first-tour",
     "darkFrac": 0,
-    "std": 40.929,
-    "colors": 149,
-    "mean": 142.423,
+    "std": 41.128,
+    "colors": 155,
+    "mean": 142.109,
     "ok": true
   },
   {
@@ -412,9 +432,9 @@
   {
     "name": "33-missions-toast",
     "darkFrac": 0,
-    "std": 49.596,
-    "colors": 428,
-    "mean": 198.18,
+    "std": 52.951,
+    "colors": 489,
+    "mean": 197.62,
     "ok": true
   },
   {
@@ -435,9 +455,9 @@
   {
     "name": "34-quiz-feedback",
     "darkFrac": 0,
-    "std": 53.014,
-    "colors": 203,
-    "mean": 155.776,
+    "std": 53.252,
+    "colors": 208,
+    "mean": 155.443,
     "ok": true
   },
   {
@@ -451,64 +471,64 @@
   {
     "name": "07-mobile-390",
     "darkFrac": 0,
-    "std": 44.689,
-    "colors": 218,
-    "mean": 185.908,
+    "std": 45.704,
+    "colors": 230,
+    "mean": 184.369,
     "ok": true
   },
   {
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
-    "std": 38.994,
-    "colors": 245,
-    "mean": 208.936,
+    "std": 41.027,
+    "colors": 256,
+    "mean": 207.418,
     "ok": true
   },
   {
     "name": "09-mobile-390-partlist",
     "darkFrac": 0,
-    "std": 37.803,
-    "colors": 217,
-    "mean": 225.388,
+    "std": 40.517,
+    "colors": 227,
+    "mean": 223.871,
     "ok": true
   },
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 44.893,
-    "colors": 526,
-    "mean": 163.346,
+    "std": 44.971,
+    "colors": 534,
+    "mean": 162.159,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 51.243,
-    "colors": 481,
-    "mean": 163.499,
+    "std": 49.771,
+    "colors": 402,
+    "mean": 165.381,
     "ok": true
   },
   {
     "name": "35-mobile-390-learn",
     "darkFrac": 0,
-    "std": 39.927,
-    "colors": 161,
-    "mean": 225.2,
+    "std": 36.251,
+    "colors": 273,
+    "mean": 180.961,
     "ok": true
   },
   {
     "name": "36-mobile-390-quiz",
     "darkFrac": 0,
-    "std": 62.593,
-    "colors": 154,
-    "mean": 188.894,
+    "std": 63.72,
+    "colors": 158,
+    "mean": 187.902,
     "ok": true
   },
   {
     "name": "手機實驗（展開）：風機在面板上方",
     "hub": {
       "x": 213,
-      "y": 227
+      "y": 233
     },
     "panelTop": 430,
     "panelRight": 382,
@@ -517,16 +537,16 @@
   {
     "name": "31-mobile-390-experiment",
     "darkFrac": 0,
-    "std": 51.097,
-    "colors": 259,
-    "mean": 203.528,
+    "std": 52.327,
+    "colors": 270,
+    "mean": 202.33,
     "ok": true
   },
   {
     "name": "手機實驗（收起）：風機在面板上方",
     "hub": {
       "x": 226,
-      "y": 330
+      "y": 336
     },
     "panelTop": 700,
     "panelRight": 382,
@@ -535,9 +555,29 @@
   {
     "name": "31b-mobile-390-experiment-folded",
     "darkFrac": 0,
-    "std": 41.713,
-    "colors": 237,
-    "mean": 192.663,
+    "std": 42.881,
+    "colors": 243,
+    "mean": 191.385,
+    "ok": true
+  },
+  {
+    "name": "31c-mobile-390-experiment-inside",
+    "darkFrac": 0,
+    "std": 53.842,
+    "colors": 503,
+    "mean": 194.076,
+    "ok": true
+  },
+  {
+    "name": "手機實驗：點「看機艙裡面」會飛到機艙",
+    "inside": {
+      "shell": "transparent",
+      "dist": 51
+    },
+    "back": {
+      "shell": "solid",
+      "dist": 292
+    },
     "ok": true
   },
   {
@@ -554,9 +594,529 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 14.099069461416782,
-    "drawCalls": 75,
-    "triangles": 43696,
+    "fps": 13.273916753576872,
+    "drawCalls": 89,
+    "triangles": 44368,
     "pixelRatio": 2
+  },
+  {
+    "name": "桌面導覽：按鈕開始、字幕出現、語音分句唸",
+    "step": 0,
+    "card": true,
+    "btn": "停止導覽",
+    "xpHidden": true,
+    "spoken": [
+      "風力發電機。",
+      "這是一台風力發電機。",
+      "它有三片長長的葉片，每一片大約 43 公尺長，比一座籃球場還長。"
+    ],
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 1「風力發電機」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 686,
+    "y": 180,
+    "cardTop": 511,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-01-start",
+    "darkFrac": 0,
+    "std": 45.203,
+    "colors": 272,
+    "mean": 189.07,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 2「風有能量」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "blade",
+    "x": 616,
+    "y": 226,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 3「葉片像飛機的翅膀」：焦點在字幕卡上方",
+    "focus": "blade",
+    "picked": "blade",
+    "x": 608,
+    "y": 225,
+    "cardTop": 511,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-03-blade",
+    "darkFrac": 0,
+    "std": 44.449,
+    "colors": 288,
+    "mean": 191.1,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 4「慢慢轉，力氣大」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 640,
+    "y": 224,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 5「打開機艙看一看」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": null,
+    "x": 952,
+    "y": 257,
+    "cardTop": 541,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 6「主軸」：焦點在字幕卡上方",
+    "focus": "mainShaft",
+    "picked": "mainShaft",
+    "x": 805,
+    "y": 300,
+    "cardTop": 572,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 7「齒輪箱讓它變快」：焦點在字幕卡上方",
+    "focus": "sunGear",
+    "picked": "sunGear",
+    "x": 652,
+    "y": 315,
+    "cardTop": 511,
+    "shell": "hidden",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-07-gears",
+    "darkFrac": 0,
+    "std": 47.381,
+    "colors": 352,
+    "mean": 162.39,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 8「發電機把轉動變成電」：焦點在字幕卡上方",
+    "focus": "generator",
+    "picked": "generator",
+    "x": 371,
+    "y": 356,
+    "cardTop": 541,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-08-generator",
+    "darkFrac": 0,
+    "std": 47.157,
+    "colors": 546,
+    "mean": 164.845,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 9「能量的接力」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "blade",
+    "x": 952,
+    "y": 257,
+    "cardTop": 541,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 10「電纜往下走」：焦點在字幕卡上方",
+    "focus": "powerCable",
+    "picked": "powerCable",
+    "x": 640,
+    "y": 302,
+    "cardTop": 541,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 11「變壓器把電壓升高」：焦點在字幕卡上方",
+    "focus": "transformer",
+    "picked": "transformer",
+    "x": 640,
+    "y": 302,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 12「送到城市和你家」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": -3620,
+    "y": -1505,
+    "cardTop": 511,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-12-grid",
+    "darkFrac": 0,
+    "std": 45.488,
+    "colors": 245,
+    "mean": 173.933,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 13「風太小」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 690,
+    "y": 188,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 14「風大，發電多」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 640,
+    "y": 214,
+    "cardTop": 511,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 15「風太大，停下來保護自己」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 640,
+    "y": 224,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "40-guide-desktop-15-storm",
+    "darkFrac": 0,
+    "std": 43.826,
+    "colors": 263,
+    "mean": 190.619,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 16「風向變了，跟著轉」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 687,
+    "y": 188,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽 17「換你試試看」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 691,
+    "y": 188,
+    "cardTop": 541,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "桌面導覽：暫停、下一段、上一段按鈕",
+    "paused": true,
+    "afterNext": 4,
+    "afterPrev": 3,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽：語音唸完自動換段",
+    "auto": 5,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽：觸控目標 ≥ 44px、沒有水平捲動",
+    "small": [],
+    "overflow": false,
+    "ok": true
+  },
+  {
+    "name": "桌面導覽：點畫面停止；按鈕可再開始、停止",
+    "afterTouch": null,
+    "restarted": 0,
+    "stopped": {
+      "step": null,
+      "btn": "自動導覽",
+      "card": "none"
+    },
+    "ok": true
+  },
+  {
+    "name": "手機導覽：按鈕開始、字幕出現、語音分句唸",
+    "step": 0,
+    "card": true,
+    "btn": "停止導覽",
+    "xpHidden": true,
+    "spoken": [
+      "風力發電機。",
+      "這是一台風力發電機。",
+      "它有三片長長的葉片，每一片大約 43 公尺長，比一座籃球場還長。"
+    ],
+    "ok": true
+  },
+  {
+    "name": "手機導覽 1「風力發電機」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 216,
+    "y": 260,
+    "cardTop": 493,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-01-start",
+    "darkFrac": 0,
+    "std": 50.408,
+    "colors": 255,
+    "mean": 201.896,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 2「風有能量」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "blade",
+    "x": 182,
+    "y": 279,
+    "cardTop": 518,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 3「葉片像飛機的翅膀」：焦點在字幕卡上方",
+    "focus": "blade",
+    "picked": "blade",
+    "x": 181,
+    "y": 278,
+    "cardTop": 493,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-03-blade",
+    "darkFrac": 0,
+    "std": 50.646,
+    "colors": 306,
+    "mean": 202.191,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 4「慢慢轉，力氣大」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 195,
+    "y": 279,
+    "cardTop": 518,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 5「打開機艙看一看」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "blade",
+    "x": 305,
+    "y": 317,
+    "cardTop": 542,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 6「主軸」：焦點在字幕卡上方",
+    "focus": "mainShaft",
+    "picked": "mainShaft",
+    "x": 246,
+    "y": 327,
+    "cardTop": 542,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 7「齒輪箱讓它變快」：焦點在字幕卡上方",
+    "focus": "sunGear",
+    "picked": "planetGear",
+    "x": 198,
+    "y": 306,
+    "cardTop": 468,
+    "shell": "hidden",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-07-gears",
+    "darkFrac": 0,
+    "std": 58.003,
+    "colors": 409,
+    "mean": 186.44,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 8「發電機把轉動變成電」：焦點在字幕卡上方",
+    "focus": "generator",
+    "picked": "generator",
+    "x": 113,
+    "y": 336,
+    "cardTop": 518,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-08-generator",
+    "darkFrac": 0,
+    "std": 55.806,
+    "colors": 520,
+    "mean": 184.217,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 9「能量的接力」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "pitchSystem",
+    "x": 296,
+    "y": 305,
+    "cardTop": 518,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 10「電纜往下走」：焦點在字幕卡上方",
+    "focus": "powerCable",
+    "picked": "powerCable",
+    "x": 195,
+    "y": 332,
+    "cardTop": 542,
+    "shell": "transparent",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 11「變壓器把電壓升高」：焦點在字幕卡上方",
+    "focus": "transformer",
+    "picked": "transformer",
+    "x": 195,
+    "y": 332,
+    "cardTop": 542,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 12「送到城市和你家」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": -316,
+    "y": 92,
+    "cardTop": 493,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-12-grid",
+    "darkFrac": 0,
+    "std": 54.297,
+    "colors": 234,
+    "mean": 191.662,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 13「風太小」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 218,
+    "y": 279,
+    "cardTop": 542,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 14「風大，發電多」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 195,
+    "y": 269,
+    "cardTop": 493,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 15「風太大，停下來保護自己」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 195,
+    "y": 279,
+    "cardTop": 518,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "41-guide-mobile-15-storm",
+    "darkFrac": 0,
+    "std": 50.014,
+    "colors": 273,
+    "mean": 200.823,
+    "ok": true
+  },
+  {
+    "name": "手機導覽 16「風向變了，跟著轉」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 215,
+    "y": 260,
+    "cardTop": 493,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽 17「換你試試看」：焦點在字幕卡上方",
+    "focus": "hub",
+    "picked": "hub",
+    "x": 218,
+    "y": 269,
+    "cardTop": 518,
+    "shell": "solid",
+    "ok": true
+  },
+  {
+    "name": "手機導覽：暫停、下一段、上一段按鈕",
+    "paused": true,
+    "afterNext": 4,
+    "afterPrev": 3,
+    "ok": true
+  },
+  {
+    "name": "手機導覽：語音唸完自動換段",
+    "auto": 5,
+    "ok": true
+  },
+  {
+    "name": "手機導覽：觸控目標 ≥ 44px、沒有水平捲動",
+    "small": [],
+    "overflow": false,
+    "ok": true
+  },
+  {
+    "name": "手機導覽：點畫面停止；按鈕可再開始、停止",
+    "afterTouch": null,
+    "restarted": 0,
+    "stopped": {
+      "step": null,
+      "btn": "自動導覽",
+      "card": "none"
+    },
+    "ok": true
   }
 ]
