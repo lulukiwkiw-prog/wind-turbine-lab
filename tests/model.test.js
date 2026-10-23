@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {
   DIM, PARTS, CURRENT_STAGE, COORDS, SIM, CABLE_ROUTE, EXPLODE, rotorCenterLocal, rotorAxisLocal, hubHeight, gearTrainAngles,
+  upwindVector, lineAxes, substationLayout,
 } from '../src/spec/turbineSpec.js';
 import { createExploder } from '../src/animation/exploder.js';
 import { createViewController } from '../src/model/viewState.js';
@@ -268,4 +269,62 @@ test('第三階段：齒輪只在拆解模式顯示；可隱藏零件與只看�
   // 離開拆解模式：隱藏設定不再生效
   view.apply({ ...base, mode: 'exterior', shellView: 'solid', hiddenParts: ['tower'] });
   assert.equal(vis('towerShell'), true);
+});
+
+// ---------------- 物理合理性 ----------------
+test('風速計：正轉時每個杯子都是圓頂（凸面）在前、杯口（凹面）在後', () => {
+  const { sensorParts, nodes } = build();
+  const head = sensorParts.anemometerHead;
+  head.updateMatrixWorld(true);
+  let cups = 0;
+  head.traverse((o) => {
+    if (!o.isMesh || o.geometry.type !== 'SphereGeometry') return;
+    cups++;
+    o.geometry.computeBoundingBox();
+    const bb = o.geometry.boundingBox;
+    // 圓頂方向（杯子局部）：bounding box 偏向哪一側
+    const domeLocal = new THREE.Vector3(0, 0, Math.sign(bb.max.z + bb.min.z));
+    const dome = domeLocal.transformDirection(o.matrixWorld);
+    const p = o.getWorldPosition(new THREE.Vector3()).sub(head.getWorldPosition(new THREE.Vector3()));
+    const motion = new THREE.Vector3(0, 1, 0).transformDirection(head.matrixWorld).cross(p); // 繞 +Y 正轉的移動方向
+    assert.ok(dome.dot(motion) > 0, '杯子的圓頂應朝向移動方向');
+  });
+  assert.equal(cups, 3);
+  assert.ok(nodes);
+});
+
+test('偏航：風向改變時機艙對準風（氣象慣例）', () => {
+  const { nodes, sensorParts, scene } = build();
+  const store = createStore();
+  const anim = createAnimator({ nodes, sensorParts, store });
+  for (const th of [0, 90, 200]) {
+    store.set({ windAngleDeg: th });
+    anim.update(0);
+    scene.updateMatrixWorld(true);
+    const face = new THREE.Vector3(0, 0, 1).transformDirection(nodes.nacelle.matrixWorld);
+    const u = upwindVector(th);
+    assert.ok(face.distanceTo(new THREE.Vector3(...u)) < 1e-9, `風向 ${th}° 時機艙沒有對準風`);
+  }
+});
+
+test('樹與山丘不會擋在輸電線、變電所與鐵塔的走廊上', () => {
+  const { scene } = build();
+  const { along, across } = lineAxes();
+  const trees = scene.getObjectByName('trees');
+  const m = new THREE.Matrix4(), p = new THREE.Vector3();
+  for (let i = 0; i < trees.count; i++) {
+    trees.getMatrixAt(i, m);
+    p.setFromMatrixPosition(m);
+    const a = p.x * along[0] + p.z * along[2], c = Math.abs(p.x * across[0] + p.z * across[2]);
+    assert.ok(!(a > -5 && a < 520 && c < 22), `第 ${i} 棵樹在線路走廊上`);
+  }
+  const hills = scene.getObjectByName('hills');
+  for (const t of substationLayout().towers) {
+    for (let i = 0; i < hills.count; i++) {
+      hills.getMatrixAt(i, m);
+      const s = new THREE.Vector3().setFromMatrixScale(m);
+      p.setFromMatrixPosition(m);
+      assert.ok(Math.hypot(p.x - t[0], p.z - t[2]) > Math.max(s.x, s.z), '高壓鐵塔埋在山丘裡');
+    }
+  }
 });

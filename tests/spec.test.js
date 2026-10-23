@@ -6,6 +6,7 @@ import {
   GEARBOX_CONFIGS, ACTIVE_GEARBOX, stageRatio, centerDistance, gearboxRatio, highSpeedShaftOffset,
   rotorCenterLocal, rotorAxisLocal, hubHeight, upwindVector, yawForWind, bladeSectionAt, MODES, DIFFICULTIES,
   CABLE_ROUTE, INTERNALS, gearboxDirection, gearLayout, gearTrainAngles, EXPLODE, CURRENT_STAGE,
+  windName, lineAxes, substationLayout,
 } from '../src/spec/turbineSpec.js';
 import { PARTS_TEXT, partText } from '../src/learning/partsData.js';
 
@@ -73,17 +74,50 @@ test('槳距：角度增加時前緣轉向上風；90° 時弦線與葉輪軸平
   assert.ok(close(le90[2], 1, 1e-9), '90° 時前緣朝正上風');
 });
 
-test('風向定義：0° 從 +Z 吹來，90° 從 +X 吹來；對風偏航角 = 風向角', () => {
-  const u0 = upwindVector(0), u90 = upwindVector(90);
+test('風向定義（氣象慣例）：0° 北風從 +Z 吹來、90° 東風從 −X 吹來；機艙對風', () => {
+  const u0 = upwindVector(0), u90 = upwindVector(90), u180 = upwindVector(180);
   assert.ok(close(u0[2], 1) && close(u0[0], 0));
-  assert.ok(close(u90[0], 1) && close(u90[2], 0, 1e-12));
+  assert.ok(close(u90[0], COORDS.compass.east[0]) && close(u90[2], 0, 1e-12), '90° = 東風，從東方（−X）吹來');
+  assert.ok(close(u180[2], -1), '180° = 南風');
+  // 北朝上時東在右邊：從上往下看（看向 −Y、畫面上方 = 北），右方 = 前方 × 上方
+  const right = cross([0, -1, 0], COORDS.compass.north);
+  assert.deepEqual(right.map((v) => v + 0), COORDS.compass.east, '東方在北方的右邊（從上往下看）');
   // 偏航 ψ 時葉輪面朝 Ry(ψ)·(0,0,1) = (sin ψ, 0, cos ψ)，應等於上風方向
-  for (const th of [0, 37, 90, 200, -45]) {
+  for (const th of [0, 37, 90, 200, -45, 315]) {
     const psi = yawForWind(th) * DEG;
     const face = [Math.sin(psi), 0, Math.cos(psi)];
     const u = upwindVector(th);
     assert.ok(close(face[0], u[0], 1e-9) && close(face[2], u[2], 1e-9));
   }
+  assert.equal(windName(0), '北風');
+  assert.equal(windName(90), '東風');
+  assert.equal(windName(225), '西南風');
+  assert.equal(windName(-45), '西北風');
+});
+
+test('物理合理性：葉尖速比、Betz 極限、發電機同步轉速、展示轉速', () => {
+  const R = DIM.rotor.radius, rho = 1.225;
+  const omega = (rpm) => (rpm * 2 * Math.PI) / 60;
+  const tsrRated = (omega(SIM.rotorRatedRpm) * R) / SIM.ratedSpeed;
+  assert.ok(tsrRated > 5.5 && tsrRated < 9, `額定葉尖速比 ${tsrRated}`);
+  assert.ok(omega(SIM.rotorRatedRpm) * R < 90, '葉尖速度 < 90 m/s（噪音與侵蝕限制）');
+  const cp = (SIM.ratedPowerKW * 1000) / (0.5 * rho * Math.PI * R * R * SIM.ratedSpeed ** 3);
+  assert.ok(cp > 0.2 && cp < 16 / 27, `額定 Cp ${cp} 必須低於 Betz 極限 0.593`);
+  assert.ok(Math.abs(SIM.rotorRatedRpm * gearboxRatio() - 1800) / 1800 < 0.02, '60 Hz 四極發電機同步轉速 1800 rpm');
+  const tsrDemo = (omega(SIM.demoRotorRpm) * R) / 8; // 預設風速 8 m/s
+  assert.ok(tsrDemo > 6 && tsrDemo < 8, `展示轉速在預設風速下的葉尖速比 ${tsrDemo}`);
+});
+
+test('輸電路徑：電桿 → 變電所 → 高壓鐵塔一路往遠方，不會斷在半路', () => {
+  const lay = substationLayout();
+  const { along } = lineAxes();
+  const last = DIM.site.poles[DIM.site.poles.length - 1];
+  const proj = (p) => (p[0] - last[0]) * along[0] + (p[2] - last[2]) * along[2];
+  assert.ok(proj(lay.gantryIn) > 5, '進線門型架在最後一根電桿之後');
+  assert.ok(proj(lay.gantryOut) > proj(lay.gantryIn));
+  let prev = proj(lay.gantryOut);
+  for (const t of lay.towers) { assert.ok(proj(t) > prev, '鐵塔沿線路往外'); prev = proj(t); }
+  assert.ok(Math.hypot(...lay.towers[lay.towers.length - 1]) > 450, '最後一座鐵塔遠到消失在霧裡，表示送往遠方');
 });
 
 test('尺寸：塔架、輪轂高度、葉尖離地與離塔架距離合理', () => {

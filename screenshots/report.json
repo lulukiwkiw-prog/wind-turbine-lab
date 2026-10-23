@@ -2,57 +2,57 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 39.878,
-    "colors": 218,
-    "mean": 183.556,
+    "std": 40.151,
+    "colors": 224,
+    "mean": 183.315,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
-    "std": 39.457,
-    "colors": 224,
-    "mean": 185.274,
+    "std": 39.779,
+    "colors": 225,
+    "mean": 184.474,
     "ok": true
   },
   {
     "name": "03-side",
     "darkFrac": 0,
-    "std": 40.795,
-    "colors": 213,
-    "mean": 185.131,
+    "std": 41.948,
+    "colors": 216,
+    "mean": 184.362,
     "ok": true
   },
   {
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
-    "std": 40.864,
-    "colors": 207,
-    "mean": 177.243,
+    "std": 40.763,
+    "colors": 208,
+    "mean": 177.323,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
-    "std": 39.312,
-    "colors": 247,
-    "mean": 192.483,
+    "std": 39.249,
+    "colors": 249,
+    "mean": 192.681,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 39.912,
-    "colors": 247,
-    "mean": 196.474,
+    "std": 39.581,
+    "colors": 246,
+    "mean": 196.797,
     "ok": true
   },
   {
     "name": "10-cutaway-transparent",
     "darkFrac": 0,
-    "std": 40.588,
-    "colors": 522,
-    "mean": 154.282,
+    "std": 41.008,
+    "colors": 523,
+    "mean": 155.395,
     "ok": true
   },
   {
@@ -70,9 +70,9 @@
   {
     "name": "11-cutaway-shell-removed",
     "darkFrac": 0,
-    "std": 43.172,
-    "colors": 611,
-    "mean": 151.722,
+    "std": 43.651,
+    "colors": 612,
+    "mean": 152.815,
     "ok": true
   },
   {
@@ -84,47 +84,67 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 47.697,
-    "colors": 535,
-    "mean": 158.362,
+    "std": 48.003,
+    "colors": 532,
+    "mean": 159.876,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 46.466,
-    "colors": 490,
-    "mean": 161.403,
+    "std": 46.964,
+    "colors": 484,
+    "mean": 162.679,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 45.287,
-    "colors": 395,
-    "mean": 163.39,
+    "std": 45.665,
+    "colors": 389,
+    "mean": 164.459,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
-    "std": 48.259,
-    "colors": 482,
-    "mean": 151.528,
+    "std": 48.373,
+    "colors": 481,
+    "mean": 151.391,
     "ok": true
   },
   {
     "name": "16-power-path",
     "darkFrac": 0,
-    "std": 30.674,
-    "colors": 281,
-    "mean": 156.918,
+    "std": 30.892,
+    "colors": 282,
+    "mean": 156.917,
     "ok": true
   },
   {
     "name": "點選 undergroundStrip1",
     "expected": "undergroundCable",
     "got": "undergroundCable",
+    "ok": true
+  },
+  {
+    "name": "16b-substation-grid",
+    "darkFrac": 0,
+    "std": 34.379,
+    "colors": 177,
+    "mean": 162.203,
+    "ok": true
+  },
+  {
+    "name": "點選 substationHouse",
+    "expected": "substation",
+    "got": "substation",
+    "ok": true
+  },
+  {
+    "name": "點選 hvTower0",
+    "expected": "powerLine",
+    "got": "powerLine",
     "ok": true
   },
   {
@@ -136,9 +156,9 @@
   {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 44.585,
-    "colors": 614,
-    "mean": 157.736,
+    "std": 45.125,
+    "colors": 617,
+    "mean": 159.238,
     "ok": true
   },
   {
@@ -156,9 +176,9 @@
   {
     "name": "19-gear-train-side",
     "darkFrac": 0,
-    "std": 42.16,
-    "colors": 525,
-    "mean": 161.021,
+    "std": 42.74,
+    "colors": 527,
+    "mean": 162.249,
     "ok": true
   },
   {
@@ -170,9 +190,9 @@
   {
     "name": "20-planetary-closeup",
     "darkFrac": 0,
-    "std": 48.756,
+    "std": 48.581,
     "colors": 433,
-    "mean": 165.294,
+    "mean": 165.525,
     "ok": true
   },
   {
@@ -184,9 +204,9 @@
   {
     "name": "20b-gear-view-front",
     "darkFrac": 0,
-    "std": 42.688,
-    "colors": 395,
-    "mean": 152.086,
+    "std": 42.649,
+    "colors": 392,
+    "mean": 152.236,
     "ok": true
   },
   {
@@ -204,17 +224,17 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 43.616,
-    "colors": 273,
-    "mean": 174.356,
+    "std": 43.23,
+    "colors": 262,
+    "mean": 176.23,
     "ok": true
   },
   {
     "name": "22-explode-closed",
     "darkFrac": 0,
-    "std": 43.258,
-    "colors": 597,
-    "mean": 158.726,
+    "std": 43.609,
+    "colors": 603,
+    "mean": 160.037,
     "ok": true
   },
   {
@@ -248,7 +268,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 16.95713612812058,
+    "fps": 14.839730906213925,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -256,41 +276,41 @@
   {
     "name": "07-mobile-390",
     "darkFrac": 0,
-    "std": 44.462,
-    "colors": 228,
-    "mean": 185.417,
+    "std": 44.539,
+    "colors": 227,
+    "mean": 185.57,
     "ok": true
   },
   {
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
-    "std": 39.259,
-    "colors": 240,
-    "mean": 208.331,
+    "std": 38.933,
+    "colors": 247,
+    "mean": 208.632,
     "ok": true
   },
   {
     "name": "09-mobile-390-partlist",
     "darkFrac": 0,
-    "std": 37.849,
-    "colors": 223,
-    "mean": 225.146,
+    "std": 37.869,
+    "colors": 226,
+    "mean": 225.151,
     "ok": true
   },
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 44.154,
-    "colors": 524,
-    "mean": 162.847,
+    "std": 44.465,
+    "colors": 529,
+    "mean": 162.909,
     "ok": true
   },
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 50.709,
-    "colors": 478,
-    "mean": 162.991,
+    "std": 50.647,
+    "colors": 481,
+    "mean": 162.98,
     "ok": true
   },
   {
@@ -301,7 +321,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 14.563990533404919,
+    "fps": 13.330794134452649,
     "drawCalls": 69,
     "triangles": 28140,
     "pixelRatio": 2

@@ -169,6 +169,11 @@ try {
     await page.waitForTimeout(400);
     await shoot(page, '16-power-path');
     await pickCheck(page, 'undergroundStrip1', 'undergroundCable');
+    // 電桿 → 變電所 → 高壓鐵塔
+    await pose(page, 'grid');
+    await shoot(page, '16b-substation-grid');
+    await pickCheck(page, 'substationHouse', 'substation');
+    await pickCheck(page, 'hvTower0', 'powerLine');
     // 返回外觀：外殼回到實心、內部零件隱藏
     const back = await page.evaluate(() => {
       const lab = window.__lab;

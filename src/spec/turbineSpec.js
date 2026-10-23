@@ -20,10 +20,12 @@ const DEG = Math.PI / 180;
 // - 右手座標系，+Y 朝上
 // - 世界原點：塔架中心軸與地面（y = 0）的交點
 // - 偏航角 ψ = 0 時，葉輪正面（上風面）朝向世界 +Z
-// - 風向角 θ：風「吹來」的方向。θ = 0 表示風從 +Z 吹來、往 -Z 吹去；
-//   θ 增加 = 從上方往下看逆時針（繞 +Y 的右手方向）。
-//   上風方向單位向量 u(θ) = (sin θ, 0, cos θ)；風的流動方向 = -u(θ)。
-// - 機艙對準風時：偏航角 ψ = θ
+// - 方位：+Z = 北、−X = 東、−Z = 南、+X = 西（從上往下看，北朝上時東在右邊）
+// - 風向角 θ（氣象慣例）：風「吹來」的方位角，從北方起算，從上往下看順時針為正。
+//   θ = 0° 北風（從 +Z 吹來）、90° 東風（從 −X 吹來）、180° 南風、270° 西風。
+//   上風方向單位向量 u(θ) = (−sin θ, 0, cos θ)；風的流動方向 = −u(θ)。
+// - 偏航角 ψ 是節點繞 +Y 的旋轉（右手、從上往下看逆時針），ψ 時葉輪面朝 (sin ψ, 0, cos ψ)。
+//   機艙對準風時：ψ = −θ
 // - 葉輪轉向：從上風處看為順時針 → 繞葉輪軸（指向上風）的角速度為負
 export const COORDS = {
   unit: 'm',
@@ -31,7 +33,8 @@ export const COORDS = {
   handedness: 'right',
   worldOrigin: '塔架中心軸與地面交點',
   rotorFacesAtYawZero: [0, 0, 1],
-  windAngleDefinition: '風吹來的方向；0° = 從 +Z 吹來；從上往下看逆時針為正',
+  compass: { north: [0, 0, 1], east: [-1, 0, 0], south: [0, 0, -1], west: [1, 0, 0] },
+  windAngleDefinition: '氣象慣例：風吹來的方位角，從北方（+Z）起算，從上往下看順時針為正（東 = 90°）',
   rotorSpinSign: -1, // 從上風處看順時針
   pitchSign: -1, // 槳距角增加 → 前緣轉向上風（順槳方向），繞葉片局部 +Y 的旋轉角 = pitchSign × β
 };
@@ -39,12 +42,18 @@ export const COORDS = {
 /** 風從哪個方向吹來（上風方向單位向量） */
 export function upwindVector(windAngleDeg) {
   const a = windAngleDeg * DEG;
-  return [Math.sin(a), 0, Math.cos(a)];
+  return [-Math.sin(a), 0, Math.cos(a)];
 }
 
-/** 機艙正對風時的偏航角（度） */
+/** 機艙正對風時的偏航角（度，節點繞 +Y 的右手旋轉角） */
 export function yawForWind(windAngleDeg) {
-  return windAngleDeg;
+  return -windAngleDeg;
+}
+
+/** 風向角 → 中文風名（八方位） */
+export function windName(windAngleDeg) {
+  const names = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+  return `${names[Math.round((((windAngleDeg % 360) + 360) % 360) / 45) % 8]}風`;
 }
 
 // ---------------------------------------------------------------------
@@ -104,9 +113,36 @@ export const DIM = {
     transformer: { at: [9, 0, 5], size: [2.4, 2.2, 1.8] }, // 箱型變壓器（世界座標）
     poles: [[22, 0, 14], [48, 0, 30], [76, 0, 46]], // 輸電桿（世界座標）
     poleHeight: 12,
+    // 變電所：在最後一根電桿後方，沿線路方向（along／across 為沿線與垂直線路的長度）
+    substation: { distanceAfterLastPole: 26, along: 18, across: 14, fenceHeight: 2.2, gantryHeight: 9, wireSpacing: 1.3 },
+    // 變電所之後的高壓輸電鐵塔（距變電所中心的沿線距離），一路延伸到遠方
+    hvLine: { distances: [40, 120, 210, 300, 390], towerHeight: 26, armSpan: 4 },
     groundRadius: 900,
   },
 };
+
+/** 輸電線路方向（第一根到最後一根電桿，水平單位向量）與垂直方向 */
+export function lineAxes() {
+  const p = DIM.site.poles;
+  const dx = p[p.length - 1][0] - p[0][0], dz = p[p.length - 1][2] - p[0][2];
+  const l = Math.hypot(dx, dz);
+  return { along: [dx / l, 0, dz / l], across: [-dz / l, 0, dx / l] };
+}
+
+/** 變電所中心與進線／出線門型架位置（世界座標） */
+export function substationLayout() {
+  const s = DIM.site.substation;
+  const { along } = lineAxes();
+  const last = DIM.site.poles[DIM.site.poles.length - 1];
+  const at = (base, d) => [base[0] + along[0] * d, 0, base[2] + along[2] * d];
+  const center = at(last, s.distanceAfterLastPole + s.along / 2);
+  return {
+    center,
+    gantryIn: at(center, -s.along / 2 + 1.5),
+    gantryOut: at(center, s.along / 2 - 1.5),
+    towers: DIM.site.hvLine.distances.map((d) => at(center, d)),
+  };
+}
 
 // ---------------------------------------------------------------------
 // 3. 傳動系統軸向配置（傳動框架 z，正值往葉輪/上風）
@@ -298,7 +334,7 @@ export const SIM = {
   teachingYawRateDegPerSec: 6, // 教學動畫加速版，介面須標示「教學示意」
   pitchRange: [0, 90], // 度：0 = 工作位置，90 = 順槳
   maxPitchRateDegPerSec: 8,
-  demoRotorRpm: 8, // 第一～三階段展示用的固定葉輪轉速（教學示意）
+  demoRotorRpm: 12, // 第一～三階段展示用的固定轉速：預設風速 8 m/s、葉尖速比約 7 時約 12 rpm（教學示意）
   visualMaxHighSpeedRps: 1.2,
   // 拆解模式要看齒輪「真的」咬合，所有齒輪依速比連動；為了不讓高速軸轉太快，葉輪放慢到 1.2 × 60 / 112 ≈ 0.64 rpm（教學示意） // 高速軸畫面最高每秒 1.2 圈（實際約為主軸 112 倍，太快會閃爍，因此放慢；教學示意）
   visualMaxRotorRpm: 20, // 動畫上限，避免畫面轉太快
@@ -343,6 +379,9 @@ export const PALETTE = {
   arrow: '#17324d', // 轉向箭頭：深藍黑，不與任何零件顏色混淆
   bedplate: '#8d98a3',
   hubBody: '#9fb0c2',
+  substation: '#9aa7b3',
+  fence: '#b9c2ca',
+  pylon: '#7d8790',
   pole: '#8c6b4f',
   wire: '#444a50',
   ground: '#8fbf6a',
@@ -451,6 +490,7 @@ export const PARTS = [
   { id: 'windVane', colorKey: 'sensor', group: 'exterior', stage: 1, node: 'nacelle' },
   { id: 'transformer', colorKey: 'transformer', group: 'electrical', stage: 1, node: 'world' },
   { id: 'powerLine', colorKey: 'wire', group: 'electrical', stage: 1, node: 'world' },
+  { id: 'substation', colorKey: 'substation', group: 'electrical', stage: 3, node: 'world' },
   // 以下第二階段起出現（資料先定義）
   { id: 'mainShaft', colorKey: 'mainShaft', group: 'internal', stage: 2, node: 'drivetrain' },
   { id: 'mainBearing', colorKey: 'bearing', group: 'internal', stage: 2, node: 'drivetrain' },
@@ -491,6 +531,7 @@ export const CONNECTIONS = [
   { from: 'powerCable', to: 'undergroundCable', kind: 'power', label: '沿塔架往下到塔底' },
   { from: 'undergroundCable', to: 'transformer', kind: 'power', label: '埋在地下' },
   { from: 'transformer', to: 'powerLine', kind: 'power', label: '升壓後經地下電纜接上電桿' },
+  { from: 'powerLine', to: 'substation', kind: 'power', label: '匯集後再升壓，經高壓鐵塔送往城市' },
   { from: 'anemometer', to: 'controller', kind: 'signal', label: '風速' },
   { from: 'windVane', to: 'controller', kind: 'signal', label: '風向' },
   { from: 'controller', to: 'pitchSystem', kind: 'signal', label: '調整槳距' },
@@ -537,9 +578,10 @@ export const VIEW = {
     nacelle: { target: [0, 80, 0], camera: [-16, 86, 18] },
     cutaway: { target: [0, 80.4, -1.0], camera: [-11.5, 86, -4.5] },
     cable: { target: [11, 2, 8], camera: [-6, 15, 33] },
+    grid: { target: [122, 8, 73], camera: [62, 34, 128] },
     explode: { target: [0, 81.2, -2.0], camera: [-15.5, 88.5, -7.5] },
   },
-  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18, explode: 10 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
+  fitHalfWidth: { full: 52, nacelle: 9, cutaway: 7, cable: 18, explode: 10, grid: 40 }, // 預設視角至少要看到的半寬（直式手機會自動拉遠）
   minDistance: 4,
   maxDistance: 340,
   focusDurationSec: 0.9,

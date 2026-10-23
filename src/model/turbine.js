@@ -136,7 +136,8 @@ export function buildTurbine(mats) {
     armGeo.rotateZ(Math.PI / 2);
     armGeo.translate(s.anemometer.cupRadius / 2, 0, 0);
     const cupGeo = new THREE.SphereGeometry(0.07, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-    cupGeo.rotateX(Math.PI / 2); // 杯口朝 -Z（再隨臂旋轉）
+    // 杯口朝 +Z、圓頂朝 −Z：風速計正轉（繞 +Y）時圓頂（凸面）在前、杯口（凹面）在後被風推，符合實際
+    cupGeo.rotateX(-Math.PI / 2);
     for (let i = 0; i < 3; i++) {
       const arm = new THREE.Group();
       arm.rotation.y = (i * 2 * Math.PI) / 3;

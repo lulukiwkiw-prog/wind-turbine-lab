@@ -44,6 +44,7 @@ graph LR
   windVane["風向標"]:::exterior
   transformer["變壓器"]:::electrical
   powerLine["輸電線"]:::electrical
+  substation["變電所"]:::electrical
   mainShaft["主軸（低速軸）"]:::internal
   mainBearing["主軸承"]:::internal
   gearbox["齒輪箱"]:::internal
@@ -78,6 +79,7 @@ graph LR
   powerCable -.->|沿塔架往下到塔底| undergroundCable
   undergroundCable -.->|埋在地下| transformer
   transformer -.->|升壓後經地下電纜接上電桿| powerLine
+  powerLine -.->|匯集後再升壓，經高壓鐵塔送往城市| substation
   anemometer -->|風速| controller
   windVane -->|風向| controller
   controller -->|調整槳距| pitchSystem

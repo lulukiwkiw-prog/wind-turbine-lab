@@ -47,7 +47,7 @@ export function createCameraRig(canvas) {
     const t = controls.target;
     t.y = THREE.MathUtils.clamp(t.y, 0, 110);
     const h = Math.hypot(t.x, t.z);
-    if (h > 80) { t.x *= 80 / h; t.z *= 80 / h; }
+    if (h > 170) { t.x *= 170 / h; t.z *= 170 / h; } // 可以走到變電所，但不會離風機太遠
   }
 
   return {

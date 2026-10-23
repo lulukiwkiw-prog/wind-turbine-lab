@@ -1,5 +1,5 @@
 // 動畫：只改節點旋轉，不重建幾何。速度與暫停一律讀集中 store。
-import { COORDS, SIM, DIM, gearboxRatio, gearboxDirection, gearTrainAngles, gearLayout } from '../spec/turbineSpec.js';
+import { COORDS, SIM, DIM, gearboxRatio, gearboxDirection, gearTrainAngles, gearLayout, yawForWind } from '../spec/turbineSpec.js';
 
 const DEG = Math.PI / 180;
 const TAU = Math.PI * 2;
@@ -27,7 +27,7 @@ export function createAnimator({ nodes, sensorParts, store }) {
 
   function applyPose() {
     const s = store.get();
-    nodes.yaw.rotation.y = s.windAngleDeg * DEG; // 第一階段：機艙正對預設風向
+    nodes.yaw.rotation.y = yawForWind(s.windAngleDeg) * DEG; // 第一～三階段：機艙正對風向（氣象慣例）
     nodes.rotor.rotation.z = rotorAngle;
     nodes.lowSpeedShaft.rotation.z = rotorAngle; // 主軸與葉輪剛性連接，角度相同
     // 齒輪組：全部由主軸（行星架）角度推得，保證齒對齒溝

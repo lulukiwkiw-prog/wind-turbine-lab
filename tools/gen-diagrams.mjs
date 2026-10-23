@@ -73,7 +73,7 @@ const tilt = DIM.drivetrain.tiltDeg * DEG;
   <circle r="6" fill="none" stroke="#d24f9b"/><circle r="1.6" fill="#d24f9b"/><text x="-60" y="22" fill="#d24f9b">+X 朝向讀者</text>
 </g>
 <g transform="translate(${W - 210} 120)">
-  <text x="0" y="0" fill="#17324d" font-weight="700">風向角 0°：風從 +Z 吹來</text>
+  <text x="0" y="0" fill="#17324d" font-weight="700">北風（0°）：從 +Z（北）吹來</text>
   <line x1="170" y1="24" x2="40" y2="24" stroke="#5aa0d6" stroke-width="4" marker-end="url(#a)"/>
   <text x="0" y="56" fill="#46607a">葉輪在塔架上風側（上風式）</text>
   <text x="0" y="76" fill="#46607a">從上風看：葉輪順時針轉</text>
