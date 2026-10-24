@@ -16,6 +16,7 @@ import { createFlows } from './animation/flows.js';
 import { createExperimentPanel } from './ui/experimentPanel.js';
 import { createLearnPanel } from './ui/learnPanel.js';
 import { createGuidePanel } from './ui/guidePanel.js';
+import { createGuideConfirm } from './ui/guideConfirm.js';
 import { createGuidePlayer } from './learning/guide.js';
 import { createSpeech } from './learning/speech.js';
 import { missionsFor } from './learning/missions.js';
@@ -246,12 +247,15 @@ const guide = createGuidePlayer({
   },
 });
 const guidePanel = createGuidePanel({ root: document.getElementById('ui'), header: document.querySelector('#ui .top'), store, player: guide });
-// 小朋友自己拖曳、縮放或點畫面，就表示想自己玩：導覽停止
-for (const type of ['pointerdown', 'wheel']) canvas.addEventListener(type, () => guide.stop(), { passive: true });
+// 導覽中拖曳、縮放畫面可以照常轉；點一下畫面或其他按鈕，先暫停並問要不要停止導覽
+const guideConfirm = createGuideConfirm({ root: document.getElementById('ui'), store, player: guide });
 
 const picker = createPicker({
   canvas, camera: rig.camera, scene,
-  onPick: (id) => store.set({ selectedPart: id }),
+  onPick: (id) => {
+    if (store.get().guideStep !== null) guideConfirm.ask(() => store.set({ selectedPart: id }));
+    else store.set({ selectedPart: id });
+  },
   skipShells: () => store.get().shellView !== 'solid',
 });
 

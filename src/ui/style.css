@@ -285,6 +285,9 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .guide-controls .btn { flex: 1; flex-direction: row; gap: 6px; font-size: 16px; }
 .guide-controls .btn svg { width: 20px; height: 20px; }
 .btn.guide-stop { color: var(--critical); }
+.guide-tip { margin: 8px 0 0; font-size: 12px; color: var(--ink-soft); text-align: center; }
+.guide-ask .modal-card { border-top: 6px solid var(--accent); }
+.guide-ask h2 { margin: 0 0 4px; font-size: 20px; }
 .guide-ff { flex: none; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0 8px; margin-left: auto; }
 .guide-ff[hidden] { display: none; }
 .guide-meter { display: grid; gap: 4px; margin-top: 6px; }
@@ -362,6 +365,8 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   .guide-controls { gap: 4px; }
   .guide-controls .btn { font-size: 14px; padding: 4px 2px; gap: 2px; }
   #ui.guide-on .toast { top: 118px; }
+  .guide.has-meter .guide-tip { display: none; }
+  .guide-tip { margin-top: 6px; font-size: 11px; }
   .guide-figure { left: 8px; right: 8px; width: auto; top: 128px; padding: 4px 8px; }
   .guide-figure svg { max-height: 120px; }
   .meter-row { grid-template-columns: 5em 1fr 8.5em; font-size: 12px; gap: 6px; }

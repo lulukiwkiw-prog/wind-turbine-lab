@@ -78,7 +78,8 @@ export function createGuidePanel({ root, header, store, player }) {
   nextBtn.innerHTML = `${ICONS.next}<span>下一段</span>`;
   stopBtn.innerHTML = `${ICONS.stop}<span>停止</span>`;
 
-  card.append(top, title, text, live, meter, bar, controls);
+  const tip = el('p', { class: 'guide-tip' }, '可以拖曳轉動畫面；點零件或其他按鈕時，會先問你要不要停止導覽。');
+  card.append(top, title, text, live, meter, bar, controls, tip);
   root.append(card, figure);
   makeDraggable(card, { name: 'guide', store });
 
@@ -93,6 +94,7 @@ export function createGuidePanel({ root, header, store, player }) {
     startBtn.setAttribute('aria-pressed', String(on));
     if (!on) return;
     meter.hidden = !scene.meter;
+    card.classList.toggle('has-meter', !!scene.meter); // 手機上有長條時，省略提示文字，字幕卡才放得下
     live.hidden = !!scene.meter;
     meterNote.hidden = scene.part !== 'generator';
     ff.textContent = scene.fastForwardSec ? `⏩ 快轉了 ${scene.fastForwardSec} 秒` : '';
