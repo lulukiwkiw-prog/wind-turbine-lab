@@ -23,6 +23,13 @@ npm run check      # lint + 規格／模型測試 + 產生圖表 + 建置 + 截�
 2. 之後每次推送（或合併）到 `main`，GitHub Actions 會自動檢查、建置並發布。
 3. 進度可以在 **Actions** 分頁看到；完成後網址是 `https://lulukiwkiw-prog.github.io/wind-turbine-lab/`。
 
+## 宣傳素材
+
+- `public/promo/wind-turbine-15s.gif`：15 秒宣傳 GIF（直式 4:5、480×600），畫面取自網站實際 3D 畫面
+- `public/promo/wind-turbine-15s-small.gif`：同內容、檔案較小的版本
+
+合併到 `main` 後的網址：`https://lulukiwkiw-prog.github.io/wind-turbine-lab/promo/wind-turbine-15s.gif`
+
 ## 文件
 
 - [docs/SPEC.md](docs/SPEC.md)：規格、座標慣例、參考資料與查閱紀錄
