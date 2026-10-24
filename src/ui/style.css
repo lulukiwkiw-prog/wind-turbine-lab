@@ -12,6 +12,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; } /* 按鈕等元件有自己的 display，確保 hidden 一定藏得起來 */
 html, body { margin: 0; height: 100%; overflow: hidden; background: #dcecf8; }
 body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color: transparent; }
 
@@ -317,7 +318,11 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
   .info .short { font-size: 17px; }
   .partlist { left: 8px; right: 8px; width: auto; top: auto; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); transform: scale(0.96); }
   .partlist.open { transform: none; }
-  .hint { bottom: calc(max(8px, env(safe-area-inset-bottom)) + 70px); font-size: 14px; }
+  .hint { bottom: calc(max(8px, env(safe-area-inset-bottom)) + 70px); font-size: 13px; padding: 6px 12px; max-width: min(300px, calc(100vw - 24px)); border-radius: 14px; }
+  /* 工具列可以左右滑：邊緣淡出，提示後面還有按鈕 */
+  .cutbar.more-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+  .cutbar.more-left { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); }
+  .cutbar.more-left.more-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
   .cutbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .cutbar::-webkit-scrollbar { display: none; }
   .btn.cut { flex: none; font-size: 15px; padding: 6px 10px; }

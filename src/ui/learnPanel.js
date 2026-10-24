@@ -1,4 +1,4 @@
-// 學習功能介面：小任務、考考你、第一次導覽、完成提示
+// 學習功能介面：小任務、考考你、操作說明（第一次打開時顯示）、完成提示
 // 進度與答題狀態都在集中 store；這裡只負責畫面。
 import { missionsFor } from '../learning/missions.js';
 import { quizFor } from '../learning/quiz.js';
@@ -34,10 +34,10 @@ export function createLearnPanel({ root, store, speech }) {
   const actions = el('div', { class: 'learn-actions' });
   const quizBtn = el('button', { class: 'btn', type: 'button' }, '考考你');
   quizBtn.addEventListener('click', () => store.set({ openPanel: null, quizIndex: 0, quizPicked: null, quizScore: 0 }));
-  const tourBtn = el('button', { class: 'btn', type: 'button' }, '看導覽');
+  const tourBtn = el('button', { class: 'btn', type: 'button' }, '操作說明');
   tourBtn.addEventListener('click', () => store.set({ openPanel: null, tourStep: 0 }));
   actions.append(quizBtn, tourBtn);
-  // 「考考你」「看導覽」放在最上面，不用捲動就按得到
+  // 「考考你」「操作說明」放在最上面，不用捲動就按得到
   panel.append(head, actions, el('p', { class: 'learn-desc' }, '自己去探索，完成時會自動打勾。不用全部做完喔！'), list);
 
   function buildMissions(difficulty) {
@@ -97,8 +97,8 @@ export function createLearnPanel({ root, store, speech }) {
     store.set({ quizIndex: s.quizIndex + 1, quizPicked: null });
   }
 
-  // ---------- 導覽 ----------
-  const tour = el('div', { class: 'modal tour', role: 'dialog', 'aria-modal': 'true', 'aria-label': '導覽' });
+  // ---------- 操作說明 ----------
+  const tour = el('div', { class: 'modal tour', role: 'dialog', 'aria-modal': 'true', 'aria-label': '操作說明' });
   const tourCard = el('div', { class: 'modal-card' });
   const tourStepLabel = el('span', { class: 'learn-progress' });
   const tourTitle = el('h2');

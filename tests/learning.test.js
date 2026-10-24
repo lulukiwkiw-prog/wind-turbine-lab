@@ -66,7 +66,8 @@ test('考考你：每題 3 個選項、答案在範圍內、都有說明；國�
 });
 
 test('導覽與零件文字：每段都有內容；零件說明可朗讀', () => {
-  assert.equal(TOUR.length, 4);
+  assert.equal(TOUR.length, 5);
+  assert.ok(TOUR.some((t) => t.text.includes('自動導覽')), '操作說明要介紹自動導覽');
   for (const t of TOUR) assert.ok(t.title && t.text);
   for (const [id, t] of Object.entries(PARTS_TEXT.elementary)) assert.ok(speechText(t.speak ?? `${t.name}。${t.short}`).length > 2, id);
 });

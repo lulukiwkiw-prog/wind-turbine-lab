@@ -72,10 +72,28 @@ function focusBox(box, minR) {
   rig.focusSphere(sphere.center, Math.max(sphere.radius, minR));
 }
 
+// 機艙附近的零件：葉片在機艙前面（上風側）轉，從原本的方向靠近常會被葉片擋住，
+// 所以改從側後方（下風側）斜上方看；輪轂與變槳系統則從前方斜看。
+const BEHIND_ROTOR_PARTS = new Set(['nacelle', 'anemometer', 'windVane', 'mainShaft', 'mainBearing', 'gearbox',
+  'highSpeedShaft', 'brake', 'generator', 'controller', 'yawSystem']);
+const FRONT_OF_ROTOR_PARTS = new Set(['hub', 'pitchSystem']);
+function rotorSideView(id, minR) {
+  const sphere = partBounds(id).getBoundingSphere(new THREE.Sphere());
+  const up = new THREE.Vector3(0, 1, 0);
+  const upwind = turbine.nodes.rotor.getWorldDirection(new THREE.Vector3()).setY(0).normalize();
+  const side = new THREE.Vector3().crossVectors(upwind, up).normalize();
+  // 挑相機目前所在的那一側，鏡頭移動比較少
+  if (rig.camera.position.clone().sub(sphere.center).dot(side) < 0) side.negate();
+  const along = FRONT_OF_ROTOR_PARTS.has(id) ? 0.8 : -0.55;
+  const dir = upwind.multiplyScalar(along).addScaledVector(side, 0.75).addScaledVector(up, 0.4).normalize();
+  rig.viewFrom(sphere.center, dir, Math.max(sphere.radius, minR));
+}
 function focusPart(id) {
   // 零件可能正在拆開移動中：以最終位置附近聚焦（先更新世界矩陣）
   scene.updateMatrixWorld(true);
-  focusBox(partBounds(id), GEAR_PARTS.has(id) ? 0.7 : CUTAWAY_PARTS.has(id) ? 1.8 : 4);
+  const minR = GEAR_PARTS.has(id) ? 0.7 : CUTAWAY_PARTS.has(id) ? 1.8 : 4;
+  if (store.get().mode !== 'explode' && (BEHIND_ROTOR_PARTS.has(id) || FRONT_OF_ROTOR_PARTS.has(id))) rotorSideView(id, minR);
+  else focusBox(partBounds(id), minR);
 }
 
 /** 看齒輪：藏起擋住齒輪的零件，從前方斜上看行星齒輪組（方向跟著機艙轉） */
