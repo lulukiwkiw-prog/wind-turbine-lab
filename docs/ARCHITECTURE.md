@@ -32,7 +32,7 @@ wind-turbine-lab/
 │  │  ├─ speech.js            語音朗讀（Web Speech API、zh-TW 優先、讀音修正表）
 │  │  ├─ missions.js          小任務（依難度分層，自動判斷完成）
 │  │  ├─ quiz.js              考考你題目
-│  │  ├─ tour.js              第一次導覽
+│  │  ├─ tour.js              操作說明（第一次打開時顯示）
 │  │  ├─ guide.js             自動導覽：劇本（17 段）與播放器（換段、暫停、停止；可在 Node 測試）
 │  │  └─ progress.js          進度存在這台裝置（localStorage，失敗不影響使用）
 │  └─ ui/                     兒童介面（ui.js、experimentPanel.js、learnPanel.js、guidePanel.js 自動導覽字幕卡、airfoilFigure.js 葉片切面小圖、icons.js、style.css）

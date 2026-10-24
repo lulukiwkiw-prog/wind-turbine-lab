@@ -153,6 +153,10 @@ export function createUI({ root, store, actions, speech }) {
 
   // ---------- 提示 ----------
   const hint = el('div', { class: 'hint' }, '用手指拖曳可以轉動，兩指可以放大縮小。點一下零件看看它是什麼！');
+  // 開場提示：幾秒後、或一碰畫面就淡出，不一直壓在風機上
+  const hideHint = () => hint.classList.add('gone');
+  setTimeout(hideHint, 8000);
+  window.addEventListener('pointerdown', hideHint, { once: true, passive: true });
 
   // ---------- 零件標籤（跟著 3D 位置移動） ----------
   const marker = el('div', { class: 'marker' });
@@ -191,6 +195,17 @@ export function createUI({ root, store, actions, speech }) {
   const exNote = el('p', { class: 'cutnote' }, '教學示意：齒數與齒形是簡化的；葉輪已放慢，讓高速軸每秒轉約 1 圈。');
 
   header.append(cutbar, cutNote, exbar, speedRow, exNote);
+  // 手機上工具列可以左右滑：還有按鈕藏在邊緣外時，邊緣淡出提示
+  const scrollHint = (bar) => {
+    const upd = () => {
+      bar.classList.toggle('more-left', bar.scrollLeft > 2);
+      bar.classList.toggle('more-right', bar.scrollLeft + bar.clientWidth < bar.scrollWidth - 2);
+    };
+    bar.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    return upd;
+  };
+  const scrollHints = [cutbar, exbar].map(scrollHint);
   root.append(header, tools, list, viewMenu, info, hint, marker);
 
   function render(s) {
@@ -224,6 +239,7 @@ export function createUI({ root, store, actions, speech }) {
       : '全部顯示';
     infoActions.hidden = !ex;
     soloBtn.textContent = s.soloPart && s.soloPart === s.selectedPart ? '顯示全部零件' : '只看這個';
+    requestAnimationFrame(() => scrollHints.forEach((f) => f())); // 顯示或按鈕文字改變後重新判斷
     seeBtn.classList.toggle('active', s.shellView === 'transparent');
     hideBtn.classList.toggle('active', s.shellView === 'hidden');
 

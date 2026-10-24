@@ -104,6 +104,49 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
 }
 
 /** 檢查風機輪轂在面板沒擋住的地方 */
+/** 點機艙附近的零件後，鏡頭要看得到它（零件中心點得到，不被葉片擋住） */
+async function rotorOcclusionCheck(page, tag, shotPrefix) {
+  const parts = ['nacelle', 'anemometer', 'windVane', 'hub', 'pitchSystem', 'generator', 'gearbox'];
+  const bad = [];
+  for (const id of parts) {
+    await page.evaluate((id) => {
+      const lab = window.__lab;
+      lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, paused: true });
+      lab.setRotorAngleDeg(20);
+      lab.jumpView('default');
+      lab.selectPart(id);
+    }, id);
+    await page.waitForTimeout(1500);
+    // 中心點不能是葉片；中心或附近（環狀零件中間是空的，例如變槳系統）要點得到這個零件
+    const r = await page.evaluate((id) => {
+      const lab = window.__lab;
+      const p = lab.partScreen(id);
+      const picked = lab.pickAt(p.x, p.y);
+      let near = picked === id;
+      for (let dx = -60; dx <= 60 && !near; dx += 20) for (let dy = -60; dy <= 60 && !near; dy += 20) near = lab.pickAt(p.x + dx, p.y + dy) === id;
+      // 葉輪會轉：轉一圈（每 5°，三片葉片 120° 一循環）看葉片會不會擋到零件中心
+      let bladeAngles = 0;
+      for (let a = 0; a < 120; a += 5) { lab.setRotorAngleDeg(a); lab.scene.updateMatrixWorld(true); if (lab.pickAt(p.x, p.y) === 'blade') bladeAngles++; }
+      lab.setRotorAngleDeg(20);
+      return { id, picked, near, bladeAngles, x: Math.round(p.x), y: Math.round(p.y) };
+    }, id);
+    if (!r.near || r.bladeAngles > 0) bad.push(r);
+    if (shotPrefix && (id === 'nacelle' || id === 'hub')) await shoot(page, `${shotPrefix}-${id}`);
+  }
+  report.push({ name: `${tag}：點機艙附近的零件不被葉片擋住`, bad, ok: bad.length === 0 });
+  if (bad.length) failures.push(`${tag}：零件被擋住 ${JSON.stringify(bad)}`);
+  await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null }));
+}
+
+/** 開場提示：碰一下畫面就淡出 */
+async function hintCheck(page, tag) {
+  const before = await page.evaluate(() => !document.querySelector('.hint').classList.contains('gone'));
+  await page.mouse.click(5, 400);
+  const after = await page.evaluate(() => document.querySelector('.hint').classList.contains('gone'));
+  report.push({ name: `${tag}：開場提示碰一下就淡出`, before, after, ok: before && after });
+  if (!(before && after)) failures.push(`${tag}：開場提示 ${JSON.stringify({ before, after })}`);
+}
+
 /** 剖視／拆解的說明預設收起來（不擋住 3D 畫面），點按鈕才展開 */
 async function notesCheck(page, name, shot) {
   const state = () => page.evaluate(() => {
@@ -266,6 +309,7 @@ try {
     const backOk = back.shellView === 'solid' && back.internalShown === 0;
     report.push({ name: '返回外觀', ...back, ok: backOk });
     if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
+    await rotorOcclusionCheck(page, '桌面', '16c-focus');
     // ---------- 點內部零件：自動拿掉外殼；關掉介紹卡恢復原狀 ----------
     {
       const st = () => page.evaluate(() => { const s = window.__lab.store.get(); return { mode: s.mode, shell: s.shellView, part: s.selectedPart }; });
@@ -460,8 +504,13 @@ try {
     // 考考你：選錯答案 → 顯示正確答案與說明
     await page.evaluate(() => window.__lab.store.set({ openPanel: null, quizIndex: 4, quizPicked: null, quizScore: 0 }));
     await page.waitForTimeout(200);
+    const navBefore = await page.evaluate(() => [...document.querySelectorAll('.modal:not([hidden]) .learn-actions .btn')].filter((b) => b.offsetParent !== null).map((b) => b.textContent.trim()));
     await page.click('.q-options .btn.option >> nth=0');
     await page.waitForTimeout(300);
+    const navAfter = await page.evaluate(() => [...document.querySelectorAll('.modal:not([hidden]) .learn-actions .btn')].filter((b) => b.offsetParent !== null).map((b) => b.textContent.trim()));
+    const navOk = !navBefore.includes('下一題') && navBefore.includes('跳過') && navAfter.includes('下一題') && !navAfter.includes('跳過');
+    report.push({ name: '考考你：答完才出現「下一題」', navBefore, navAfter, ok: navOk });
+    if (!navOk) failures.push(`考考你按鈕：${JSON.stringify({ navBefore, navAfter })}`);
     await shoot(page, '34-quiz-feedback');
     const fb = await page.evaluate(() => document.querySelector('.q-feedback').innerText);
     const quizOk = /正確答案是「8 倍」/.test(fb);
@@ -484,8 +533,10 @@ try {
   // ---------- 手機寬度 390px ----------
   {
     const { ctx, page, errors } = await openPage({ width: 390, height: 844 }, { isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+    await hintCheck(page, '手機');
     await pose(page, 'default');
     await shoot(page, '07-mobile-390');
+    await rotorOcclusionCheck(page, '手機', '07b-mobile-390-focus');
     await pose(page, 'default', { part: 'blade' });
     await shoot(page, '08-mobile-390-select-blade');
     await page.evaluate(() => window.__lab.store.set({ selectedPart: null, openPanel: 'parts' }));
