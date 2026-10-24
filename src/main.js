@@ -97,7 +97,6 @@ function selectPart(id) {
   const patch = { selectedPart: id, openPanel: null };
   if (GEAR_PARTS.has(id) && s.mode !== 'explode') patch.mode = 'explode';
   else if (CUTAWAY_PARTS.has(id) && s.mode === 'exterior') patch.mode = 'cutaway';
-  else if (CUTAWAY_PARTS.has(id) && s.mode === 'experiment' && s.shellView === 'solid') patch.shellView = 'transparent';
   if (s.mode === 'explode' && s.hiddenParts.includes(id)) patch.hiddenParts = s.hiddenParts.filter((x) => x !== id);
   store.set(patch);
 }
@@ -271,6 +270,27 @@ store.subscribe((s, prev, changed) => {
     else if (s.mode === 'explode') rig.preset('explode');
     else if (s.mode === 'experiment') rig.preset('experiment');
     else rig.reset();
+  }
+});
+
+// 點內部零件：自動拿掉外殼，才看得到零件；取消選取（或改點外面的零件）時恢復成點之前的外殼與模式。
+// 小朋友自己換模式或自己選外殼樣式，就以他的選擇為準，不再恢復。自動導覽時由導覽決定外殼。
+store.subscribe((s, prev, changed) => {
+  if (s.guideStep !== null) {
+    if (s.peekRestore) store.set({ peekRestore: null });
+    return;
+  }
+  const r = s.peekRestore;
+  if (!changed.includes('selectedPart')) {
+    const userShell = changed.includes('shellView') && !changed.includes('mode') && s.shellView !== 'hidden';
+    if (r && (userShell || s.mode !== r.inMode)) store.set({ peekRestore: null });
+    return;
+  }
+  if (CUTAWAY_PARTS.has(s.selectedPart) && s.mode !== 'explode') {
+    store.set({ shellView: 'hidden', ...(r ? {} : { peekRestore: { mode: prev.mode, shellView: prev.shellView, inMode: s.mode } }) });
+  } else if (r) {
+    if (s.mode !== r.inMode) store.set({ peekRestore: null }); // 已經換到別的模式
+    else store.set({ peekRestore: null, shellView: r.shellView, ...(r.mode !== s.mode ? { mode: r.mode } : {}) });
   }
 });
 

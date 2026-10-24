@@ -84,33 +84,33 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 46.337,
-    "colors": 536,
-    "mean": 155.916,
+    "std": 49.869,
+    "colors": 616,
+    "mean": 152.042,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 45.271,
-    "colors": 483,
-    "mean": 158.945,
+    "std": 49.116,
+    "colors": 543,
+    "mean": 155.468,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 43.836,
-    "colors": 362,
-    "mean": 161.556,
+    "std": 45.904,
+    "colors": 389,
+    "mean": 159.383,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
-    "std": 46.585,
-    "colors": 474,
-    "mean": 147.546,
+    "std": 52.001,
+    "colors": 570,
+    "mean": 144.308,
     "ok": true
   },
   {
@@ -154,11 +154,79 @@
     "ok": true
   },
   {
+    "name": "16b-peek-generator-no-shell",
+    "darkFrac": 0,
+    "std": 53.995,
+    "colors": 384,
+    "mean": 164.993,
+    "ok": true
+  },
+  {
+    "name": "點內部零件自動拿掉外殼：外觀→點發電機",
+    "a1": {
+      "mode": "cutaway",
+      "shell": "hidden",
+      "part": "generator"
+    },
+    "a2": {
+      "mode": "exterior",
+      "shell": "solid",
+      "part": null
+    },
+    "ok": true
+  },
+  {
+    "name": "點內部零件自動拿掉外殼：剖視透明→點槳距系統→改點葉片",
+    "b1": {
+      "mode": "cutaway",
+      "shell": "hidden",
+      "part": "pitchSystem"
+    },
+    "b2": {
+      "mode": "cutaway",
+      "shell": "transparent",
+      "part": "blade"
+    },
+    "ok": true
+  },
+  {
+    "name": "點內部零件自動拿掉外殼：點齒輪箱後自己選外殼透明",
+    "c1": {
+      "mode": "cutaway",
+      "shell": "transparent",
+      "part": null
+    },
+    "ok": true
+  },
+  {
+    "name": "點內部零件自動拿掉外殼：發電實驗→點發電機",
+    "d1": {
+      "mode": "experiment",
+      "shell": "hidden",
+      "part": "generator"
+    },
+    "d2": {
+      "mode": "experiment",
+      "shell": "solid",
+      "part": null
+    },
+    "ok": true
+  },
+  {
+    "name": "點內部零件自動拿掉外殼：點煞車後換到發電實驗",
+    "e1": {
+      "mode": "experiment",
+      "shell": "solid",
+      "part": null
+    },
+    "ok": true
+  },
+  {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 39.37,
-    "colors": 572,
-    "mean": 152.689,
+    "std": 39.802,
+    "colors": 603,
+    "mean": 152.375,
     "ok": true
   },
   {
@@ -212,9 +280,9 @@
   {
     "name": "20c-explode-notes-open",
     "darkFrac": 0,
-    "std": 43.142,
-    "colors": 412,
-    "mean": 152.645,
+    "std": 43.193,
+    "colors": 405,
+    "mean": 152.671,
     "ok": true
   },
   {
@@ -426,7 +494,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 10.926790503626215,
+    "fps": 12.829369387150305,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -436,7 +504,7 @@
     "darkFrac": 0,
     "std": 41.128,
     "colors": 155,
-    "mean": 142.097,
+    "mean": 142.106,
     "ok": true
   },
   {
@@ -454,9 +522,9 @@
   {
     "name": "33-missions-toast",
     "darkFrac": 0,
-    "std": 49.492,
-    "colors": 411,
-    "mean": 197.441,
+    "std": 51.376,
+    "colors": 417,
+    "mean": 198.797,
     "ok": true
   },
   {
@@ -502,7 +570,7 @@
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
     "std": 41.027,
-    "colors": 256,
+    "colors": 255,
     "mean": 207.418,
     "ok": true
   },
@@ -517,8 +585,8 @@
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 43.118,
-    "colors": 504,
+    "std": 43.117,
+    "colors": 501,
     "mean": 159.974,
     "ok": true
   },
@@ -539,16 +607,16 @@
   {
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
-    "std": 45.19,
-    "colors": 427,
-    "mean": 153.311,
+    "std": 45.191,
+    "colors": 426,
+    "mean": 153.31,
     "ok": true
   },
   {
     "name": "23b-mobile-390-explode-notes-open",
     "darkFrac": 0,
     "std": 50.282,
-    "colors": 457,
+    "colors": 456,
     "mean": 162.892,
     "ok": true
   },
@@ -569,9 +637,9 @@
   {
     "name": "35-mobile-390-learn",
     "darkFrac": 0,
-    "std": 42.709,
-    "colors": 166,
-    "mean": 223.303,
+    "std": 42.727,
+    "colors": 211,
+    "mean": 223.326,
     "ok": true
   },
   {
@@ -613,16 +681,16 @@
   {
     "name": "31b-mobile-390-experiment-folded",
     "darkFrac": 0,
-    "std": 42.874,
+    "std": 42.875,
     "colors": 245,
-    "mean": 191.424,
+    "mean": 191.423,
     "ok": true
   },
   {
     "name": "31c-mobile-390-experiment-inside",
     "darkFrac": 0,
-    "std": 53.845,
-    "colors": 512,
+    "std": 53.846,
+    "colors": 510,
     "mean": 194.07,
     "ok": true
   },
@@ -652,7 +720,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 13.860654222878427,
+    "fps": 13.832625234659336,
     "drawCalls": 100,
     "triangles": 45024,
     "pixelRatio": 2
@@ -683,9 +751,9 @@
   {
     "name": "40-guide-desktop-01-start",
     "darkFrac": 0,
-    "std": 45.215,
-    "colors": 266,
-    "mean": 189.052,
+    "std": 45.218,
+    "colors": 273,
+    "mean": 189.046,
     "ok": true
   },
   {
@@ -711,9 +779,9 @@
   {
     "name": "40-guide-desktop-03-blade",
     "darkFrac": 0,
-    "std": 46.775,
-    "colors": 332,
-    "mean": 193.641,
+    "std": 46.776,
+    "colors": 326,
+    "mean": 193.636,
     "ok": true
   },
   {
@@ -749,9 +817,9 @@
   {
     "name": "桌面導覽 7「齒輪箱讓它變快」：焦點在字幕卡上方",
     "focus": "sunGear",
-    "picked": "sunGear",
-    "x": 652,
-    "y": 313,
+    "picked": "planetGear",
+    "x": 655,
+    "y": 309,
     "cardTop": 511,
     "shell": "hidden",
     "ok": true
@@ -759,17 +827,17 @@
   {
     "name": "40-guide-desktop-07-gears",
     "darkFrac": 0,
-    "std": 47.525,
-    "colors": 358,
-    "mean": 162.28,
+    "std": 47.386,
+    "colors": 360,
+    "mean": 162.371,
     "ok": true
   },
   {
     "name": "桌面導覽 8「發電機把轉動變成電」：焦點在字幕卡上方",
     "focus": "generator",
     "picked": "generator",
-    "x": 389,
-    "y": 353,
+    "x": 425,
+    "y": 347,
     "cardTop": 541,
     "shell": "transparent",
     "ok": true
@@ -777,15 +845,15 @@
   {
     "name": "40-guide-desktop-08-generator",
     "darkFrac": 0,
-    "std": 46.857,
-    "colors": 554,
-    "mean": 166.678,
+    "std": 46.425,
+    "colors": 546,
+    "mean": 166.232,
     "ok": true
   },
   {
     "name": "桌面導覽 9「能量的接力」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": "blade",
+    "picked": "pitchSystem",
     "x": 952,
     "y": 257,
     "cardTop": 541,
@@ -796,8 +864,8 @@
     "name": "桌面導覽 10「電纜往下走」：焦點在字幕卡上方",
     "focus": "powerCable",
     "picked": "powerCable",
-    "x": 615,
-    "y": 1301,
+    "x": 622,
+    "y": 1321,
     "cardTop": 541,
     "shell": "transparent",
     "ok": true
@@ -815,9 +883,9 @@
   {
     "name": "40-guide-desktop-11-transformer",
     "darkFrac": 0,
-    "std": 41.532,
-    "colors": 253,
-    "mean": 165.776,
+    "std": 41.716,
+    "colors": 255,
+    "mean": 165.464,
     "ok": true
   },
   {
@@ -833,9 +901,9 @@
   {
     "name": "40-guide-desktop-12-grid",
     "darkFrac": 0,
-    "std": 45.485,
-    "colors": 243,
-    "mean": 173.94,
+    "std": 45.496,
+    "colors": 244,
+    "mean": 173.93,
     "ok": true
   },
   {
@@ -851,9 +919,9 @@
   {
     "name": "40-guide-desktop-13-calm",
     "darkFrac": 0,
-    "std": 49.396,
-    "colors": 496,
-    "mean": 173.246,
+    "std": 49.464,
+    "colors": 499,
+    "mean": 172.577,
     "ok": true
   },
   {
@@ -869,9 +937,9 @@
   {
     "name": "40-guide-desktop-14-strong",
     "darkFrac": 0,
-    "std": 49.307,
-    "colors": 534,
-    "mean": 173.954,
+    "std": 49.251,
+    "colors": 532,
+    "mean": 173.917,
     "ok": true
   },
   {
@@ -887,9 +955,9 @@
   {
     "name": "40-guide-desktop-15-storm",
     "darkFrac": 0,
-    "std": 45.53,
-    "colors": 263,
-    "mean": 189.884,
+    "std": 45.54,
+    "colors": 259,
+    "mean": 189.847,
     "ok": true
   },
   {
@@ -926,15 +994,15 @@
   {
     "name": "40-guide-desktop-10-cable-end",
     "darkFrac": 0,
-    "std": 43.051,
-    "colors": 241,
-    "mean": 164.137,
+    "std": 43.08,
+    "colors": 244,
+    "mean": 164.043,
     "ok": true
   },
   {
     "name": "桌面導覽：跟著電走到變壓器",
     "mid": {
-      "y": 77,
+      "y": 75,
       "picked": "transformer",
       "towerOpacity": 0.25
     },
@@ -951,13 +1019,13 @@
     "calm": {
       "meter": true,
       "power": "沒有發電",
-      "hs": 0.4223452747808582,
+      "hs": 0.42207285838722874,
       "kw": 0
     },
     "strong": {
       "meter": true,
       "power": "2,000 kW",
-      "hs": 1.1995281898033097,
+      "hs": 1.1995098441031447,
       "kw": 1999.9999999999998
     },
     "ok": true
@@ -1017,9 +1085,9 @@
   {
     "name": "41-guide-mobile-01-start",
     "darkFrac": 0,
-    "std": 50.405,
-    "colors": 256,
-    "mean": 201.905,
+    "std": 50.409,
+    "colors": 254,
+    "mean": 201.903,
     "ok": true
   },
   {
@@ -1045,9 +1113,9 @@
   {
     "name": "41-guide-mobile-03-blade",
     "darkFrac": 0,
-    "std": 51.356,
-    "colors": 350,
-    "mean": 214.211,
+    "std": 51.385,
+    "colors": 347,
+    "mean": 214.186,
     "ok": true
   },
   {
@@ -1063,7 +1131,7 @@
   {
     "name": "手機導覽 5「打開機艙看一看」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": "blade",
+    "picked": "pitchSystem",
     "x": 302,
     "y": 317,
     "cardTop": 542,
@@ -1093,9 +1161,9 @@
   {
     "name": "41-guide-mobile-07-gears",
     "darkFrac": 0,
-    "std": 58.126,
-    "colors": 412,
-    "mean": 186.337,
+    "std": 58.128,
+    "colors": 417,
+    "mean": 186.339,
     "ok": true
   },
   {
@@ -1111,9 +1179,9 @@
   {
     "name": "41-guide-mobile-08-generator",
     "darkFrac": 0,
-    "std": 55.46,
-    "colors": 509,
-    "mean": 184.595,
+    "std": 55.667,
+    "colors": 513,
+    "mean": 184.271,
     "ok": true
   },
   {
@@ -1130,8 +1198,8 @@
     "name": "手機導覽 10「電纜往下走」：焦點在字幕卡上方",
     "focus": "powerCable",
     "picked": "powerCable",
-    "x": 171,
-    "y": 1042,
+    "x": 178,
+    "y": 1089,
     "cardTop": 493,
     "shell": "transparent",
     "ok": true
@@ -1149,9 +1217,9 @@
   {
     "name": "41-guide-mobile-11-transformer",
     "darkFrac": 0,
-    "std": 60.287,
-    "colors": 358,
-    "mean": 175.236,
+    "std": 60.179,
+    "colors": 355,
+    "mean": 175.396,
     "ok": true
   },
   {
@@ -1167,9 +1235,9 @@
   {
     "name": "41-guide-mobile-12-grid",
     "darkFrac": 0,
-    "std": 54.295,
-    "colors": 242,
-    "mean": 191.661,
+    "std": 54.29,
+    "colors": 240,
+    "mean": 191.671,
     "ok": true
   },
   {
@@ -1185,9 +1253,9 @@
   {
     "name": "41-guide-mobile-13-calm",
     "darkFrac": 0,
-    "std": 57.239,
-    "colors": 489,
-    "mean": 195.573,
+    "std": 57.48,
+    "colors": 486,
+    "mean": 195.315,
     "ok": true
   },
   {
@@ -1203,9 +1271,9 @@
   {
     "name": "41-guide-mobile-14-strong",
     "darkFrac": 0,
-    "std": 57.37,
-    "colors": 536,
-    "mean": 194.478,
+    "std": 57.798,
+    "colors": 525,
+    "mean": 193.896,
     "ok": true
   },
   {
@@ -1221,16 +1289,16 @@
   {
     "name": "41-guide-mobile-15-storm",
     "darkFrac": 0,
-    "std": 51.607,
-    "colors": 276,
-    "mean": 202.853,
+    "std": 51.651,
+    "colors": 273,
+    "mean": 202.774,
     "ok": true
   },
   {
     "name": "手機導覽 16「風向變了，跟著轉」：焦點在字幕卡上方",
     "focus": "hub",
     "picked": "hub",
-    "x": 213,
+    "x": 212,
     "y": 233,
     "cardTop": 430,
     "shell": "solid",
@@ -1260,15 +1328,15 @@
   {
     "name": "41-guide-mobile-10-cable-end",
     "darkFrac": 0,
-    "std": 56.468,
-    "colors": 227,
-    "mean": 182.452,
+    "std": 56.569,
+    "colors": 230,
+    "mean": 182.264,
     "ok": true
   },
   {
     "name": "手機導覽：跟著電走到變壓器",
     "mid": {
-      "y": 74,
+      "y": 73,
       "picked": "transformer",
       "towerOpacity": 0.25
     },
@@ -1285,13 +1353,13 @@
     "calm": {
       "meter": true,
       "power": "沒有發電",
-      "hs": 0.42244694098642815,
+      "hs": 0.42223754869800223,
       "kw": 0
     },
     "strong": {
       "meter": true,
       "power": "2,000 kW",
-      "hs": 1.199509766655808,
+      "hs": 1.1995099363540853,
       "kw": 1999.9999999999998
     },
     "ok": true
