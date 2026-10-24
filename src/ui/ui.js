@@ -5,6 +5,7 @@ import {
 } from '../spec/turbineSpec.js';
 import { partText } from '../learning/partsData.js';
 import { ICONS } from './icons.js';
+import { makeDraggable } from './draggable.js';
 
 const el = (tag, attrs = {}, html = '') => {
   const e = document.createElement(tag);
@@ -150,6 +151,7 @@ export function createUI({ root, store, actions, speech }) {
   });
   infoActions.append(soloBtn, hideBtn2);
   info.append(infoHead, infoShort, moreBtn, infoMore, infoNote, infoActions);
+  makeDraggable(info, { name: 'info', store });
 
   // ---------- 提示 ----------
   const hint = el('div', { class: 'hint' }, '用手指拖曳可以轉動，兩指可以放大縮小。點一下零件看看它是什麼！');

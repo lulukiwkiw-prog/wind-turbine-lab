@@ -14,6 +14,28 @@ export function loadProgress() {
   }
 }
 
+const PANEL_KEY = 'wind-turbine-lab:panels:v1';
+
+/** 使用者拖曳過的視窗位置（讀不到就回到原本位置） */
+export function loadPanelPos() {
+  try {
+    const data = JSON.parse(window.localStorage.getItem(PANEL_KEY) ?? '{}');
+    const out = {};
+    for (const [k, p] of Object.entries(data ?? {})) if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) out[k] = { x: p.x, y: p.y };
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+export function savePanelPos(pos) {
+  try {
+    window.localStorage.setItem(PANEL_KEY, JSON.stringify(pos));
+  } catch {
+    // 無法儲存時不影響使用
+  }
+}
+
 export function saveProgress(progress) {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(progress));

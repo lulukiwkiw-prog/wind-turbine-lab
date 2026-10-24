@@ -19,7 +19,7 @@ import { createGuidePanel } from './ui/guidePanel.js';
 import { createGuidePlayer } from './learning/guide.js';
 import { createSpeech } from './learning/speech.js';
 import { missionsFor } from './learning/missions.js';
-import { loadProgress, saveProgress } from './learning/progress.js';
+import { loadProgress, saveProgress, loadPanelPos, savePanelPos } from './learning/progress.js';
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -204,6 +204,8 @@ createLearnPanel({ root: document.getElementById('ui'), store, speech });
 
 // 學習進度：讀取這台裝置上次的進度；第一次來就顯示導覽
 const saved = loadProgress();
+store.set({ panelPos: loadPanelPos() }); // 使用者上次拖曳過的視窗位置
+store.subscribe((s, prev, changed) => { if (changed.includes('panelPos')) savePanelPos(s.panelPos); });
 let tourDone = saved.tourDone;
 store.set({ missionsDone: saved.missionsDone, tourStep: tourDone || new URLSearchParams(location.search).has('notour') ? null : 0 });
 store.subscribe((s, prev, changed) => {
@@ -332,7 +334,8 @@ function targetShift() {
   if (store.get().guideStep !== null) { // 導覽字幕卡在下方：畫面中心移到標題列（和小圖）與字幕卡之間
     let top = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
     let left = 0;
-    const bottom = guideEl.getBoundingClientRect().top;
+    // 使用者自己把字幕卡移走了：不再為它讓出下方空間
+    const bottom = guideEl.dataset.moved ? h : guideEl.getBoundingClientRect().top;
     if (guidePanel.figure.classList.contains('open')) {
       const f = guidePanel.figure.getBoundingClientRect();
       if (f.width > w * 0.6) top = Math.max(top, f.bottom); // 手機：小圖在上方
@@ -342,7 +345,8 @@ function targetShift() {
     const scale = Math.min(1, Math.max(0.5, Math.min(bandH / (h * 0.8), bandW / (w * 0.8))));
     return { cx: (left + w) / 2 - w / 2, cy: (top + bottom) / 2 - h / 2, scale };
   }
-  if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden) return { cx: 0, cy: 0, scale: 1 };
+  // 使用者自己移動過發電實驗面板：照他放的位置，不再移動 3D 畫面
+  if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden || xpEl.dataset.moved) return { cx: 0, cy: 0, scale: 1 };
   const r = xpEl.getBoundingClientRect();
   let left = 0, top = 0, bottom = h;
   if (r.width > w * 0.6) { // 下方面板（手機）
