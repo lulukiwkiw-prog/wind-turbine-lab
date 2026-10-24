@@ -266,6 +266,60 @@ try {
     const backOk = back.shellView === 'solid' && back.internalShown === 0;
     report.push({ name: '返回外觀', ...back, ok: backOk });
     if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
+    // ---------- 點內部零件：自動拿掉外殼；關掉介紹卡恢復原狀 ----------
+    {
+      const st = () => page.evaluate(() => { const s = window.__lab.store.get(); return { mode: s.mode, shell: s.shellView, part: s.selectedPart }; });
+      const closeCard = () => page.click('.info.open .btn.icon[aria-label="關閉"]');
+      const pickFromList = async (id) => {
+        await page.evaluate(() => window.__lab.store.set({ openPanel: 'parts' }));
+        await page.click(`.partlist.open [data-part="${id}"]`);
+        await page.waitForTimeout(300);
+      };
+      const cases = [];
+      // 1. 外觀模式點齒輪箱 → 剖視、拿掉外殼；關掉 → 回到外觀、實心
+      await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, paused: true }));
+      await pickFromList('generator');
+      const a1 = await st();
+      await page.waitForTimeout(1200);
+      await shoot(page, '16b-peek-generator-no-shell');
+      await closeCard();
+      const a2 = await st();
+      cases.push(['外觀→點發電機', a1.mode === 'cutaway' && a1.shell === 'hidden' && a2.mode === 'exterior' && a2.shell === 'solid', { a1, a2 }]);
+      // 2. 剖視（透明）點槳距系統 → 拿掉；改點葉片 → 回到透明
+      await page.evaluate(() => window.__lab.store.set({ mode: 'cutaway' }));
+      await page.evaluate(() => window.__lab.store.set({ shellView: 'transparent' }));
+      await pickFromList('pitchSystem');
+      const b1 = await st();
+      await pickFromList('blade');
+      const b2 = await st();
+      cases.push(['剖視透明→點槳距系統→改點葉片', b1.shell === 'hidden' && b2.shell === 'transparent' && b2.mode === 'cutaway' && b2.part === 'blade', { b1, b2 }]);
+      // 3. 點了以後自己選「外殼透明」→ 關掉時尊重小朋友的選擇
+      await pickFromList('gearbox');
+      await page.click('.cutbar.open [data-cut="transparent"]');
+      await closeCard();
+      const c1 = await st();
+      cases.push(['點齒輪箱後自己選外殼透明', c1.shell === 'transparent', { c1 }]);
+      // 4. 發電實驗點發電機 → 拿掉；關掉 → 實心
+      await page.evaluate(() => window.__lab.store.set({ mode: 'experiment', selectedPart: null }));
+      await page.waitForTimeout(300);
+      await page.evaluate(() => window.__lab.selectPart('generator'));
+      const d1 = await st();
+      await closeCard();
+      const d2 = await st();
+      cases.push(['發電實驗→點發電機', d1.shell === 'hidden' && d2.shell === 'solid' && d2.mode === 'experiment', { d1, d2 }]);
+      // 5. 點了以後自己換模式 → 不再恢復
+      await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null }));
+      await pickFromList('brake');
+      await page.click('.modes [data-mode="experiment"]');
+      await page.waitForTimeout(300);
+      const e1 = await st();
+      cases.push(['點煞車後換到發電實驗', e1.mode === 'experiment' && e1.shell === 'solid' && e1.part === null, { e1 }]);
+      for (const [name, ok, detail] of cases) {
+        report.push({ name: `點內部零件自動拿掉外殼：${name}`, ...detail, ok });
+        if (!ok) failures.push(`點內部零件自動拿掉外殼：${name} ${JSON.stringify(detail)}`);
+      }
+      await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null }));
+    }
     // ---------- 第三階段：機械拆解 ----------
     await explode(page);
     await shoot(page, '18-explode');

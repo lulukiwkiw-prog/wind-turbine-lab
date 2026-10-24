@@ -32,6 +32,7 @@ const initial = () => ({
   towerXray: false, // 塔架變透明，看得到裡面的電纜（自動導覽「電纜往下走」用）
   showSpeeds: false, // 機械拆解：展開「轉速比較」
   showNote: false, // 剖視／拆解：展開「教學示意」說明
+  peekRestore: null, // 點內部零件時自動拿掉外殼；記住原本的 { mode, shellView, inMode } 以便取消選取時恢復
 });
 
 const isCurrentPart = (v) => PARTS.some((p) => p.id === v && p.stage <= CURRENT_STAGE);
@@ -55,6 +56,8 @@ const validators = {
   towerXray: (v) => typeof v === 'boolean',
   showSpeeds: (v) => typeof v === 'boolean',
   showNote: (v) => typeof v === 'boolean',
+  peekRestore: (v) => v === null || (typeof v === 'object' && v.mode in MODES && v.inMode in MODES
+    && ['solid', 'transparent', 'hidden'].includes(v.shellView)),
   shellView: (v) => ['solid', 'transparent', 'hidden'].includes(v),
   exploded: (v) => typeof v === 'boolean',
   hiddenParts: (v) => Array.isArray(v) && v.every(isCurrentPart) && new Set(v).size === v.length,
