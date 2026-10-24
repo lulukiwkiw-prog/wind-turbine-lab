@@ -4,6 +4,7 @@ import { GUIDE_CHAPTERS } from '../learning/guide.js';
 import { SIM, gearboxRatio } from '../spec/turbineSpec.js';
 import { ICONS } from './icons.js';
 import { airfoilSVG } from './airfoilFigure.js';
+import { makeDraggable } from './draggable.js';
 
 const el = (tag, attrs = {}, html = '') => {
   const e = document.createElement(tag);
@@ -79,6 +80,7 @@ export function createGuidePanel({ root, header, store, player }) {
 
   card.append(top, title, text, live, meter, bar, controls);
   root.append(card, figure);
+  makeDraggable(card, { name: 'guide', store });
 
   function render(s) {
     const on = s.guideStep !== null;

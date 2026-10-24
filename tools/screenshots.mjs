@@ -104,6 +104,47 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
 }
 
 /** 檢查風機輪轂在面板沒擋住的地方 */
+/** 拖曳視窗：真的用指標拖把手；位置要移動、記住（重新整理後還在）、不出畫面；按「歸位」回原位 */
+async function dragCheck(page, tag, { name, sel, open, dx, dy, shot }) {
+  await page.evaluate(open);
+  await page.waitForTimeout(500);
+  const rect = () => page.evaluate((sel) => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), vw: innerWidth, vh: innerHeight }; }, sel);
+  const before = await rect();
+  const h = await page.evaluate((sel) => { const r = document.querySelector(`${sel} .drag-grip`).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);
+  const drag = async (tx, ty) => {
+    await page.mouse.move(h.x, h.y);
+    await page.mouse.down();
+    await page.mouse.move(h.x + tx / 2, h.y + ty / 2, { steps: 4 });
+    await page.mouse.move(h.x + tx, h.y + ty, { steps: 4 });
+    await page.mouse.up();
+    await page.waitForTimeout(200);
+  };
+  await drag(dx, dy);
+  const after = await rect();
+  const resetShown = await page.evaluate((sel) => !document.querySelector(`${sel} .drag-reset`).hidden, sel);
+  if (shot) await shoot(page, shot);
+  // 重新整理：位置還在
+  await page.reload();
+  await page.waitForFunction(() => window.__lab?.ready === true);
+  await page.evaluate(open);
+  await page.waitForTimeout(600);
+  const reloaded = await rect();
+  // 往畫面外拖：會被擋在畫面內
+  const h2 = await page.evaluate((sel) => { const r = document.querySelector(`${sel} .drag-grip`).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);
+  Object.assign(h, h2);
+  await drag(-3000, 3000);
+  const clamped = await rect();
+  // 歸位
+  await page.click(`${sel} .drag-reset`);
+  await page.waitForTimeout(300);
+  const back = await rect();
+  const near = (a, b) => Math.abs(a.x - b.x) <= 3 && Math.abs(a.y - b.y) <= 3;
+  const ok = Math.abs(after.x - before.x - dx) <= 3 && Math.abs(after.y - before.y - dy) <= 3 && resetShown
+    && near(reloaded, after) && clamped.x >= -1 && clamped.y <= clamped.vh - 50 && near(back, before);
+  report.push({ name: `${tag}：拖曳${name}（移動、記住、不出畫面、歸位）`, before, after, reloaded, clamped, back, ok });
+  if (!ok) failures.push(`${tag}：拖曳${name} ${JSON.stringify({ before, after, resetShown, reloaded, clamped, back })}`);
+}
+
 /** 點機艙附近的零件後，鏡頭要看得到它（零件中心點得到，不被葉片擋住） */
 async function rotorOcclusionCheck(page, tag, shotPrefix) {
   const parts = ['nacelle', 'anemometer', 'windVane', 'hub', 'pitchSystem', 'generator', 'gearbox'];
@@ -310,6 +351,10 @@ try {
     report.push({ name: '返回外觀', ...back, ok: backOk });
     if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
     await rotorOcclusionCheck(page, '桌面', '16c-focus');
+    await dragCheck(page, '桌面', { name: '零件介紹卡', sel: '.info', open: () => window.__lab.store.set({ mode: 'exterior', selectedPart: 'tower' }), dx: 420, dy: -200, shot: '16d-drag-info' });
+    await dragCheck(page, '桌面', { name: '發電實驗面板', sel: '.xp', open: () => window.__lab.store.set({ selectedPart: null, mode: 'experiment' }), dx: 500, dy: 0 });
+    await dragCheck(page, '桌面', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); }, dx: 200, dy: -380 });
+    await page.evaluate(() => { window.__lab.guide.stop(); window.__lab.store.set({ mode: 'exterior', selectedPart: null }); });
     // ---------- 點內部零件：自動拿掉外殼；關掉介紹卡恢復原狀 ----------
     {
       const st = () => page.evaluate(() => { const s = window.__lab.store.get(); return { mode: s.mode, shell: s.shellView, part: s.selectedPart }; });
@@ -537,6 +582,10 @@ try {
     await pose(page, 'default');
     await shoot(page, '07-mobile-390');
     await rotorOcclusionCheck(page, '手機', '07b-mobile-390-focus');
+    await dragCheck(page, '手機', { name: '零件介紹卡', sel: '.info', open: () => window.__lab.store.set({ mode: 'exterior', selectedPart: 'tower' }), dx: 0, dy: -380, shot: '07c-mobile-390-drag-info' });
+    await dragCheck(page, '手機', { name: '發電實驗面板', sel: '.xp', open: () => window.__lab.store.set({ selectedPart: null, mode: 'experiment' }), dx: 0, dy: -200 });
+    await dragCheck(page, '手機', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); }, dx: 0, dy: -300 });
+    await page.evaluate(() => { window.__lab.guide.stop(); window.__lab.store.set({ mode: 'exterior', selectedPart: null }); });
     await pose(page, 'default', { part: 'blade' });
     await shoot(page, '08-mobile-390-select-blade');
     await page.evaluate(() => window.__lab.store.set({ selectedPart: null, openPanel: 'parts' }));

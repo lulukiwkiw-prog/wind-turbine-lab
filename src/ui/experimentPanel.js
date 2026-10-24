@@ -1,6 +1,8 @@
 // 發電實驗控制面板：風速、風向（八方位）、葉片角度（自動／手動）、讀數與能量轉換
 // 輸入只寫進集中 store；讀數來自模擬（每秒更新數次）。
 import { SIM, windName } from '../spec/turbineSpec.js';
+import { makeDraggable } from './draggable.js';
+
 
 const el = (tag, attrs = {}, html = '') => {
   const e = document.createElement(tag);
@@ -165,6 +167,7 @@ export function createExperimentPanel({ root, store, actions }) {
   // 結果（狀態、發電量）放最上面，一眼就看得到；接著是可以調整的三件事
   body.append(status, meter, windBox, dirBox, pitchBox, tiles, chain, cNote, views, note);
   panel.append(head, body);
+  makeDraggable(panel, { name: 'experiment', store });
   root.append(panel);
 
   function renderInputs(s) {
