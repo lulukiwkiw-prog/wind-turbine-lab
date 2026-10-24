@@ -791,17 +791,46 @@ try {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     report.push({ name: `${tag}導覽：觸控目標 ≥ 44px、沒有水平捲動`, small, overflow, ok: !small.length && !overflow });
     if (small.length || overflow) fail(`按鈕過小或水平捲動 ${JSON.stringify({ small, overflow })}`);
-    // 6. 拖曳畫面就停止；再用按鈕開始、停止
-    const box = await page.evaluate(() => { const r = document.querySelector('#ui .top').getBoundingClientRect(); return { x: innerWidth / 2, y: r.bottom + 40 }; });
+    // 6. 拖曳畫面：導覽繼續；點一下畫面：先暫停、問要不要停止；按其他按鈕也一樣
+    await page.evaluate(() => window.__lab.guide.start(3));
+    const st = () => page.evaluate(() => {
+      const s = window.__lab.store.get();
+      return { step: s.guideStep, paused: s.guidePaused, ask: !document.querySelector('.guide-ask').hidden, mode: s.mode, part: s.selectedPart };
+    });
+    const box = await page.evaluate(() => { const r = document.querySelector('#ui .top').getBoundingClientRect(); return { x: innerWidth / 2, y: r.bottom + 60 }; });
+    await page.mouse.move(box.x, box.y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 80, box.y + 10, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(200);
+    const afterDrag = await st();
     if (mobile) await page.touchscreen.tap(box.x, box.y); else await page.mouse.click(box.x, box.y);
-    const afterTouch = await page.evaluate(() => window.__lab.store.get().guideStep);
+    await page.waitForTimeout(300);
+    const afterTap = await st();
+    await shoot(page, `${mobile ? '41' : '40'}-guide-${device}-ask-stop`);
+    await page.click('.guide-ask .btn.primary');
+    const afterKeep = await st();
+    await page.click('.modes [data-mode="cutaway"]');
+    await page.waitForTimeout(200);
+    const afterMode = await st();
+    await page.click('.guide-ask .btn:not(.primary)');
+    await page.waitForTimeout(300);
+    const afterStop = await st();
+    const askOk = afterDrag.step === 3 && !afterDrag.ask && !afterDrag.paused
+      && afterTap.step === 3 && afterTap.ask && afterTap.paused
+      && afterKeep.step === 3 && !afterKeep.ask && !afterKeep.paused
+      && afterMode.step === 3 && afterMode.ask && afterMode.mode === 'experiment'
+      && afterStop.step === null && !afterStop.ask && afterStop.mode === 'cutaway';
+    report.push({ name: `${tag}導覽：拖曳不打斷；點畫面或按鈕先問，繼續／停止都正確`, afterDrag, afterTap, afterKeep, afterMode, afterStop, ok: askOk });
+    if (!askOk) fail(`停止確認 ${JSON.stringify({ afterDrag, afterTap, afterKeep, afterMode, afterStop })}`);
+    // 7. 用按鈕開始、停止
     await page.click('.guide-start');
     const restarted = await page.evaluate(() => window.__lab.store.get().guideStep);
     await page.click('.guide-start');
     const stopped = await page.evaluate(() => ({ step: window.__lab.store.get().guideStep, btn: document.querySelector('.guide-start').textContent.trim(), card: getComputedStyle(document.querySelector('.guide')).display }));
-    const stopOk = afterTouch === null && restarted === 0 && stopped.step === null && stopped.btn === '自動導覽' && stopped.card === 'none';
-    report.push({ name: `${tag}導覽：點畫面停止；按鈕可再開始、停止`, afterTouch, restarted, stopped, ok: stopOk });
-    if (!stopOk) fail(`停止 ${JSON.stringify({ afterTouch, restarted, stopped })}`);
+    const stopOk = restarted === 0 && stopped.step === null && stopped.btn === '自動導覽' && stopped.card === 'none';
+    report.push({ name: `${tag}導覽：按鈕可再開始、停止`, restarted, stopped, ok: stopOk });
+    if (!stopOk) fail(`停止 ${JSON.stringify({ restarted, stopped })}`);
     if (errors.length) fail(`頁面錯誤：${errors.join(' | ')}`);
     await ctx.close();
   }

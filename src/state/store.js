@@ -29,6 +29,7 @@ const initial = () => ({
   xpFolded: false, // 發電實驗面板收起（手機上只留一行摘要）
   guideStep: null, // 自動導覽：第幾段（null = 沒有在播放）
   guidePaused: false, // 自動導覽暫停中
+  guideAsk: false, // 導覽中點了畫面或其他按鈕：顯示「要停止自動導覽嗎？」
   towerXray: false, // 塔架變透明，看得到裡面的電纜（自動導覽「電纜往下走」用）
   showSpeeds: false, // 機械拆解：展開「轉速比較」
   showNote: false, // 剖視／拆解：展開「教學示意」說明
@@ -54,6 +55,7 @@ const validators = {
   xpFolded: (v) => typeof v === 'boolean',
   guideStep: (v) => v === null || (Number.isInteger(v) && v >= 0),
   guidePaused: (v) => typeof v === 'boolean',
+  guideAsk: (v) => typeof v === 'boolean',
   towerXray: (v) => typeof v === 'boolean',
   showSpeeds: (v) => typeof v === 'boolean',
   showNote: (v) => typeof v === 'boolean',
