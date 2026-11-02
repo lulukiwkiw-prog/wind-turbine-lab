@@ -207,7 +207,7 @@ export function createUI({ root, store, actions, speech }) {
     window.addEventListener('resize', upd);
     return upd;
   };
-  const scrollHints = [cutbar, exbar].map(scrollHint);
+  const scrollHints = [cutbar, exbar, modeBar].map(scrollHint);
   root.append(header, tools, list, viewMenu, info, hint, marker);
 
   function render(s) {

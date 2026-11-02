@@ -577,6 +577,7 @@ export const MODES = {
   cutaway: { label: '機艙剖視', stage: 2 },
   explode: { label: '機械拆解', stage: 3 },
   experiment: { label: '發電實驗', stage: 4 },
+  world: { label: '世界風場', stage: 4 },
 };
 export const CURRENT_STAGE = 4;
 

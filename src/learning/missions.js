@@ -1,3 +1,5 @@
+import { WORLD_TOUR_COUNT } from './worldFarms.js';
+
 // 小任務：依難度分層（國小版先填）。完成時自動打勾，不強制完成。
 // check(ctx)：ctx = { state（集中狀態）, sim（模擬讀數） }，回傳 true 代表完成。
 export const MISSIONS = {
@@ -9,6 +11,7 @@ export const MISSIONS = {
     { id: 'full-power', title: '讓風機滿載發電', hint: '風夠大時，發電量會到 2000 kW。', check: ({ state, sim }) => state.mode === 'experiment' && sim.status === 'rated' },
     { id: 'east-wind', title: '讓機艙轉向東風', hint: '按風向的「東」，等機艙慢慢轉過去對準風。', check: ({ state, sim }) => state.mode === 'experiment' && ((state.windAngleDeg % 360) + 360) % 360 === 90 && Math.abs(sim.yawErrorDeg) < 5 && state.windSpeed > 0 },
     { id: 'shutdown', title: '看風機停機保護', hint: '把風速調到 25 m/s 以上，看看風機怎麼保護自己。', check: ({ state, sim }) => state.mode === 'experiment' && sim.status === 'shutdown' },
+    { id: 'world-tour', title: '環遊世界', hint: `到「世界風場」看 ${WORLD_TOUR_COUNT} 個不同國家的風場。`, check: ({ state }) => state.worldSeen.length >= WORLD_TOUR_COUNT },
     { id: 'feather', title: '自己把葉片轉開', hint: '選「我來調整」，把葉片角度調大，看葉輪變慢。', check: ({ state, sim }) => state.mode === 'experiment' && !state.pitchAuto && sim.pitchDeg > 60 && sim.windSpeed >= 3.5 && sim.rotorRpm < 3 },
   ],
   junior: [],
