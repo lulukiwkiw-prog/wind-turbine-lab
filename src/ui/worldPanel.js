@@ -1,6 +1,6 @@
 // 「世界風場」玩法：世界地圖＋說明卡。選到的風場在地圖上放大顯示，地標可以點，說明卡可以翻頁、唸出來。
 // 狀態（選到哪一個、看過哪些、分類、是否看全世界）都在集中 store；這裡只負責畫面。
-import { WORLD_FARMS, WORLD_CATEGORIES, toMapXY } from '../learning/worldFarms.js';
+import { WORLD_FARMS, WORLD_CATEGORIES, toMapXY, googleMapsUrl } from '../learning/worldFarms.js';
 import { WORLD_LAND, DETAIL_LAND } from '../data/worldMap.js';
 import { sentences } from '../learning/guide.js';
 import { ICONS } from './icons.js';
@@ -88,10 +88,21 @@ export function createWorldPanel({ root, store, speech }) {
   });
   speech.onChange((ok) => { speakBtn.hidden = !ok; });
   cardHead.append(icon, titleBox, speakBtn);
+  // 照片（有自由授權照片的風場才顯示），下面一行標明作者與授權；點照片可以放大
+  const photo = el('figure', { class: 'world-photo' });
+  const photoBtn = el('button', { class: 'world-photo-btn', type: 'button', 'aria-label': '放大看照片' });
+  const photoImg = el('img', { loading: 'lazy', decoding: 'async' });
+  photoBtn.append(photoImg);
+  const photoCredit = el('figcaption', { class: 'world-photo-credit' });
+  photo.append(photoBtn, photoCredit);
+  photoBtn.addEventListener('click', () => photo.classList.toggle('zoomed'));
   const headline = el('p', { class: 'world-headline' });
   const text = el('p', { class: 'world-text' });
   const compare = el('p', { class: 'world-compare' });
   const note = el('p', { class: 'world-note' });
+  // 在 Google 地圖看衛星圖：只是連結（開新視窗），網站本身不載入 Google 的東西
+  const mapLink = el('a', { class: 'btn world-maplink', target: '_blank', rel: 'noopener' }, '🛰️ 在 Google 地圖看衛星圖');
+  const mapNote = el('p', { class: 'world-mapnote' });
   const src = el('details', { class: 'world-src' });
   const srcSum = el('summary');
   const srcList = el('ul');
@@ -111,7 +122,7 @@ export function createWorldPanel({ root, store, speech }) {
   prevBtn.addEventListener('click', () => step(-1));
   nextBtn.addEventListener('click', () => step(1));
   nav.append(prevBtn, pos, nextBtn);
-  card.append(cardHead, headline, text, compare, note, src, nav);
+  card.append(cardHead, photo, headline, text, compare, note, mapLink, mapNote, src, nav);
 
   panel.append(head, chips, map, card);
   root.append(panel);
@@ -202,6 +213,20 @@ export function createWorldPanel({ root, store, speech }) {
     compare.textContent = `比一比：${f.compare}`;
     note.textContent = f.note ? `注意：${f.note}` : '';
     note.hidden = !f.note;
+    photo.hidden = !f.photo;
+    photo.classList.remove('zoomed');
+    if (f.photo) {
+      photoImg.src = `${import.meta.env.BASE_URL}world/${f.photo.file}`;
+      photoImg.alt = f.photo.alt;
+      photoCredit.replaceChildren(
+        el('span', {}, `照片：${f.photo.credit}・`),
+        el('a', { href: f.photo.licenseUrl, target: '_blank', rel: 'noopener' }, f.photo.license),
+        el('span', {}, '・'),
+        el('a', { href: f.photo.page, target: '_blank', rel: 'noopener' }, '維基共享資源'),
+      );
+    }
+    mapLink.href = googleMapsUrl(f);
+    mapNote.textContent = f.mapNote ? `${f.mapNote}（會開新視窗）` : '會開新視窗，可以自己放大找風機。';
     srcSum.textContent = `資料來源（資料至 ${f.asOf} 年）`;
     srcList.replaceChildren(...f.sources.map((x) => {
       const li = el('li');

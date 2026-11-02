@@ -127,6 +127,7 @@ async function worldCheck(page, tag, shot) {
       panelShown: !document.querySelector('.world').hidden && panel.height > 100,
       belowHeader: innerWidth <= 720 || panel.top >= head.bottom - 1,
       mission: s.missionsDone.includes('world-tour'),
+      mapLink: (() => { const a = document.querySelector('.world-maplink'); return a && a.offsetParent !== null && a.target === '_blank' && a.href.includes('basemap=satellite'); })(),
     };
   });
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, worldFarm: null, worldSeen: [], worldFilter: 'all', worldOverview: false, missionsDone: [] }));
@@ -158,7 +159,7 @@ async function worldCheck(page, tag, shot) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   const ok = a.panelShown && a.belowHeader && a.pins === 11 && a.farm && b.farm !== a.farm && b.title !== a.title
     && (!other || c.farm === other) && d.filter === 'taiwan' && /台灣/.test(d.title) && d.visiblePins === 3 && !d.covered.length
-    && e.overview && e.visiblePins >= 3 && f.seen >= 3 && f.mission && !small.length && !overflow;
+    && e.overview && e.visiblePins >= 3 && f.seen >= 3 && f.mission && a.mapLink && d.mapLink && !small.length && !overflow;
   report.push({ name: `${tag}：世界風場（地標、翻頁、分類、看全世界、小任務）`, a, b, c, d, e, f, small, ok });
   if (!ok) failures.push(`${tag}：世界風場 ${JSON.stringify({ a, b, c, d, e, f, small, overflow })}`);
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', worldFilter: 'all', worldOverview: false }));
@@ -170,6 +171,13 @@ async function dragCheck(page, tag, { name, sel, open, dx, dy, shot }) {
   await page.waitForTimeout(300);
   // 等視窗打開的動畫真的結束再量（軟體繪圖較慢時動畫會晚開始）
   await page.waitForFunction((sel) => document.querySelector(sel).getAnimations().length === 0, sel, { timeout: 8000 });
+  // 內容可能還在填（例如字幕卡的即時讀數）：等位置與大小連續兩次量起來都一樣
+  await page.waitForFunction(async (sel) => {
+    const box = () => { const r = document.querySelector(sel).getBoundingClientRect(); return `${r.top}|${r.height}`; };
+    const a = box();
+    await new Promise((res) => setTimeout(res, 400));
+    return a === box();
+  }, sel, { timeout: 8000 });
   const rect = () => page.evaluate((sel) => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), vw: innerWidth, vh: innerHeight }; }, sel);
   const before = await rect();
   const h = await page.evaluate((sel) => { const r = document.querySelector(`${sel} .drag-grip`).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);

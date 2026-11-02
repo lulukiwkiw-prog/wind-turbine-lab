@@ -1,7 +1,8 @@
 // 世界風場：資料要完整（每筆都有來源與年份）、座標合理、分類齊全；小任務與考考你連動正確
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { WORLD_FARMS, WORLD_CATEGORIES, WORLD_TOUR_COUNT, toMapXY } from '../src/learning/worldFarms.js';
+import { WORLD_FARMS, WORLD_CATEGORIES, WORLD_TOUR_COUNT, toMapXY, googleMapsUrl } from '../src/learning/worldFarms.js';
+import { existsSync } from 'node:fs';
 import { WORLD_LAND, DETAIL_LAND } from '../src/data/worldMap.js';
 import { missionsFor } from '../src/learning/missions.js';
 import { quizFor } from '../src/learning/quiz.js';
@@ -50,6 +51,28 @@ test('比一比的數字和網站風機一致（葉片約 43 公尺、單機 200
   assert.match(by('penghu-1965').compare, /40 倍/);
   assert.equal(2000 / 50, 40);
   assert.match(by('tibet').compare, /3,952 公尺/);
+});
+
+test('在 Google 地圖看衛星圖：每個風場都有連結；已拆除的風場有提醒', () => {
+  for (const f of WORLD_FARMS) {
+    assert.ok(Number.isInteger(f.mapZoom) && f.mapZoom >= 3 && f.mapZoom <= 18, `${f.id} mapZoom`);
+    const u = new URL(googleMapsUrl(f));
+    assert.equal(u.origin, 'https://www.google.com');
+    assert.equal(u.searchParams.get('api'), '1');
+    assert.equal(u.searchParams.get('basemap'), 'satellite');
+    assert.equal(u.searchParams.get('center'), `${f.lat},${f.lon}`);
+  }
+  assert.match(WORLD_FARMS.find((f) => f.id === 'vindeby').mapNote, /拆除/);
+});
+
+test('照片（可省略）：有照片就要有作者、授權與原始頁面，檔案要存在；只接受自由授權', () => {
+  for (const f of WORLD_FARMS.filter((x) => x.photo)) {
+    const p = f.photo;
+    for (const k of ['file', 'alt', 'credit', 'license', 'licenseUrl', 'page']) assert.ok(p[k], `${f.id}.photo.${k}`);
+    assert.match(p.license, /^(CC BY(-SA)? [0-9.]+|CC0|Public domain|公有領域)/, `${f.id} 授權`);
+    assert.match(p.page, /^https:\/\/commons\.wikimedia\.org\//);
+    assert.ok(existsSync(new URL(`../public/world/${p.file}`, import.meta.url)), `${f.id} 照片檔`);
+  }
 });
 
 test('地圖資料：世界與放大區域的陸地路徑都存在', () => {
