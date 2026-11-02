@@ -1,6 +1,7 @@
 // 集中狀態管理：模式、難度、動畫速度、暫停、選取零件……全部只存在這裡。
 // 其他模組只能透過 store.get() 讀取、store.set() 修改、store.subscribe() 監聽，
 // 不得自行保存會與這裡衝突的狀態副本。
+import { WORLD_FARMS, WORLD_CATEGORIES } from '../learning/worldFarms.js';
 import { MODES, DIFFICULTIES, DEFAULT_DIFFICULTY, ANIMATION, CURRENT_STAGE, PARTS } from '../spec/turbineSpec.js';
 
 const initial = () => ({
@@ -33,6 +34,10 @@ const initial = () => ({
   towerXray: false, // 塔架變透明，看得到裡面的電纜（自動導覽「電纜往下走」用）
   showSpeeds: false, // 機械拆解：展開「轉速比較」
   showNote: false, // 剖視／拆解：展開「教學示意」說明
+  worldFarm: null, // 世界風場：目前看哪一個（null = 剛進來，自動選第一個）
+  worldSeen: Object.freeze([]), // 世界風場：看過哪些（小任務「環遊世界」用）
+  worldFilter: 'all', // 世界風場：分類
+  worldOverview: false, // 世界風場：地圖看全世界（false = 放大到選到的風場）
   panelPos: Object.freeze({}), // 使用者拖曳過的視窗位移 { '名稱:m|d': {x, y} }（px）
   peekRestore: null, // 點內部零件時自動拿掉外殼；記住原本的 { mode, shellView, inMode } 以便取消選取時恢復
 });
@@ -59,6 +64,10 @@ const validators = {
   towerXray: (v) => typeof v === 'boolean',
   showSpeeds: (v) => typeof v === 'boolean',
   showNote: (v) => typeof v === 'boolean',
+  worldFarm: (v) => v === null || WORLD_FARMS.some((f) => f.id === v),
+  worldSeen: (v) => Array.isArray(v) && v.every((x) => WORLD_FARMS.some((f) => f.id === x)) && new Set(v).size === v.length,
+  worldFilter: (v) => v === 'all' || WORLD_CATEGORIES.some((c) => c.id === v),
+  worldOverview: (v) => typeof v === 'boolean',
   panelPos: (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
     && Object.values(v).every((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y)),
   peekRestore: (v) => v === null || (typeof v === 'object' && v.mode in MODES && v.inMode in MODES

@@ -17,6 +17,7 @@ import { createExperimentPanel } from './ui/experimentPanel.js';
 import { createLearnPanel } from './ui/learnPanel.js';
 import { createGuidePanel } from './ui/guidePanel.js';
 import { createGuideConfirm } from './ui/guideConfirm.js';
+import { createWorldPanel } from './ui/worldPanel.js';
 import { createGuidePlayer } from './learning/guide.js';
 import { createSpeech } from './learning/speech.js';
 import { missionsFor } from './learning/missions.js';
@@ -115,7 +116,7 @@ function selectPart(id) {
   if (id === s.selectedPart) { focusPart(id); return; } // 再按一次：重新聚焦
   const patch = { selectedPart: id, openPanel: null };
   if (GEAR_PARTS.has(id) && s.mode !== 'explode') patch.mode = 'explode';
-  else if (CUTAWAY_PARTS.has(id) && s.mode === 'exterior') patch.mode = 'cutaway';
+  else if (CUTAWAY_PARTS.has(id) && (s.mode === 'exterior' || s.mode === 'world')) patch.mode = 'cutaway';
   if (s.mode === 'explode' && s.hiddenParts.includes(id)) patch.hiddenParts = s.hiddenParts.filter((x) => x !== id);
   store.set(patch);
 }
@@ -202,6 +203,7 @@ const ui = createUI({
 });
 
 createLearnPanel({ root: document.getElementById('ui'), store, speech });
+const worldPanel = createWorldPanel({ root: document.getElementById('ui'), store, speech });
 
 // 學習進度：讀取這台裝置上次的進度；第一次來就顯示導覽
 const saved = loadProgress();
@@ -270,7 +272,7 @@ store.subscribe((s, prev, changed) => {
       if (GEAR_PARTS.has(s.selectedPart)) patch.selectedPart = null;
     }
     if (s.mode === 'explode') Object.assign(patch, { shellView: 'hidden', exploded: true });
-    if (s.mode === 'exterior') {
+    if (s.mode === 'exterior' || s.mode === 'world') {
       patch.shellView = 'solid';
       if (INSIDE_PARTS.has(s.selectedPart)) patch.selectedPart = null;
     }
@@ -349,9 +351,11 @@ function targetShift() {
     const scale = Math.min(1, Math.max(0.5, Math.min(bandH / (h * 0.8), bandW / (w * 0.8))));
     return { cx: (left + w) / 2 - w / 2, cy: (top + bottom) / 2 - h / 2, scale };
   }
-  // 使用者自己移動過發電實驗面板：照他放的位置，不再移動 3D 畫面
-  if (store.get().mode !== 'experiment' || !xpEl || xpEl.hidden || xpEl.dataset.moved) return { cx: 0, cy: 0, scale: 1 };
-  const r = xpEl.getBoundingClientRect();
+  // 發電實驗面板或世界風場面板擋住畫面時讓位；使用者自己移動過面板，就照他放的位置，不再移動 3D 畫面
+  const mode = store.get().mode;
+  const sideEl = mode === 'experiment' ? xpEl : mode === 'world' ? worldPanel.element : null;
+  if (!sideEl || sideEl.hidden || sideEl.dataset.moved) return { cx: 0, cy: 0, scale: 1 };
+  const r = sideEl.getBoundingClientRect();
   let left = 0, top = 0, bottom = h;
   if (r.width > w * 0.6) { // 下方面板（手機）
     bottom = r.top;

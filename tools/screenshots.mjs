@@ -104,10 +104,72 @@ async function experiment(page, { wind = 8, angle = 0, seconds = 40, view = 'exp
 }
 
 /** 檢查風機輪轂在面板沒擋住的地方 */
+/** 世界風場：實際點模式按鈕、下一個、地標、分類、看全世界；看過 3 個完成小任務；按鈕夠大、不出畫面 */
+async function worldCheck(page, tag, shot) {
+  const st = () => page.evaluate(() => {
+    const s = window.__lab.store.get();
+    const pins = [...document.querySelectorAll('.world-pin')];
+    const panel = document.querySelector('.world').getBoundingClientRect();
+    const head = document.querySelector('#ui .top').getBoundingClientRect();
+    return {
+      farm: s.worldFarm, filter: s.worldFilter, overview: s.worldOverview, seen: s.worldSeen.length,
+      title: document.querySelector('.world-card h3').textContent,
+      pins: pins.length, visiblePins: pins.filter((b) => !b.hidden).length,
+      // 看得到的地標中心點要點得到（沒有被「看全世界」等按鈕蓋住）
+      covered: pins.filter((b) => !b.hidden).filter((b) => {
+        const r = b.getBoundingClientRect();
+        const m = document.querySelector('.world-map').getBoundingClientRect();
+        const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        if (x < m.left || x > m.right || y < m.top || y > m.bottom) return false; // 地圖邊緣外的不算
+        const top = document.elementFromPoint(x, y);
+        return !b.contains(top) && !top?.closest('.world-pin'); // 地標之間互相重疊（地圖拉遠時）不算
+      }).map((b) => b.dataset.farm),
+      panelShown: !document.querySelector('.world').hidden && panel.height > 100,
+      belowHeader: innerWidth <= 720 || panel.top >= head.bottom - 1,
+      mission: s.missionsDone.includes('world-tour'),
+    };
+  });
+  await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, worldFarm: null, worldSeen: [], worldFilter: 'all', worldOverview: false, missionsDone: [] }));
+  await page.click('.modes [data-mode="world"]');
+  await page.waitForTimeout(900);
+  const a = await st();
+  await page.click('.world-nav .btn >> nth=1'); // 下一個
+  await page.waitForTimeout(800);
+  const b = await st();
+  // 點地圖上另一個看得到的地標
+  const other = await page.evaluate(() => [...document.querySelectorAll('.world-pin')].find((p) => !p.hidden && !p.classList.contains('active'))?.dataset.farm);
+  if (other) await page.click(`.world-pin[data-farm="${other}"]`);
+  await page.waitForTimeout(800);
+  const c = await st();
+  await page.click('.world-chip[data-cat="taiwan"]');
+  await page.waitForTimeout(800);
+  const d = await st();
+  if (shot) await shoot(page, shot);
+  await page.click('.world-zoom');
+  await page.waitForTimeout(900);
+  const e = await st();
+  page.evaluate(() => window.__lab.checkMissions());
+  await page.waitForTimeout(200);
+  const f = await st();
+  const small = await page.evaluate(() => [...document.querySelectorAll('.world button')]
+    .filter((x) => x.offsetParent !== null && !x.hidden)
+    .map((x) => ({ t: x.textContent.trim() || x.getAttribute('aria-label'), w: x.getBoundingClientRect().width, h: x.getBoundingClientRect().height }))
+    .filter((r) => r.w < 43.5 || r.h < 43.5)); // 地圖縮放時有小數誤差
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  const ok = a.panelShown && a.belowHeader && a.pins === 11 && a.farm && b.farm !== a.farm && b.title !== a.title
+    && (!other || c.farm === other) && d.filter === 'taiwan' && /台灣/.test(d.title) && d.visiblePins === 3 && !d.covered.length
+    && e.overview && e.visiblePins >= 3 && f.seen >= 3 && f.mission && !small.length && !overflow;
+  report.push({ name: `${tag}：世界風場（地標、翻頁、分類、看全世界、小任務）`, a, b, c, d, e, f, small, ok });
+  if (!ok) failures.push(`${tag}：世界風場 ${JSON.stringify({ a, b, c, d, e, f, small, overflow })}`);
+  await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', worldFilter: 'all', worldOverview: false }));
+}
+
 /** 拖曳視窗：真的用指標拖把手；位置要移動、記住（重新整理後還在）、不出畫面；按「歸位」回原位 */
 async function dragCheck(page, tag, { name, sel, open, dx, dy, shot }) {
   await page.evaluate(open);
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(300);
+  // 等視窗打開的動畫真的結束再量（軟體繪圖較慢時動畫會晚開始）
+  await page.waitForFunction((sel) => document.querySelector(sel).getAnimations().length === 0, sel, { timeout: 8000 });
   const rect = () => page.evaluate((sel) => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), vw: innerWidth, vh: innerHeight }; }, sel);
   const before = await rect();
   const h = await page.evaluate((sel) => { const r = document.querySelector(`${sel} .drag-grip`).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);
@@ -351,9 +413,10 @@ try {
     report.push({ name: '返回外觀', ...back, ok: backOk });
     if (!backOk) failures.push(`返回外觀後狀態不正確：${JSON.stringify(back)}`);
     await rotorOcclusionCheck(page, '桌面', '16c-focus');
+    await worldCheck(page, '桌面', '50-world-desktop-taiwan');
     await dragCheck(page, '桌面', { name: '零件介紹卡', sel: '.info', open: () => window.__lab.store.set({ mode: 'exterior', selectedPart: 'tower' }), dx: 420, dy: -200, shot: '16d-drag-info' });
     await dragCheck(page, '桌面', { name: '發電實驗面板', sel: '.xp', open: () => window.__lab.store.set({ selectedPart: null, mode: 'experiment' }), dx: 500, dy: 0 });
-    await dragCheck(page, '桌面', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); }, dx: 200, dy: -380 });
+    await dragCheck(page, '桌面', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); if (!window.__lab.store.get().guidePaused) window.__lab.guide.togglePause(); }, dx: 200, dy: -380 });
     await page.evaluate(() => { window.__lab.guide.stop(); window.__lab.store.set({ mode: 'exterior', selectedPart: null }); });
     // ---------- 點內部零件：自動拿掉外殼；關掉介紹卡恢復原狀 ----------
     {
@@ -582,9 +645,10 @@ try {
     await pose(page, 'default');
     await shoot(page, '07-mobile-390');
     await rotorOcclusionCheck(page, '手機', '07b-mobile-390-focus');
+    await worldCheck(page, '手機', '51-world-mobile-taiwan');
     await dragCheck(page, '手機', { name: '零件介紹卡', sel: '.info', open: () => window.__lab.store.set({ mode: 'exterior', selectedPart: 'tower' }), dx: 0, dy: -380, shot: '07c-mobile-390-drag-info' });
     await dragCheck(page, '手機', { name: '發電實驗面板', sel: '.xp', open: () => window.__lab.store.set({ selectedPart: null, mode: 'experiment' }), dx: 0, dy: -200 });
-    await dragCheck(page, '手機', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); }, dx: 0, dy: -300 });
+    await dragCheck(page, '手機', { name: '自動導覽字幕卡', sel: '.guide', open: () => { window.__lab.store.set({ mode: 'exterior' }); window.__lab.guide.start(0); if (!window.__lab.store.get().guidePaused) window.__lab.guide.togglePause(); }, dx: 0, dy: -300 });
     await page.evaluate(() => { window.__lab.guide.stop(); window.__lab.store.set({ mode: 'exterior', selectedPart: null }); });
     await pose(page, 'default', { part: 'blade' });
     await shoot(page, '08-mobile-390-select-blade');
