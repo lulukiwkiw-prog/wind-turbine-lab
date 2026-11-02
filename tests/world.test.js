@@ -9,11 +9,12 @@ import { quizFor } from '../src/learning/quiz.js';
 import { MODES, CURRENT_STAGE } from '../src/spec/turbineSpec.js';
 import { createStore } from '../src/state/store.js';
 
-test('世界風場資料：11 個風場、四個分類都有，台灣 3 個', () => {
-  assert.equal(WORLD_FARMS.length, 11);
+test('世界風場資料：9 個風場、四個分類都有，不介紹已經拆除的', () => {
+  assert.equal(WORLD_FARMS.length, 9);
+  for (const id of ['vindeby', 'penghu-1965']) assert.ok(!WORLD_FARMS.some((f) => f.id === id), `${id} 已拆除，不介紹`);
   assert.equal(new Set(WORLD_FARMS.map((f) => f.id)).size, WORLD_FARMS.length, 'id 不重複');
   const count = (c) => WORLD_FARMS.filter((f) => f.category === c).length;
-  assert.deepEqual(WORLD_CATEGORIES.map((c) => count(c.id)), [4, 2, 2, 3]);
+  assert.deepEqual(WORLD_CATEGORIES.map((c) => count(c.id)), [3, 2, 2, 2]);
 });
 
 test('世界風場資料：每筆都有文字、比一比、資料年份與 https 來源；座標與放大範圍合理', () => {
@@ -32,7 +33,7 @@ test('世界風場資料：每筆都有文字、比一比、資料年份與 http
   for (const f of WORLD_FARMS.filter((x) => x.category === 'taiwan')) {
     const [w, s, e, n] = DETAIL_LAND.taiwan.box;
     assert.ok(f.lon > w && f.lon < e && f.lat > s && f.lat < n, f.id);
-    // 共用中心放大時，三個地標都在畫面內（手機地圖寬高比約 0.48）
+    // 共用中心放大時，台灣的地標都在畫面內（手機地圖寬高比約 0.48）
     const half = { lon: f.zoom / 2, lat: (f.zoom * 0.48) / 2 };
     for (const g of WORLD_FARMS.filter((x) => x.category === 'taiwan')) {
       assert.ok(Math.abs(g.lon - f.center.lon) < half.lon && Math.abs(g.lat - f.center.lat) < half.lat, `${f.id} 看得到 ${g.id}`);
@@ -48,12 +49,10 @@ test('比一比的數字和網站風機一致（葉片約 43 公尺、單機 200
   assert.equal(10_000_000 / 2000, 5000);
   assert.match(by('north-sea-giants').compare, /1,800 倍/);
   assert.equal(3_600_000 / 2000, 1800);
-  assert.match(by('penghu-1965').compare, /40 倍/);
-  assert.equal(2000 / 50, 40);
   assert.match(by('tibet').compare, /3,952 公尺/);
 });
 
-test('在 Google 地圖看衛星圖：每個風場都有連結；已拆除的風場有提醒', () => {
+test('在 Google 地圖看衛星圖：每個風場都有連結', () => {
   for (const f of WORLD_FARMS) {
     assert.ok(Number.isInteger(f.mapZoom) && f.mapZoom >= 3 && f.mapZoom <= 18, `${f.id} mapZoom`);
     const u = new URL(googleMapsUrl(f));
@@ -62,7 +61,6 @@ test('在 Google 地圖看衛星圖：每個風場都有連結；已拆除的風
     assert.equal(u.searchParams.get('basemap'), 'satellite');
     assert.equal(u.searchParams.get('center'), `${f.lat},${f.lon}`);
   }
-  assert.match(WORLD_FARMS.find((f) => f.id === 'vindeby').mapNote, /拆除/);
 });
 
 test('照片（可省略）：有照片就要有作者、授權與原始頁面，檔案要存在；只接受自由授權', () => {
@@ -100,8 +98,8 @@ test('小任務「環遊世界」：看過 3 個風場才完成', () => {
   assert.ok(m);
   const ctx = (seen) => ({ state: { worldSeen: seen }, sim: {} });
   assert.equal(WORLD_TOUR_COUNT, 3);
-  assert.equal(m.check(ctx(['tibet', 'vindeby'])), false);
-  assert.equal(m.check(ctx(['tibet', 'vindeby', 'ross-island'])), true);
+  assert.equal(m.check(ctx(['tibet', 'jiuquan'])), false);
+  assert.equal(m.check(ctx(['tibet', 'jiuquan', 'ross-island'])), true);
 });
 
 test('考考你：3 題世界風場題目，答案與資料一致', () => {
@@ -111,7 +109,7 @@ test('考考你：3 題世界風場題目，答案與資料一致', () => {
   assert.equal(high.options[high.answer], '中國西藏');
   const float = find('海太深');
   assert.match(float.options[float.answer], /浮體/);
-  const first = find('台灣第一座風機');
-  assert.equal(first.options[first.answer], '澎湖');
-  assert.ok(WORLD_FARMS.find((f) => f.id === 'penghu-1965').place.includes('澎湖'));
+  const tw = find('海上風場，蓋在哪個縣');
+  assert.equal(tw.options[tw.answer], '苗栗');
+  assert.ok(WORLD_FARMS.find((f) => f.id === 'formosa-1').place.includes('苗栗'));
 });

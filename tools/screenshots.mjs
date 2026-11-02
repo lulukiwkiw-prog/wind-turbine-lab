@@ -119,8 +119,10 @@ async function worldCheck(page, tag, shot) {
       covered: pins.filter((b) => !b.hidden).filter((b) => {
         const r = b.getBoundingClientRect();
         const m = document.querySelector('.world-map').getBoundingClientRect();
+        const pnl = document.querySelector('.world').getBoundingClientRect();
         const x = r.left + r.width / 2, y = r.top + r.height / 2;
         if (x < m.left || x > m.right || y < m.top || y > m.bottom) return false; // 地圖邊緣外的不算
+        if (y < pnl.top || y > pnl.bottom) return false; // 面板捲動後不在畫面內的不算
         const top = document.elementFromPoint(x, y);
         return !b.contains(top) && !top?.closest('.world-pin'); // 地標之間互相重疊（地圖拉遠時）不算
       }).map((b) => b.dataset.farm),
@@ -157,9 +159,9 @@ async function worldCheck(page, tag, shot) {
     .map((x) => ({ t: x.textContent.trim() || x.getAttribute('aria-label'), w: x.getBoundingClientRect().width, h: x.getBoundingClientRect().height }))
     .filter((r) => r.w < 43.5 || r.h < 43.5)); // 地圖縮放時有小數誤差
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
-  const ok = a.panelShown && a.belowHeader && a.pins === 11 && a.farm && b.farm !== a.farm && b.title !== a.title
-    && (!other || c.farm === other) && d.filter === 'taiwan' && /台灣/.test(d.title) && d.visiblePins === 3 && !d.covered.length
-    && e.overview && e.visiblePins >= 3 && f.seen >= 3 && f.mission && a.mapLink && d.mapLink && !small.length && !overflow;
+  const ok = a.panelShown && a.belowHeader && a.pins === 9 && a.farm && b.farm !== a.farm && b.title !== a.title
+    && (!other || c.farm === other) && d.filter === 'taiwan' && /台灣/.test(d.title) && d.visiblePins === 2 && !d.covered.length
+    && e.overview && e.visiblePins === 2 && f.seen >= 3 && f.mission && a.mapLink && d.mapLink && !small.length && !overflow;
   report.push({ name: `${tag}：世界風場（地標、翻頁、分類、看全世界、小任務）`, a, b, c, d, e, f, small, ok });
   if (!ok) failures.push(`${tag}：世界風場 ${JSON.stringify({ a, b, c, d, e, f, small, overflow })}`);
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', worldFilter: 'all', worldOverview: false }));

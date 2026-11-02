@@ -1,9 +1,9 @@
-// 世界風場：給小朋友看的特別風場。每一筆都附資料來源與資料年份（asOf）。
+// 世界風場：給小朋友看的特別風場（只介紹現在還在運轉或測試中的）。每一筆都附資料來源與資料年份（asOf）。
 // 「世界第一」這類紀錄會變動，還在變動或有爭議的寫在 note，畫面上會顯示。
 // lat／lon：地圖上的位置（度，北緯、東經為正）；zoom：選到時地圖顯示的寬度（經度）；
 // mapZoom：「在 Google 地圖看」按鈕打開衛星圖時的縮放；mapNote：打開前的提醒（例如已拆除）。
 // photo（可省略）：自由授權照片 { file（public/world/ 底下）, alt, credit（作者）, license, licenseUrl, page（照片原始頁面）}。
-// center：放大時的地圖中心（沒寫就用風場本身）。台灣三處共用同一個中心，三個地標都看得到，也不會被按鈕擋住。
+// center：放大時的地圖中心（沒寫就用風場本身）。台灣兩處共用同一個中心，兩個地標都看得到，也不會被按鈕擋住。
 // 比一比（compare）的數字以本網站風機為準：葉片約 43 公尺、單機 2000 kW。
 
 const TAIWAN_CENTER = { lat: 23.75, lon: 120.0 };
@@ -62,20 +62,6 @@ export const WORLD_FARMS = [
     ],
   },
   {
-    id: 'vindeby', category: 'record', icon: '🏆',
-    title: '世界第一座海上風場', place: '丹麥・洛蘭島外海', year: '1991 年',
-    lat: 54.97, lon: 11.13, zoom: 30, mapZoom: 12,
-    mapNote: '這座風場已在 2017 年拆除，地圖上看不到風機了。',
-    headline: '海上風場從這裡開始',
-    text: '1991 年，丹麥在海上蓋了 11 座風機，證明風機也能在海上發電。它的地基參考了燈塔的做法。運轉 25 年後，在 2017 年拆除，零件也回收了。',
-    compare: '那時一台是 450 kW，現在最大的有 26 MW，大了 50 多倍！',
-    asOf: '2017',
-    sources: [
-      { title: 'Ørsted：世界第一座海上風場拆除', url: 'https://orsted.com/en/media/news/2017/09/worlds-first-offshore-wind-farm-now-dismantled' },
-      { title: 'Wikipedia：Vindeby', url: 'https://en.wikipedia.org/wiki/Vindeby_Offshore_Wind_Farm' },
-    ],
-  },
-  {
     id: 'hywind-scotland', category: 'offshore', icon: '🌊',
     title: '會漂在海上的風機', place: '英國蘇格蘭・彼得黑德外海', year: '2017 年',
     lat: 57.48, lon: -1.35, zoom: 30, mapZoom: 11,
@@ -129,19 +115,6 @@ export const WORLD_FARMS = [
       { title: '紐西蘭風能協會：Ross Island', url: 'https://windenergy.org.nz/ross-island-wind-farm' },
       { title: 'Antarctica NZ：新風機', url: 'https://www.antarcticanz.govt.nz/media/news/new-turbines-for-the-windiest-continent' },
       { title: 'Scott Base 風場更新', url: 'https://scottbaseredevelopment.govt.nz/wind-farm-upgrade' },
-    ],
-  },
-  {
-    id: 'penghu-1965', category: 'taiwan', icon: '🇹🇼',
-    title: '台灣第一座風機', place: '台灣澎湖・後寮', year: '1965 年',
-    lat: 23.66, lon: 119.6, zoom: 6, center: TAIWAN_CENTER, mapZoom: 11,
-    mapNote: '1965 年那一台已經不在了，可以找找看今天澎湖的風機。',
-    headline: '台灣風力發電的起點',
-    text: '1965 年，台電在澎湖後寮裝了一台 50 kW 的風機，接上電網，運轉了 8 年。澎湖冬天的東北季風很強，很適合風力發電。',
-    compare: '它是 50 kW，我們網站的風機是 2,000 kW，大了 40 倍！',
-    asOf: '2024',
-    sources: [
-      { title: '關鍵評論網：台灣風電的故事', url: 'https://www.thenewslens.com/article/257706' },
     ],
   },
   {
