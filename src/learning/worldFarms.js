@@ -2,7 +2,8 @@
 // 「世界第一」這類紀錄會變動，還在變動或有爭議的寫在 note，畫面上會顯示。
 // lat／lon：地圖上的位置（度，北緯、東經為正）；zoom：選到時地圖顯示的寬度（經度）；
 // mapZoom：「在 Google 地圖看」按鈕打開衛星圖時的縮放；mapNote：打開前的提醒（例如已拆除）。
-// photo（可省略）：自由授權照片 { file（public/world/ 底下）, alt, credit（作者）, license, licenseUrl, page（照片原始頁面）}。
+// photo（可省略）：維基共享資源上自由授權的照片 { file（public/world/ 底下）, alt, credit（作者）, license, licenseUrl, page（照片原始頁面）}。
+// 只放「這個風場本身」的照片，找不到就不放；台灣政府機關的照片用「政府網站資料開放宣告」（與 CC BY 4.0 相容，標示出處即可）。
 // center：放大時的地圖中心（沒寫就用風場本身）。台灣兩處共用同一個中心，兩個地標都看得到，也不會被按鈕擋住。
 // 比一比（compare）的數字以本網站風機為準：葉片約 43 公尺、單機 2000 kW。
 
@@ -40,6 +41,11 @@ export const WORLD_FARMS = [
     compare: '1,000 萬 kW 大約等於 5,000 台我們網站的風機（每台 2,000 kW）。',
     note: '「世界最大風場」的說法多半來自比較舊的資料，現在的排名很難確認。',
     asOf: '2024',
+    photo: {
+      file: 'jiuquan.jpg', alt: '戈壁沙漠上排成一長排的風機，旁邊有高壓電塔',
+      credit: 'Popolon（甘肅酒泉瓜州的風場，2013 年）', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      page: 'https://commons.wikimedia.org/wiki/File:Guazhou.champs_%C3%A9oliennes.jpg',
+    },
     sources: [
       { title: 'Guinness World Records', url: 'https://www.guinnessworldrecords.com/world-records/highest-capacity-wind-farm' },
       { title: 'China Daily（2024）', url: 'https://regional.chinadaily.com.cn/gansu/2024-10/12/c_1035006.htm' },
@@ -55,6 +61,11 @@ export const WORLD_FARMS = [
     compare: '360 萬 kW 是我們網站一台風機的 1,800 倍！',
     note: 'Dogger Bank 還在分期完工，部分工程延到 2027 年（資料至 2026 年）。',
     asOf: '2026',
+    photo: {
+      file: 'north-sea.jpg', alt: '從飛機上往下看，藍色大海上的幾座海上風機',
+      credit: 'dom fellowes（從飛機上看英國北海的海上風機）', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/',
+      page: 'https://commons.wikimedia.org/wiki/File:Hornsea_2_wind_farm_from_the_air.jpg',
+    },
     sources: [
       { title: 'Enerdata：Hornsea 2 全部運轉', url: 'https://www.enerdata.net/publications/daily-energy-news/orsteds-13-gw-hornsea-2-offshore-wind-farm-reaches-full-operation-uk.html' },
       { title: 'Equinor：Dogger Bank', url: 'https://www.equinor.com/en/energy/uk-wind' },
@@ -70,6 +81,11 @@ export const WORLD_FARMS = [
     text: '這裡的風機不是插在海底，而是站在像大浮標的浮體上，再用纜繩拉住。海太深、不能打樁的地方也能蓋。這裡有 5 座風機。',
     compare: '浮體下面很重，像不倒翁一樣，風再大也不會翻倒。',
     asOf: '2022',
+    photo: {
+      file: 'hywind-scotland.jpg', alt: '傍晚的海面上，兩座 Hywind 浮動式風機',
+      credit: 'Mike Pennington（2022 年，彼得黑德外海）', license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
+      page: 'https://commons.wikimedia.org/wiki/File:Hywind_Wind_Farm,_off_Peterhead_-_geograph.org.uk_-_7226685.jpg',
+    },
     sources: [
       { title: 'Equinor：Hywind Scotland 5 週年', url: 'https://www.equinor.com/news/hywind-5-years-world-first-floating-wind-farm' },
     ],
@@ -125,6 +141,11 @@ export const WORLD_FARMS = [
     text: '在苗栗竹南外海 2～6 公里，有 20 座 6 MW 的風機，2019 年底完工。一年大約發 4.8 億度電，可以給大約 11 萬戶家庭用。',
     compare: '一台 6 MW，是我們網站風機的 3 倍。',
     asOf: '2019',
+    photo: {
+      file: 'formosa-1.jpg', alt: '從苗栗海邊看出去，海上排成一排的海洋竹南風場風機',
+      credit: '苗栗縣政府（2019 年）', license: '政府網站資料開放宣告', licenseUrl: 'https://www.miaoli.gov.tw/cp.aspx?n=7687',
+      page: 'https://commons.wikimedia.org/wiki/File:%E6%B5%B7%E6%B4%8B%E7%AB%B9%E5%8D%97%E9%9B%A2%E5%B2%B8%E9%A2%A8%E5%8A%9B%E7%99%BC%E9%9B%BB%E5%A0%B4.jpg',
+    },
     sources: [
       { title: 'TechNews 科技新報', url: 'https://technews.tw/2019/05/19/offshore-wind-starting/' },
       { title: '台灣英文新聞', url: 'https://www.taiwannews.com.tw/zh/news/3705651' },
@@ -139,6 +160,11 @@ export const WORLD_FARMS = [
     compare: '最好的 20 個地方裡，台灣海峽就占了 16 個！',
     note: '這份研究是 2014 年發表的，之後沒有找到更新的排名。',
     asOf: '2014',
+    photo: {
+      file: 'taipower-changhua.jpg', alt: '彰化外海的台電離岸風場：近處一座大風機，遠處海上還有好多座',
+      credit: '台灣電力公司（台電離岸風場第一期，彰化外海，2021 年）', license: '政府網站資料開放宣告', licenseUrl: 'https://www.taipower.com.tw/tc/page.aspx?mid=70',
+      page: 'https://commons.wikimedia.org/wiki/File:%E5%8F%B0%E9%9B%BB%E9%9B%A2%E5%B2%B8%E9%A2%A8%E5%8A%9B%E7%99%BC%E9%9B%BB%E5%A0%B4_%E7%AC%AC%E4%B8%80%E6%9C%9F.jpg',
+    },
     sources: [
       { title: 'TechNews 科技新報', url: 'https://technews.tw/2018/07/09/taiwan-develop-offshore-wind-power/' },
     ],

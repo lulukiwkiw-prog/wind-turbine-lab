@@ -67,10 +67,12 @@ test('照片（可省略）：有照片就要有作者、授權與原始頁面�
   for (const f of WORLD_FARMS.filter((x) => x.photo)) {
     const p = f.photo;
     for (const k of ['file', 'alt', 'credit', 'license', 'licenseUrl', 'page']) assert.ok(p[k], `${f.id}.photo.${k}`);
-    assert.match(p.license, /^(CC BY(-SA)? [0-9.]+|CC0|Public domain|公有領域)/, `${f.id} 授權`);
+    assert.match(p.license, /^(CC BY(-SA)? [0-9.]+|CC0|Public domain|公有領域|政府網站資料開放宣告)/, `${f.id} 授權`);
     assert.match(p.page, /^https:\/\/commons\.wikimedia\.org\//);
     assert.ok(existsSync(new URL(`../public/world/${p.file}`, import.meta.url)), `${f.id} 照片檔`);
+    assert.match(p.licenseUrl, /^https:\/\//);
   }
+  assert.equal(WORLD_FARMS.filter((x) => x.photo).length, 5, '目前有照片的風場');
 });
 
 test('地圖資料：世界與放大區域的陸地路徑都存在', () => {
