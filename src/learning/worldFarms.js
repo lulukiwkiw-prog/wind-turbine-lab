@@ -1,8 +1,7 @@
 // 世界風場：給小朋友看的特別風場（只介紹現在還在運轉或測試中的）。每一筆都附資料來源與資料年份（asOf）。
 // 「世界第一」這類紀錄會變動，還在變動或有爭議的寫在 note，畫面上會顯示。
 // lat／lon：地圖上的位置（度，北緯、東經為正）；zoom：選到時地圖顯示的寬度（經度）；
-// mapZoom：「在 Google 地圖看」按鈕打開衛星圖時的縮放；mapNote：打開前的提醒。
-// site：查得到可靠位置的風場（Google 地圖會放紅色大頭針）；view：只知道大約位置時，衛星圖改看這裡（不放大頭針）。
+// more：「認識更多」按鈕連到的介紹網站 { title, url }：官方網站優先，沒有官網才用新聞報導。
 // photo（可省略）：維基共享資源上自由授權的照片 { file（public/world/ 底下）, alt, credit（作者）, license, licenseUrl, page（照片原始頁面）}。
 // 只放「這個風場本身」的照片，找不到就不放；台灣政府機關的照片用「政府網站資料開放宣告」（與 CC BY 4.0 相容，標示出處即可）。
 // center：放大時的地圖中心（沒寫就用風場本身）。台灣兩處共用同一個中心，兩個地標都看得到，也不會被按鈕擋住。
@@ -21,13 +20,13 @@ export const WORLD_FARMS = [
   {
     id: 'biggest-turbine', category: 'record', icon: '🏆',
     title: '世界最大的風機', place: '中國山東・東營測試場', year: '2025 年',
-    lat: 37.6, lon: 118.9, zoom: 70, mapZoom: 9,
-    mapNote: '測試場的確切位置沒有公開，只能打開東營一帶（沒有大頭針）。這台風機 2025 年才裝好，衛星照片可能是更早拍的，找不到是正常的。',
+    lat: 37.6, lon: 118.9, zoom: 70,
     headline: '一台就有 26 MW！',
     text: '2025 年，中國在山東的測試場裝好一台 26 MW 的海上風機，是目前最大的一台。它的葉輪直徑 310 公尺，一片葉片就有 153 公尺長。',
     compare: '我們網站的葉片大約 43 公尺，它的葉片大約是 3.5 倍長！',
     note: '它是測試機，還不在一般的商業風場裡。',
     asOf: '2025',
+    more: { title: '新華網：26 MW 風機開始發電（簡體中文）', url: 'https://www.news.cn/politics/20251031/5621d06b121d414e9fe0f7da4de286b3/c.html' },
     sources: [
       { title: 'offshorewind.biz（2026）', url: 'https://www.offshorewind.biz/2026/01/01/offshore-wind-turbines-in-2025-china-continues-leading-in-single-unit-capacity-vestass-15-mw-turbine-installed-at-offshore-wind-farms/' },
       { title: 'Recharge', url: 'https://www.rechargenews.com/technology/worlds-most-powerful-wind-turbine-installed-in-china/2-1-1864616' },
@@ -36,9 +35,7 @@ export const WORLD_FARMS = [
   {
     id: 'jiuquan', category: 'record', icon: '🏜️',
     title: '甘肅酒泉風電基地', place: '中國甘肅・戈壁沙漠', year: '2009 年開工',
-    lat: 40.5, lon: 96.0, zoom: 70, mapZoom: 12,
-    view: { lat: 40.59, lon: 95.89 }, // 瓜州北大橋一帶（thewindpower：Beidaqiao East，大約位置）
-    mapNote: '這是瓜州一帶的大約位置（沒有大頭針）。放大以後，沙漠上一排排的白色小點就是風機。',
+    lat: 40.5, lon: 96.0, zoom: 70,
     headline: '沙漠裡的超大風場',
     text: '在戈壁沙漠上，數千座風機排成一大片。報導說這裡已經有大約 1,000 萬 kW，目標是 2,000 萬 kW。',
     compare: '1,000 萬 kW 大約等於 5,000 台我們網站的風機（每台 2,000 kW）。',
@@ -49,6 +46,7 @@ export const WORLD_FARMS = [
       credit: 'Popolon（甘肅酒泉瓜州的風場，2013 年）', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
       page: 'https://commons.wikimedia.org/wiki/File:Guazhou.champs_%C3%A9oliennes.jpg',
     },
+    more: { title: '新華網：甘肅的「陸上三峽」（簡體中文）', url: 'https://www.news.cn/politics/20250120/40c49906c3dd45f0b146ae63ccb3008b/c.html' },
     sources: [
       { title: 'Guinness World Records', url: 'https://www.guinnessworldrecords.com/world-records/highest-capacity-wind-farm' },
       { title: 'China Daily（2024）', url: 'https://regional.chinadaily.com.cn/gansu/2024-10/12/c_1035006.htm' },
@@ -57,9 +55,7 @@ export const WORLD_FARMS = [
   {
     id: 'north-sea-giants', category: 'record', icon: '🏆',
     title: '英國北海的巨型海上風場', place: '英國外海・北海', year: '2022 年起',
-    lat: 54.4, lon: 1.9, zoom: 30, mapZoom: 11,
-    site: { lat: 53.94, lon: 1.688 }, // Hornsea 2（marinelink 風場資料）
-    mapNote: '紅色大頭針是 Hornsea 2。風場離岸 89 公里，衛星照片常常只拍到藍色海面。',
+    lat: 54.4, lon: 1.9, zoom: 30,
     headline: '海上風場的大巨人',
     text: 'Hornsea 2 在 2022 年全部啟用，大約 130 萬 kW。附近的 Dogger Bank 完工後會有 277 座風機、360 萬 kW，可以供應大約 600 萬戶英國家庭用電。',
     compare: '360 萬 kW 是我們網站一台風機的 1,800 倍！',
@@ -70,6 +66,7 @@ export const WORLD_FARMS = [
       credit: 'dom fellowes（從飛機上看英國北海的海上風機）', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/',
       page: 'https://commons.wikimedia.org/wiki/File:Hornsea_2_wind_farm_from_the_air.jpg',
     },
+    more: { title: 'Hornsea 2 官方網站（英文）', url: 'https://hornseaprojects.co.uk/Hornsea-Project-Two' },
     sources: [
       { title: 'Enerdata：Hornsea 2 全部運轉', url: 'https://www.enerdata.net/publications/daily-energy-news/orsteds-13-gw-hornsea-2-offshore-wind-farm-reaches-full-operation-uk.html' },
       { title: 'Equinor：Dogger Bank', url: 'https://www.equinor.com/en/energy/uk-wind' },
@@ -79,9 +76,7 @@ export const WORLD_FARMS = [
   {
     id: 'hywind-scotland', category: 'offshore', icon: '🌊',
     title: '會漂在海上的風機', place: '英國蘇格蘭・彼得黑德外海', year: '2017 年',
-    lat: 57.48, lon: -1.35, zoom: 30, mapZoom: 14,
-    site: { lat: 57.483, lon: -1.35 }, // Wikipedia：Hywind Scotland
-    mapNote: '紅色大頭針就是風場。在離岸的海上，衛星照片可能只拍到藍色海面。',
+    lat: 57.48, lon: -1.35, zoom: 30,
     headline: '世界第一座浮動式風場',
     text: '這裡的風機不是插在海底，而是站在像大浮標的浮體上，再用纜繩拉住。海太深、不能打樁的地方也能蓋。這裡有 5 座風機。',
     compare: '浮體下面很重，像不倒翁一樣，風再大也不會翻倒。',
@@ -91,6 +86,7 @@ export const WORLD_FARMS = [
       credit: 'Mike Pennington（2022 年，彼得黑德外海）', license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
       page: 'https://commons.wikimedia.org/wiki/File:Hywind_Wind_Farm,_off_Peterhead_-_geograph.org.uk_-_7226685.jpg',
     },
+    more: { title: 'Equinor 官方網站：Hywind Scotland（英文）', url: 'https://www.equinor.com/energy/hywind-scotland' },
     sources: [
       { title: 'Equinor：Hywind Scotland 5 週年', url: 'https://www.equinor.com/news/hywind-5-years-world-first-floating-wind-farm' },
     ],
@@ -98,13 +94,12 @@ export const WORLD_FARMS = [
   {
     id: 'hywind-tampen', category: 'offshore', icon: '🛢️',
     title: '幫海上油井供電的風場', place: '挪威・北海', year: '2022 年',
-    lat: 61.3, lon: 2.25, zoom: 30, mapZoom: 13,
-    site: { lat: 61.328, lon: 2.269 }, // marinelink、helis 風場資料
-    mapNote: '紅色大頭針就是風場。它在離岸大約 140 公里的海上，衛星照片多半只拍到藍色海面。',
+    lat: 61.3, lon: 2.25, zoom: 30,
     headline: '在大海中間的浮動風場',
     text: '在離岸大約 140 公里的北海，有 11 座浮動風機，一共 88 MW。它供應附近幾座海上油氣平台大約 35% 的用電，平台就能少燒一些天然氣。',
     compare: '離岸 140 公里，差不多是從台北到台中的直線距離！',
     asOf: '2023',
+    more: { title: 'Equinor 官方網站：Hywind Tampen（英文）', url: 'https://www.equinor.com/en/what-we-do/hywind-tampen.html' },
     sources: [
       { title: 'Wikipedia：Hywind Tampen', url: 'https://en.wikipedia.org/wiki/Hywind_Tampen' },
       { title: 'POWER Magazine', url: 'https://powermag.com/first-floating-offshore-wind-farm-to-power-oil-and-gas-platforms-kicks-off' },
@@ -113,13 +108,13 @@ export const WORLD_FARMS = [
   {
     id: 'tibet', category: 'extreme', icon: '🏔️',
     title: '比玉山還高的風場', place: '中國西藏・昌都八宿等地', year: '近幾年',
-    lat: 30.05, lon: 96.9, zoom: 70, mapZoom: 9,
-    mapNote: '風場在八宿縣的邦達鎮一帶，確切位置沒有公開（沒有大頭針），要自己放大找。',
+    lat: 30.05, lon: 96.9, zoom: 70,
     headline: '世界屋脊上的風機',
     text: '西藏有好幾座風場蓋在海拔 5,000 公尺以上。那裡空氣很稀薄、又很冷，風機要特別設計。昌都八宿的風場最常被說是「世界最高」，最高點接近 5,200 公尺。',
     compare: '玉山是 3,952 公尺，這裡比玉山還高 1,000 多公尺！',
     note: '「世界最高」有好幾座在爭，要看是算平均高度，還是最高的一座風機。',
     asOf: '2024',
+    more: { title: '中國日報：大唐八宿風電站投產（簡體中文）', url: 'https://cn.chinadaily.com.cn/a/202411/01/WS67247dd3a310b59111da12ec.html' },
     sources: [
       { title: 'Sungrow：海拔 5,200 公尺的風場', url: 'https://www.sungrowpower.com/au/en/cases/how-sungrow-energizes-the-worlds-highest-wind-farm-at-5200-meters' },
       { title: 'Recharge：西藏 5,100 公尺風場', url: 'https://www.rechargenews.com/wind/at-5-100-metres-is-this-tibet-wind-farm-the-highest-in-the-world-/2-1-1457917' },
@@ -128,13 +123,12 @@ export const WORLD_FARMS = [
   {
     id: 'ross-island', category: 'extreme', icon: '🐧',
     title: '在南極發電的風機', place: '南極・羅斯島', year: '2010 年',
-    lat: -77.85, lon: 166.7, zoom: 70, mapZoom: 13,
-    view: { lat: -77.835, lon: 166.70 }, // Crater Hill 大約位置（Twin Crater 東邊 0.8 公里）
-    mapNote: '風機在麥克默多站和史考特基地中間的火山丘（Crater Hill）上，這是大約位置（沒有大頭針）。南極的衛星照片比較模糊。',
+    lat: -77.85, lon: 166.7, zoom: 70,
     headline: '世界最南邊的風場之一',
     text: '南極的羅斯島上有風機，同時供電給紐西蘭的史考特基地和美國的麥克默多站。兩個基地用的電規格不一樣，還要轉換才能一起用。現在正在換新風機，目標是新基地 90% 以上用再生能源。',
     compare: '新風機只能等 11 月到 3 月南極的夏天，冰比較好走時才運得進去。',
     asOf: '2025',
+    more: { title: 'Meridian Energy 官方網站：Ross Island（英文）', url: 'https://www.meridianenergy.co.nz/power-stations/wind/ross-island' },
     sources: [
       { title: '紐西蘭風能協會：Ross Island', url: 'https://windenergy.org.nz/ross-island-wind-farm' },
       { title: 'Antarctica NZ：新風機', url: 'https://www.antarcticanz.govt.nz/media/news/new-turbines-for-the-windiest-continent' },
@@ -144,9 +138,7 @@ export const WORLD_FARMS = [
   {
     id: 'formosa-1', category: 'taiwan', icon: '🇹🇼',
     title: '台灣第一座商業海上風場', place: '台灣苗栗・竹南外海', year: '2019 年',
-    lat: 24.72, lon: 120.83, zoom: 6, center: TAIWAN_CENTER, mapZoom: 13,
-    mapNote: '紅色大頭針就是風場，放大一點可以看到海上的白色風機。',
-    site: { lat: 24.70, lon: 120.813 }, // Wikipedia、4C Offshore
+    lat: 24.72, lon: 120.83, zoom: 6, center: TAIWAN_CENTER,
     headline: '海洋風電（Formosa 1）',
     text: '在苗栗竹南外海 2～6 公里，有 20 座 6 MW 的風機，2019 年底完工。一年大約發 4.8 億度電，可以給大約 11 萬戶家庭用。',
     compare: '一台 6 MW，是我們網站風機的 3 倍。',
@@ -156,6 +148,7 @@ export const WORLD_FARMS = [
       credit: '苗栗縣政府（2019 年）', license: '政府網站資料開放宣告', licenseUrl: 'https://www.miaoli.gov.tw/cp.aspx?n=7687',
       page: 'https://commons.wikimedia.org/wiki/File:%E6%B5%B7%E6%B4%8B%E7%AB%B9%E5%8D%97%E9%9B%A2%E5%B2%B8%E9%A2%A8%E5%8A%9B%E7%99%BC%E9%9B%BB%E5%A0%B4.jpg',
     },
+    more: { title: '海洋風電官方網站（英文）', url: 'https://formosa1windpower.com/en' },
     sources: [
       { title: 'TechNews 科技新報', url: 'https://technews.tw/2019/05/19/offshore-wind-starting/' },
       { title: '台灣英文新聞', url: 'https://www.taiwannews.com.tw/zh/news/3705651' },
@@ -164,9 +157,7 @@ export const WORLD_FARMS = [
   {
     id: 'taiwan-strait', category: 'taiwan', icon: '🇹🇼',
     title: '台灣海峽的好風', place: '台灣海峽・彰化外海一帶', year: '2014 年研究',
-    lat: 24.1, lon: 120.05, zoom: 6, center: TAIWAN_CENTER, mapZoom: 13,
-    mapNote: '紅色大頭針是照片裡的台電離岸風場（彰化芳苑外海）。',
-    site: { lat: 23.987, lon: 120.242 }, // 台電離岸風場第一期（marinelink）
+    lat: 24.1, lon: 120.05, zoom: 6, center: TAIWAN_CENTER,
     headline: '世界頂尖的風',
     text: '國際顧問公司 4C Offshore 在 2014 年的研究說，全世界風況最好的 20 處海上風場，有 16 處在台灣海峽。冬天的東北季風吹過窄窄的海峽，風又強又穩。',
     compare: '最好的 20 個地方裡，台灣海峽就占了 16 個！',
@@ -177,6 +168,7 @@ export const WORLD_FARMS = [
       credit: '台灣電力公司（台電離岸風場第一期，彰化外海，2021 年）', license: '政府網站資料開放宣告', licenseUrl: 'https://www.taipower.com.tw/tc/page.aspx?mid=70',
       page: 'https://commons.wikimedia.org/wiki/File:%E5%8F%B0%E9%9B%BB%E9%9B%A2%E5%B2%B8%E9%A2%A8%E5%8A%9B%E7%99%BC%E9%9B%BB%E5%A0%B4_%E7%AC%AC%E4%B8%80%E6%9C%9F.jpg',
     },
+    more: { title: 'TechNews 科技新報：台灣海峽的好風', url: 'https://technews.tw/2018/07/09/taiwan-develop-offshore-wind-power/' },
     sources: [
       { title: 'TechNews 科技新報', url: 'https://technews.tw/2018/07/09/taiwan-develop-offshore-wind-power/' },
     ],
@@ -185,19 +177,6 @@ export const WORLD_FARMS = [
 
 /** 地圖座標：x = 經度 + 180、y = 90 − 緯度（與 worldMap.js 相同） */
 export const toMapXY = (lat, lon) => ({ x: lon + 180, y: 90 - lat });
-
-/**
- * 用 Google 地圖打開衛星圖（只是連結，網站本身不載入 Google 的任何東西）。
- * 有可靠位置（site）就放紅色大頭針；只有大約位置就只打開那一帶，不放大頭針，免得指錯地方。
- */
-export function googleMapsUrl(f) {
-  if (f.site) {
-    const { lat, lon } = f.site;
-    return `https://www.google.com/maps/place/${lat},${lon}/@${lat},${lon},${f.mapZoom}z/data=!3m1!1e3`;
-  }
-  const c = f.view ?? f;
-  return `https://www.google.com/maps/@?api=1&map_action=map&center=${c.lat},${c.lon}&zoom=${f.mapZoom}&basemap=satellite`;
-}
 
 /** 小任務「環遊世界」需要看幾個風場 */
 export const WORLD_TOUR_COUNT = 3;

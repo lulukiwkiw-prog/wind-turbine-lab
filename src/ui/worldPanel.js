@@ -1,6 +1,6 @@
 // 「世界風場」玩法：世界地圖＋說明卡。選到的風場在地圖上放大顯示，地標可以點，說明卡可以翻頁、唸出來。
 // 狀態（選到哪一個、看過哪些、分類、是否看全世界）都在集中 store；這裡只負責畫面。
-import { WORLD_FARMS, WORLD_CATEGORIES, toMapXY, googleMapsUrl } from '../learning/worldFarms.js';
+import { WORLD_FARMS, WORLD_CATEGORIES, toMapXY } from '../learning/worldFarms.js';
 import { WORLD_LAND, DETAIL_LAND } from '../data/worldMap.js';
 import { sentences } from '../learning/guide.js';
 import { ICONS } from './icons.js';
@@ -100,9 +100,9 @@ export function createWorldPanel({ root, store, speech }) {
   const text = el('p', { class: 'world-text' });
   const compare = el('p', { class: 'world-compare' });
   const note = el('p', { class: 'world-note' });
-  // 在 Google 地圖看衛星圖：只是連結（開新視窗），網站本身不載入 Google 的東西
-  const mapLink = el('a', { class: 'btn world-maplink', target: '_blank', rel: 'noopener' }, '🛰️ 在 Google 地圖看衛星圖');
-  const mapNote = el('p', { class: 'world-mapnote' });
+  // 認識更多：連到風場的介紹網站（官方網站優先，開新視窗）
+  const moreLink = el('a', { class: 'btn world-more', target: '_blank', rel: 'noopener' }, '🔗 認識更多');
+  const moreNote = el('p', { class: 'world-morenote' });
   const src = el('details', { class: 'world-src' });
   const srcSum = el('summary');
   const srcList = el('ul');
@@ -122,7 +122,7 @@ export function createWorldPanel({ root, store, speech }) {
   prevBtn.addEventListener('click', () => step(-1));
   nextBtn.addEventListener('click', () => step(1));
   nav.append(prevBtn, pos, nextBtn);
-  card.append(cardHead, photo, headline, text, compare, note, mapLink, mapNote, src, nav);
+  card.append(cardHead, photo, headline, text, compare, note, moreLink, moreNote, src, nav);
 
   panel.append(head, chips, map, card);
   root.append(panel);
@@ -225,8 +225,8 @@ export function createWorldPanel({ root, store, speech }) {
         el('a', { href: f.photo.page, target: '_blank', rel: 'noopener' }, '維基共享資源'),
       );
     }
-    mapLink.href = googleMapsUrl(f);
-    mapNote.textContent = f.mapNote ? `${f.mapNote}（會開新視窗）` : '會開新視窗，可以自己放大找風機。';
+    moreLink.href = f.more.url;
+    moreNote.textContent = `${f.more.title}（會開新視窗）`;
     srcSum.textContent = `資料來源（資料至 ${f.asOf} 年）`;
     srcList.replaceChildren(...f.sources.map((x) => {
       const li = el('li');

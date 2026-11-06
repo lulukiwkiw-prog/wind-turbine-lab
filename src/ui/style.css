@@ -290,8 +290,8 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .world-photo.zoomed .world-photo-btn img { height: auto; max-height: 60vh; object-fit: contain; background: #0d2740; }
 .world-photo-credit { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
 .world-photo-credit a { color: var(--accent); }
-.btn.world-maplink { align-self: flex-start; text-decoration: none; font-size: 16px; background: var(--accent-soft); box-shadow: none; }
-.world-mapnote { margin: -2px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
+.btn.world-more { align-self: flex-start; text-decoration: none; font-size: 16px; background: var(--accent-soft); box-shadow: none; }
+.world-morenote { margin: -2px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
 .world-note { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 .world-src { font-size: 13px; color: var(--ink-soft); }
 .world-src summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }

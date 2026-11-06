@@ -1,7 +1,7 @@
 // 世界風場：資料要完整（每筆都有來源與年份）、座標合理、分類齊全；小任務與考考你連動正確
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { WORLD_FARMS, WORLD_CATEGORIES, WORLD_TOUR_COUNT, toMapXY, googleMapsUrl } from '../src/learning/worldFarms.js';
+import { WORLD_FARMS, WORLD_CATEGORIES, WORLD_TOUR_COUNT, toMapXY } from '../src/learning/worldFarms.js';
 import { existsSync } from 'node:fs';
 import { WORLD_LAND, DETAIL_LAND } from '../src/data/worldMap.js';
 import { missionsFor } from '../src/learning/missions.js';
@@ -52,25 +52,13 @@ test('比一比的數字和網站風機一致（葉片約 43 公尺、單機 200
   assert.match(by('tibet').compare, /3,952 公尺/);
 });
 
-test('在 Google 地圖看衛星圖：每個風場都有連結；有可靠位置才放大頭針，其他的要說明', () => {
+test('認識更多：每個風場都有 https 介紹網站；不再連到 Google 地圖', () => {
   for (const f of WORLD_FARMS) {
-    assert.ok(Number.isInteger(f.mapZoom) && f.mapZoom >= 3 && f.mapZoom <= 18, `${f.id} mapZoom`);
-    assert.ok(f.mapNote, `${f.id} 要有打開前的提醒`);
-    const u = new URL(googleMapsUrl(f));
-    assert.equal(u.origin, 'https://www.google.com');
-    if (f.site) {
-      const { lat, lon } = f.site;
-      assert.ok(Math.abs(lat - f.lat) < 1 && Math.abs(lon - f.lon) < 1, `${f.id} 大頭針在風場附近`);
-      assert.equal(decodeURIComponent(u.pathname), `/maps/place/${lat},${lon}/@${lat},${lon},${f.mapZoom}z/data=!3m1!1e3`);
-      assert.match(f.mapNote, /大頭針/);
-    } else {
-      const c = f.view ?? f;
-      assert.equal(u.searchParams.get('basemap'), 'satellite');
-      assert.equal(u.searchParams.get('center'), `${c.lat},${c.lon}`);
-      assert.match(f.mapNote, /沒有大頭針/, `${f.id} 要說明只是大約位置`);
-    }
+    assert.ok(f.more?.title, `${f.id}.more.title`);
+    assert.match(f.more.url, /^https:\/\//, `${f.id} 介紹網站`);
+    assert.ok(!f.more.url.includes('google.com/maps'));
+    for (const k of ['mapZoom', 'mapNote', 'site', 'view']) assert.equal(f[k], undefined, `${f.id}.${k} 已經不用`);
   }
-  assert.ok(WORLD_FARMS.filter((f) => f.site).length >= 5);
 });
 
 test('照片（可省略）：有照片就要有作者、授權與原始頁面，檔案要存在；只接受自由授權', () => {
