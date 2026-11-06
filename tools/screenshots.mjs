@@ -129,7 +129,7 @@ async function worldCheck(page, tag, shot) {
       panelShown: !document.querySelector('.world').hidden && panel.height > 100,
       belowHeader: innerWidth <= 720 || panel.top >= head.bottom - 1,
       mission: s.missionsDone.includes('world-tour'),
-      mapLink: (() => { const a = document.querySelector('.world-maplink'); return a && a.offsetParent !== null && a.target === '_blank' && (a.href.includes('basemap=satellite') || a.href.includes('!3m1!1e3')); })(),
+      moreLink: (() => { const a = document.querySelector('.world-more'); return a && a.offsetParent !== null && a.target === '_blank' && a.href.startsWith('https://') && !a.href.includes('google.com/maps'); })(),
     };
   });
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, worldFarm: null, worldSeen: [], worldFilter: 'all', worldOverview: false, missionsDone: [] }));
@@ -161,7 +161,7 @@ async function worldCheck(page, tag, shot) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   const ok = a.panelShown && a.belowHeader && a.pins === 9 && a.farm && b.farm !== a.farm && b.title !== a.title
     && (!other || c.farm === other) && d.filter === 'taiwan' && /台灣/.test(d.title) && d.visiblePins === 2 && !d.covered.length
-    && e.overview && e.visiblePins === 2 && f.seen >= 3 && f.mission && a.mapLink && d.mapLink && !small.length && !overflow;
+    && e.overview && e.visiblePins === 2 && f.seen >= 3 && f.mission && a.moreLink && d.moreLink && !small.length && !overflow;
   report.push({ name: `${tag}：世界風場（地標、翻頁、分類、看全世界、小任務）`, a, b, c, d, e, f, small, ok });
   if (!ok) failures.push(`${tag}：世界風場 ${JSON.stringify({ a, b, c, d, e, f, small, overflow })}`);
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', worldFilter: 'all', worldOverview: false }));
