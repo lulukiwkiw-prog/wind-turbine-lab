@@ -129,7 +129,7 @@ async function worldCheck(page, tag, shot) {
       panelShown: !document.querySelector('.world').hidden && panel.height > 100,
       belowHeader: innerWidth <= 720 || panel.top >= head.bottom - 1,
       mission: s.missionsDone.includes('world-tour'),
-      mapLink: (() => { const a = document.querySelector('.world-maplink'); return a && a.offsetParent !== null && a.target === '_blank' && a.href.includes('basemap=satellite'); })(),
+      mapLink: (() => { const a = document.querySelector('.world-maplink'); return a && a.offsetParent !== null && a.target === '_blank' && (a.href.includes('basemap=satellite') || a.href.includes('!3m1!1e3')); })(),
     };
   });
   await page.evaluate(() => window.__lab.store.set({ mode: 'exterior', selectedPart: null, openPanel: null, worldFarm: null, worldSeen: [], worldFilter: 'all', worldOverview: false, missionsDone: [] }));

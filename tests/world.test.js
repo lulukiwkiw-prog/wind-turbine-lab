@@ -52,15 +52,25 @@ test('比一比的數字和網站風機一致（葉片約 43 公尺、單機 200
   assert.match(by('tibet').compare, /3,952 公尺/);
 });
 
-test('在 Google 地圖看衛星圖：每個風場都有連結', () => {
+test('在 Google 地圖看衛星圖：每個風場都有連結；有可靠位置才放大頭針，其他的要說明', () => {
   for (const f of WORLD_FARMS) {
     assert.ok(Number.isInteger(f.mapZoom) && f.mapZoom >= 3 && f.mapZoom <= 18, `${f.id} mapZoom`);
+    assert.ok(f.mapNote, `${f.id} 要有打開前的提醒`);
     const u = new URL(googleMapsUrl(f));
     assert.equal(u.origin, 'https://www.google.com');
-    assert.equal(u.searchParams.get('api'), '1');
-    assert.equal(u.searchParams.get('basemap'), 'satellite');
-    assert.equal(u.searchParams.get('center'), `${f.lat},${f.lon}`);
+    if (f.site) {
+      const { lat, lon } = f.site;
+      assert.ok(Math.abs(lat - f.lat) < 1 && Math.abs(lon - f.lon) < 1, `${f.id} 大頭針在風場附近`);
+      assert.equal(decodeURIComponent(u.pathname), `/maps/place/${lat},${lon}/@${lat},${lon},${f.mapZoom}z/data=!3m1!1e3`);
+      assert.match(f.mapNote, /大頭針/);
+    } else {
+      const c = f.view ?? f;
+      assert.equal(u.searchParams.get('basemap'), 'satellite');
+      assert.equal(u.searchParams.get('center'), `${c.lat},${c.lon}`);
+      assert.match(f.mapNote, /沒有大頭針/, `${f.id} 要說明只是大約位置`);
+    }
   }
+  assert.ok(WORLD_FARMS.filter((f) => f.site).length >= 5);
 });
 
 test('照片（可省略）：有照片就要有作者、授權與原始頁面，檔案要存在；只接受自由授權', () => {

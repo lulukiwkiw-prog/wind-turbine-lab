@@ -291,7 +291,7 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .world-photo-credit { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
 .world-photo-credit a { color: var(--accent); }
 .btn.world-maplink { align-self: flex-start; text-decoration: none; font-size: 16px; background: var(--accent-soft); box-shadow: none; }
-.world-mapnote { margin: -2px 0 0; font-size: 12px; color: var(--ink-soft); }
+.world-mapnote { margin: -2px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
 .world-note { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 .world-src { font-size: 13px; color: var(--ink-soft); }
 .world-src summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }
@@ -301,6 +301,22 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .world-nav .btn { font-size: 15px; gap: 4px; }
 .world-nav .btn svg { width: 20px; height: 20px; }
 .world-pos { font-size: 14px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+/* 桌面：視窗蓋住後面的風機，左邊大地圖、右邊說明卡（說明卡自己捲動；右側工具列留著） */
+@media (min-width: 721px) {
+  .world {
+    right: 96px; width: auto; overflow: hidden;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-areas: "handle handle" "head card" "chips card" "map card";
+    column-gap: 16px;
+  }
+  .world > .drag-handle { grid-area: handle; }
+  .world-head { grid-area: head; }
+  .world-chips { grid-area: chips; }
+  .world-map { grid-area: map; height: auto; min-height: 220px; }
+  .world-card { grid-area: card; overflow-y: auto; min-height: 0; padding-right: 4px; }
+  .world-photo-btn img { height: 220px; }
+}
 #ui.mode-world .hint { display: none; }
 #ui.mode-world .info { left: auto; right: 96px; }
 /* 模式列在手機上可以左右滑：還有按鈕藏在邊緣外時淡出提示 */
