@@ -2,16 +2,16 @@
   {
     "name": "01-overview",
     "darkFrac": 0,
-    "std": 40.613,
-    "colors": 232,
-    "mean": 182.739,
+    "std": 40.611,
+    "colors": 228,
+    "mean": 182.734,
     "ok": true
   },
   {
     "name": "02-front",
     "darkFrac": 0,
     "std": 40.259,
-    "colors": 227,
+    "colors": 226,
     "mean": 183.906,
     "ok": true
   },
@@ -27,31 +27,31 @@
     "name": "04-nacelle-closeup",
     "darkFrac": 0,
     "std": 41.138,
-    "colors": 223,
-    "mean": 176.759,
+    "colors": 222,
+    "mean": 176.758,
     "ok": true
   },
   {
     "name": "05-select-hub",
     "darkFrac": 0,
     "std": 41.757,
-    "colors": 264,
-    "mean": 181.967,
+    "colors": 266,
+    "mean": 181.966,
     "ok": true
   },
   {
     "name": "06-info-expanded",
     "darkFrac": 0,
-    "std": 43.34,
-    "colors": 266,
-    "mean": 185.912,
+    "std": 43.341,
+    "colors": 268,
+    "mean": 185.911,
     "ok": true
   },
   {
     "name": "10-cutaway-transparent",
     "darkFrac": 0,
-    "std": 38.132,
-    "colors": 500,
+    "std": 38.133,
+    "colors": 498,
     "mean": 151.896,
     "ok": true
   },
@@ -70,9 +70,9 @@
   {
     "name": "11-cutaway-shell-removed",
     "darkFrac": 0,
-    "std": 40.742,
-    "colors": 591,
-    "mean": 149.316,
+    "std": 40.744,
+    "colors": 590,
+    "mean": 149.315,
     "ok": true
   },
   {
@@ -84,33 +84,33 @@
   {
     "name": "12-focus-gearbox",
     "darkFrac": 0,
-    "std": 52.138,
-    "colors": 632,
-    "mean": 154.32,
+    "std": 52.142,
+    "colors": 633,
+    "mean": 154.317,
     "ok": true
   },
   {
     "name": "13-focus-generator",
     "darkFrac": 0,
-    "std": 54.56,
-    "colors": 619,
-    "mean": 156.692,
+    "std": 54.563,
+    "colors": 618,
+    "mean": 156.69,
     "ok": true
   },
   {
     "name": "14-hub-pitch-system",
     "darkFrac": 0,
-    "std": 46.876,
-    "colors": 460,
-    "mean": 174.455,
+    "std": 46.877,
+    "colors": 459,
+    "mean": 174.454,
     "ok": true
   },
   {
     "name": "15-yaw-system",
     "darkFrac": 0,
     "std": 54.968,
-    "colors": 529,
-    "mean": 143.836,
+    "colors": 526,
+    "mean": 143.835,
     "ok": true
   },
   {
@@ -157,7 +157,7 @@
     "name": "16c-focus-nacelle",
     "darkFrac": 0,
     "std": 44.891,
-    "colors": 282,
+    "colors": 284,
     "mean": 171.793,
     "ok": true
   },
@@ -165,8 +165,8 @@
     "name": "16c-focus-hub",
     "darkFrac": 0,
     "std": 41.757,
-    "colors": 264,
-    "mean": 181.967,
+    "colors": 266,
+    "mean": 181.966,
     "ok": true
   },
   {
@@ -177,9 +177,9 @@
   {
     "name": "50-world-desktop-taiwan",
     "darkFrac": 0,
-    "std": 42.646,
-    "colors": 339,
-    "mean": 196.774,
+    "std": 42.502,
+    "colors": 421,
+    "mean": 190.781,
     "ok": true
   },
   {
@@ -414,9 +414,9 @@
   {
     "name": "16b-peek-generator-no-shell",
     "darkFrac": 0,
-    "std": 53.812,
-    "colors": 622,
-    "mean": 158.165,
+    "std": 54.565,
+    "colors": 613,
+    "mean": 156.588,
     "ok": true
   },
   {
@@ -482,9 +482,9 @@
   {
     "name": "18-explode",
     "darkFrac": 0,
-    "std": 39.903,
-    "colors": 600,
-    "mean": 152.383,
+    "std": 39.894,
+    "colors": 602,
+    "mean": 152.384,
     "ok": true
   },
   {
@@ -502,9 +502,9 @@
   {
     "name": "19-gear-train-side",
     "darkFrac": 0,
-    "std": 37.387,
+    "std": 37.385,
     "colors": 477,
-    "mean": 155.78,
+    "mean": 155.781,
     "ok": true
   },
   {
@@ -538,9 +538,9 @@
   {
     "name": "20c-explode-notes-open",
     "darkFrac": 0,
-    "std": 43.272,
-    "colors": 406,
-    "mean": 152.878,
+    "std": 43.265,
+    "colors": 403,
+    "mean": 152.871,
     "ok": true
   },
   {
@@ -572,17 +572,17 @@
   {
     "name": "21-solo-generator",
     "darkFrac": 0,
-    "std": 40.865,
-    "colors": 204,
-    "mean": 171.445,
+    "std": 40.855,
+    "colors": 206,
+    "mean": 171.458,
     "ok": true
   },
   {
     "name": "22-explode-closed",
     "darkFrac": 0,
-    "std": 37.958,
+    "std": 37.956,
     "colors": 562,
-    "mean": 153.529,
+    "mean": 153.53,
     "ok": true
   },
   {
@@ -603,9 +603,9 @@
   {
     "name": "24a-experiment-inside",
     "darkFrac": 0,
-    "std": 52.328,
-    "colors": 527,
-    "mean": 176.489,
+    "std": 52.318,
+    "colors": 534,
+    "mean": 176.513,
     "ok": true
   },
   {
@@ -623,49 +623,49 @@
   {
     "name": "24-experiment-8ms",
     "darkFrac": 0,
-    "std": 43.576,
-    "colors": 272,
-    "mean": 197.041,
+    "std": 43.578,
+    "colors": 265,
+    "mean": 197.04,
     "ok": true
   },
   {
     "name": "25-experiment-15ms-rated",
     "darkFrac": 0,
-    "std": 44.438,
-    "colors": 300,
-    "mean": 196.572,
+    "std": 44.44,
+    "colors": 299,
+    "mean": 196.569,
     "ok": true
   },
   {
     "name": "26-experiment-27ms-shutdown",
     "darkFrac": 0,
-    "std": 44.49,
-    "colors": 289,
-    "mean": 196.542,
+    "std": 44.489,
+    "colors": 288,
+    "mean": 196.54,
     "ok": true
   },
   {
     "name": "27-experiment-yawing-east-wind",
     "darkFrac": 0,
-    "std": 44.612,
-    "colors": 303,
-    "mean": 196.405,
+    "std": 44.608,
+    "colors": 305,
+    "mean": 196.408,
     "ok": true
   },
   {
     "name": "28-experiment-manual-overspeed",
     "darkFrac": 0,
-    "std": 43.528,
-    "colors": 269,
-    "mean": 196.997,
+    "std": 44.399,
+    "colors": 301,
+    "mean": 196.524,
     "ok": true
   },
   {
     "name": "29-experiment-inside",
     "darkFrac": 0,
-    "std": 52.365,
-    "colors": 532,
-    "mean": 176.457,
+    "std": 52.339,
+    "colors": 534,
+    "mean": 176.563,
     "ok": true
   },
   {
@@ -677,9 +677,9 @@
   {
     "name": "30-experiment-power-to-grid",
     "darkFrac": 0,
-    "std": 47.981,
-    "colors": 245,
-    "mean": 184.201,
+    "std": 47.996,
+    "colors": 238,
+    "mean": 184.195,
     "ok": true
   },
   {
@@ -752,7 +752,7 @@
   },
   {
     "name": "渲染統計（桌面）",
-    "fps": 10.442377064743663,
+    "fps": 19.190174630589997,
     "drawCalls": 27,
     "triangles": 18604,
     "pixelRatio": 1
@@ -760,9 +760,9 @@
   {
     "name": "32-first-tour",
     "darkFrac": 0,
-    "std": 41.208,
-    "colors": 154,
-    "mean": 142.182,
+    "std": 41.209,
+    "colors": 155,
+    "mean": 142.175,
     "ok": true
   },
   {
@@ -780,9 +780,9 @@
   {
     "name": "33-missions-toast",
     "darkFrac": 0,
-    "std": 55.282,
-    "colors": 473,
-    "mean": 187.169,
+    "std": 54.499,
+    "colors": 479,
+    "mean": 186.425,
     "ok": true
   },
   {
@@ -815,9 +815,9 @@
   {
     "name": "34-quiz-feedback",
     "darkFrac": 0,
-    "std": 51.915,
-    "colors": 204,
-    "mean": 155.746,
+    "std": 51.844,
+    "colors": 205,
+    "mean": 155.818,
     "ok": true
   },
   {
@@ -845,9 +845,9 @@
   {
     "name": "07b-mobile-390-focus-nacelle",
     "darkFrac": 0,
-    "std": 53.236,
-    "colors": 308,
-    "mean": 186.272,
+    "std": 53.235,
+    "colors": 310,
+    "mean": 186.273,
     "ok": true
   },
   {
@@ -866,9 +866,9 @@
   {
     "name": "51-world-mobile-taiwan",
     "darkFrac": 0,
-    "std": 51.19,
-    "colors": 394,
-    "mean": 206.338,
+    "std": 49.652,
+    "colors": 396,
+    "mean": 199.223,
     "ok": true
   },
   {
@@ -1104,7 +1104,7 @@
     "name": "08-mobile-390-select-blade",
     "darkFrac": 0,
     "std": 40.055,
-    "colors": 255,
+    "colors": 256,
     "mean": 211.28,
     "ok": true
   },
@@ -1119,9 +1119,9 @@
   {
     "name": "17-mobile-390-cutaway",
     "darkFrac": 0,
-    "std": 42.77,
-    "colors": 505,
-    "mean": 159.75,
+    "std": 42.771,
+    "colors": 502,
+    "mean": 159.747,
     "ok": true
   },
   {
@@ -1142,15 +1142,15 @@
     "name": "23-mobile-390-explode-gears",
     "darkFrac": 0,
     "std": 44.673,
-    "colors": 433,
+    "colors": 434,
     "mean": 153.015,
     "ok": true
   },
   {
     "name": "23b-mobile-390-explode-notes-open",
     "darkFrac": 0,
-    "std": 50.026,
-    "colors": 470,
+    "std": 50.025,
+    "colors": 471,
     "mean": 162.811,
     "ok": true
   },
@@ -1171,9 +1171,9 @@
   {
     "name": "35-mobile-390-learn",
     "darkFrac": 0,
-    "std": 42.68,
-    "colors": 189,
-    "mean": 223.124,
+    "std": 42.778,
+    "colors": 190,
+    "mean": 223.097,
     "ok": true
   },
   {
@@ -1197,9 +1197,9 @@
   {
     "name": "31-mobile-390-experiment",
     "darkFrac": 0,
-    "std": 52.26,
-    "colors": 281,
-    "mean": 202.284,
+    "std": 52.257,
+    "colors": 286,
+    "mean": 202.287,
     "ok": true
   },
   {
@@ -1215,17 +1215,17 @@
   {
     "name": "31b-mobile-390-experiment-folded",
     "darkFrac": 0,
-    "std": 43.759,
-    "colors": 256,
-    "mean": 193.917,
+    "std": 43.76,
+    "colors": 257,
+    "mean": 193.916,
     "ok": true
   },
   {
     "name": "31c-mobile-390-experiment-inside",
     "darkFrac": 0,
-    "std": 53.826,
-    "colors": 516,
-    "mean": 194.133,
+    "std": 53.821,
+    "colors": 521,
+    "mean": 194.137,
     "ok": true
   },
   {
@@ -1254,7 +1254,7 @@
   },
   {
     "name": "渲染統計（手機）",
-    "fps": 11.875309252845126,
+    "fps": 15.896671634380228,
     "drawCalls": 100,
     "triangles": 45024,
     "pixelRatio": 2
@@ -1285,9 +1285,9 @@
   {
     "name": "40-guide-desktop-01-start",
     "darkFrac": 0,
-    "std": 46.326,
+    "std": 46.319,
     "colors": 267,
-    "mean": 190.402,
+    "mean": 190.412,
     "ok": true
   },
   {
@@ -1313,9 +1313,9 @@
   {
     "name": "40-guide-desktop-03-blade",
     "darkFrac": 0,
-    "std": 47.969,
-    "colors": 338,
-    "mean": 194.874,
+    "std": 47.988,
+    "colors": 335,
+    "mean": 194.851,
     "ok": true
   },
   {
@@ -1331,7 +1331,7 @@
   {
     "name": "桌面導覽 5「打開機艙看一看」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": null,
+    "picked": "blade",
     "x": 913,
     "y": 232,
     "cardTop": 480,
@@ -1353,7 +1353,7 @@
     "focus": "sunGear",
     "picked": "planetGear",
     "x": 650,
-    "y": 282,
+    "y": 276,
     "cardTop": 450,
     "shell": "hidden",
     "ok": true
@@ -1361,16 +1361,16 @@
   {
     "name": "40-guide-desktop-07-gears",
     "darkFrac": 0,
-    "std": 48.771,
-    "colors": 369,
-    "mean": 167.901,
+    "std": 48.743,
+    "colors": 372,
+    "mean": 167.936,
     "ok": true
   },
   {
     "name": "桌面導覽 8「發電機把轉動變成電」：焦點在字幕卡上方",
     "focus": "generator",
     "picked": "generator",
-    "x": 455,
+    "x": 456,
     "y": 310,
     "cardTop": 480,
     "shell": "transparent",
@@ -1379,15 +1379,15 @@
   {
     "name": "40-guide-desktop-08-generator",
     "darkFrac": 0,
-    "std": 48.339,
-    "colors": 546,
-    "mean": 170.412,
+    "std": 48.428,
+    "colors": 531,
+    "mean": 170.216,
     "ok": true
   },
   {
     "name": "桌面導覽 9「能量的接力」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": "pitchSystem",
+    "picked": null,
     "x": 913,
     "y": 232,
     "cardTop": 480,
@@ -1398,8 +1398,8 @@
     "name": "桌面導覽 10「電纜往下走」：焦點在字幕卡上方",
     "focus": "powerCable",
     "picked": "powerCable",
-    "x": 623,
-    "y": 1158,
+    "x": 632,
+    "y": 1185,
     "cardTop": 480,
     "shell": "transparent",
     "ok": true
@@ -1417,9 +1417,9 @@
   {
     "name": "40-guide-desktop-11-transformer",
     "darkFrac": 0,
-    "std": 44.393,
-    "colors": 261,
-    "mean": 169.746,
+    "std": 44.484,
+    "colors": 259,
+    "mean": 169.58,
     "ok": true
   },
   {
@@ -1435,9 +1435,9 @@
   {
     "name": "40-guide-desktop-12-grid",
     "darkFrac": 0,
-    "std": 47.241,
-    "colors": 250,
-    "mean": 177.232,
+    "std": 47.243,
+    "colors": 256,
+    "mean": 177.23,
     "ok": true
   },
   {
@@ -1453,9 +1453,9 @@
   {
     "name": "40-guide-desktop-13-calm",
     "darkFrac": 0,
-    "std": 51.558,
-    "colors": 501,
-    "mean": 176.678,
+    "std": 51.543,
+    "colors": 505,
+    "mean": 176.755,
     "ok": true
   },
   {
@@ -1471,9 +1471,9 @@
   {
     "name": "40-guide-desktop-14-strong",
     "darkFrac": 0,
-    "std": 50.559,
-    "colors": 519,
-    "mean": 175.844,
+    "std": 50.981,
+    "colors": 520,
+    "mean": 176.305,
     "ok": true
   },
   {
@@ -1489,16 +1489,16 @@
   {
     "name": "40-guide-desktop-15-storm",
     "darkFrac": 0,
-    "std": 46.736,
-    "colors": 267,
-    "mean": 191.154,
+    "std": 46.746,
+    "colors": 259,
+    "mean": 191.121,
     "ok": true
   },
   {
     "name": "桌面導覽 16「風向變了，跟著轉」：焦點在字幕卡上方",
     "focus": "hub",
     "picked": "hub",
-    "x": 674,
+    "x": 673,
     "y": 155,
     "cardTop": 414,
     "shell": "solid",
@@ -1508,7 +1508,7 @@
     "name": "桌面導覽 17「換你試試看」：焦點在字幕卡上方",
     "focus": "hub",
     "picked": "hub",
-    "x": 685,
+    "x": 686,
     "y": 172,
     "cardTop": 480,
     "shell": "solid",
@@ -1528,15 +1528,15 @@
   {
     "name": "40-guide-desktop-10-cable-end",
     "darkFrac": 0,
-    "std": 45.584,
-    "colors": 264,
-    "mean": 168.295,
+    "std": 45.434,
+    "colors": 254,
+    "mean": 168.458,
     "ok": true
   },
   {
     "name": "桌面導覽：跟著電走到變壓器",
     "mid": {
-      "y": 74,
+      "y": 73,
       "picked": "transformer",
       "towerOpacity": 0.25
     },
@@ -1553,13 +1553,13 @@
     "calm": {
       "meter": true,
       "power": "沒有發電",
-      "hs": 0.42209023489671665,
+      "hs": 0.42188829086123797,
       "kw": 0
     },
     "strong": {
       "meter": true,
       "power": "2,000 kW",
-      "hs": 1.199510362701536,
+      "hs": 1.199538965939621,
       "kw": 1999.9999999999998
     },
     "ok": true
@@ -1585,9 +1585,9 @@
   {
     "name": "40-guide-desktop-ask-stop",
     "darkFrac": 0,
-    "std": 41.84,
-    "colors": 212,
-    "mean": 135.983,
+    "std": 42.108,
+    "colors": 208,
+    "mean": 135.775,
     "ok": true
   },
   {
@@ -1665,15 +1665,15 @@
   {
     "name": "41-guide-mobile-01-start",
     "darkFrac": 0,
-    "std": 50.963,
-    "colors": 272,
-    "mean": 205.428,
+    "std": 50.954,
+    "colors": 274,
+    "mean": 205.448,
     "ok": true
   },
   {
     "name": "手機導覽 2「風有能量」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": "hub",
+    "picked": "blade",
     "x": 184,
     "y": 257,
     "cardTop": 463,
@@ -1693,9 +1693,9 @@
   {
     "name": "41-guide-mobile-03-blade",
     "darkFrac": 0,
-    "std": 51.339,
-    "colors": 364,
-    "mean": 217.118,
+    "std": 51.407,
+    "colors": 356,
+    "mean": 217.064,
     "ok": true
   },
   {
@@ -1711,7 +1711,7 @@
   {
     "name": "手機導覽 5「打開機艙看一看」：焦點在字幕卡上方",
     "focus": "hub",
-    "picked": null,
+    "picked": "blade",
     "x": 288,
     "y": 291,
     "cardTop": 487,
@@ -1732,8 +1732,8 @@
     "name": "手機導覽 7「齒輪箱讓它變快」：焦點在字幕卡上方",
     "focus": "sunGear",
     "picked": "planetGear",
-    "x": 199,
-    "y": 277,
+    "x": 198,
+    "y": 274,
     "cardTop": 413,
     "shell": "hidden",
     "ok": true
@@ -1741,9 +1741,9 @@
   {
     "name": "41-guide-mobile-07-gears",
     "darkFrac": 0,
-    "std": 58.995,
-    "colors": 415,
-    "mean": 191.213,
+    "std": 59.121,
+    "colors": 409,
+    "mean": 191.128,
     "ok": true
   },
   {
@@ -1759,9 +1759,9 @@
   {
     "name": "41-guide-mobile-08-generator",
     "darkFrac": 0,
-    "std": 56.744,
-    "colors": 521,
-    "mean": 189.172,
+    "std": 56.38,
+    "colors": 540,
+    "mean": 190.23,
     "ok": true
   },
   {
@@ -1778,8 +1778,8 @@
     "name": "手機導覽 10「電纜往下走」：焦點在字幕卡上方",
     "focus": "powerCable",
     "picked": "powerCable",
-    "x": 180,
-    "y": 994,
+    "x": 179,
+    "y": 989,
     "cardTop": 438,
     "shell": "transparent",
     "ok": true
@@ -1797,9 +1797,9 @@
   {
     "name": "41-guide-mobile-11-transformer",
     "darkFrac": 0,
-    "std": 60.51,
-    "colors": 357,
-    "mean": 182.597,
+    "std": 60.491,
+    "colors": 354,
+    "mean": 182.742,
     "ok": true
   },
   {
@@ -1815,9 +1815,9 @@
   {
     "name": "41-guide-mobile-12-grid",
     "darkFrac": 0,
-    "std": 55.101,
-    "colors": 254,
-    "mean": 195.9,
+    "std": 55.099,
+    "colors": 246,
+    "mean": 195.899,
     "ok": true
   },
   {
@@ -1833,9 +1833,9 @@
   {
     "name": "41-guide-mobile-13-calm",
     "darkFrac": 0,
-    "std": 57.356,
-    "colors": 509,
-    "mean": 198.908,
+    "std": 57.548,
+    "colors": 497,
+    "mean": 198.606,
     "ok": true
   },
   {
@@ -1851,9 +1851,9 @@
   {
     "name": "41-guide-mobile-14-strong",
     "darkFrac": 0,
-    "std": 58.159,
-    "colors": 516,
-    "mean": 196.57,
+    "std": 57.664,
+    "colors": 535,
+    "mean": 197.525,
     "ok": true
   },
   {
@@ -1869,16 +1869,16 @@
   {
     "name": "41-guide-mobile-15-storm",
     "darkFrac": 0,
-    "std": 51.743,
-    "colors": 293,
-    "mean": 205.514,
+    "std": 51.749,
+    "colors": 291,
+    "mean": 205.509,
     "ok": true
   },
   {
     "name": "手機導覽 16「風向變了，跟著轉」：焦點在字幕卡上方",
     "focus": "hub",
     "picked": "hub",
-    "x": 213,
+    "x": 212,
     "y": 216,
     "cardTop": 396,
     "shell": "solid",
@@ -1908,15 +1908,15 @@
   {
     "name": "41-guide-mobile-10-cable-end",
     "darkFrac": 0,
-    "std": 57.542,
-    "colors": 245,
-    "mean": 188.316,
+    "std": 57.721,
+    "colors": 250,
+    "mean": 188.022,
     "ok": true
   },
   {
     "name": "手機導覽：跟著電走到變壓器",
     "mid": {
-      "y": 77,
+      "y": 74,
       "picked": "transformer",
       "towerOpacity": 0.25
     },
@@ -1933,13 +1933,13 @@
     "calm": {
       "meter": true,
       "power": "沒有發電",
-      "hs": 0.4222607483575535,
+      "hs": 0.4219770952732187,
       "kw": 0
     },
     "strong": {
       "meter": true,
       "power": "2,000 kW",
-      "hs": 1.1995106610371442,
+      "hs": 1.1995744805309567,
       "kw": 1999.9999999999998
     },
     "ok": true
@@ -1965,9 +1965,9 @@
   {
     "name": "41-guide-mobile-ask-stop",
     "darkFrac": 0,
-    "std": 54.409,
-    "colors": 228,
-    "mean": 159.046,
+    "std": 54.561,
+    "colors": 226,
+    "mean": 158.882,
     "ok": true
   },
   {
