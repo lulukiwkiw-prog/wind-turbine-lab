@@ -283,6 +283,15 @@ body { font-family: var(--font); color: var(--ink); -webkit-tap-highlight-color:
 .world-headline { margin: 0; font-size: 18px; font-weight: 700; color: var(--cat, var(--accent)); }
 .world-text { margin: 0; font-size: 17px; line-height: 1.6; }
 .world-compare { margin: 0; font-size: 16px; line-height: 1.5; background: #fff4d6; border-radius: 10px; padding: 6px 10px; font-weight: 600; }
+.world-photo { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.world-photo-btn { border: 0; padding: 0; background: none; cursor: zoom-in; border-radius: 10px; overflow: hidden; display: block; }
+.world-photo-btn img { display: block; width: 100%; height: 180px; object-fit: cover; }
+.world-photo.zoomed .world-photo-btn { cursor: zoom-out; }
+.world-photo.zoomed .world-photo-btn img { height: auto; max-height: 60vh; object-fit: contain; background: #0d2740; }
+.world-photo-credit { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
+.world-photo-credit a { color: var(--accent); }
+.btn.world-maplink { align-self: flex-start; text-decoration: none; font-size: 16px; background: var(--accent-soft); box-shadow: none; }
+.world-mapnote { margin: -2px 0 0; font-size: 12px; color: var(--ink-soft); }
 .world-note { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 .world-src { font-size: 13px; color: var(--ink-soft); }
 .world-src summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }
